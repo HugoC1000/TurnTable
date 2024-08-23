@@ -2,6 +2,18 @@ import discord
 import os # default module
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import json
+
+if os.path.exists('schedule.json'):
+    with open('schedule.json', 'r') as f:
+        schedule_data = json.load(f)
+else:
+    schedule_data = {"users": {}}
+
+# Save the JSON file
+def save_schedule_data():
+    with open('schedule.json', 'w') as f:
+        json.dump(schedule_data, f, indent=4)
 
 schedule_pattern = [
     ["1A","1B","1C(P)","1D","1E"],
@@ -33,7 +45,7 @@ custom_block_orders = {
 
 
 # Dictionary to store multiple users' schedules
-user_schedules = {}
+#user_schedules = {}
 
 # Helper function to determine if a day is a day off
 def is_day_off(date):
@@ -63,15 +75,15 @@ def get_today_schedule(today):
 intents=discord.Intents.all()
 client=discord.Bot(intents=intents)
 
-async def get_animal_types(ctx: discord.AutocompleteContext):
-  """
-  Here we will check if 'ctx.options['animal_type']' is a marine or land animal and return respective option choices
-  """
-  animal_type = ctx.options['animal_type']
-  if animal_type == 'Marine':
-    return ['Whale', 'Shark', 'Fish', 'Octopus', 'Turtle']
-  else: # is land animal
-    return ['Snake', 'Wolf', 'Lizard', 'Lion', 'Bird']
+# async def get_animal_types(ctx: discord.AutocompleteContext):
+#   """
+#   Here we will check if 'ctx.options['animal_type']' is a marine or land animal and return respective option choices
+#   """
+#   animal_type = ctx.options['animal_type']
+#   if animal_type == 'Marine':
+#     return ['Whale', 'Shark', 'Fish', 'Octopus', 'Turtle']
+#   else: # is land animal
+#     return ['Snake', 'Wolf', 'Lizard', 'Lion', 'Bird']
   
 
 load_dotenv() # load all the variables from the env file
@@ -100,39 +112,40 @@ async def another_test(ctx: discord.ApplicationContext, course_name : str):
 async def another_test(ctx: discord.ApplicationContext, block1a : str, block1b : str, block1c : str, block1d : str, block1e : str, block2a : str, block2b : str, block2c : str, block2d : str, block2e : str):
    
     user_id = str(ctx.author.id)
-    if user_id not in user_schedules:
-        user_schedules[user_id] = {}
+
+    if user_id not in schedule_data["users"]:
+        schedule_data["users"][user_id] = {}
     
-    user_schedules[user_id]["1A"] = block1a
-    user_schedules[user_id]["1B"] = block1b
-    user_schedules[user_id]["1C"] = block1c
-    user_schedules[user_id]["1D"] = block1d
-    user_schedules[user_id]["1E"] = block1e
-    user_schedules[user_id]["2A"] = block2a
-    user_schedules[user_id]["2B"] = block2b
-    user_schedules[user_id]["2C"] = block2c
-    user_schedules[user_id]["2D"] = block2d
-    user_schedules[user_id]["2E"] = block2e
+    schedule_data["users"][user_id]["1A"] = block1a
+    schedule_data["users"][user_id]["1B"] = block1b
+    schedule_data["users"][user_id]["1C"] = block1c
+    schedule_data["users"][user_id]["1D"] = block1d
+    schedule_data["users"][user_id]["1E"] = block1e
+    schedule_data["users"][user_id]["2A"] = block2a
+    schedule_data["users"][user_id]["2B"] = block2b
+    schedule_data["users"][user_id]["2C"] = block2c
+    schedule_data["users"][user_id]["2D"] = block2d
+    schedule_data["users"][user_id]["2E"] = block2e
     
     
-    print(user_schedules[user_id])
+    print(schedule_data["users"][user_id])
     await ctx.respond(f"Saved")
 
 
 # Function to print today's schedule with course names for a specific user
-def print_today_schedule(username, today):
-    if username not in user_schedules:
-        print(f"No schedule found for {username}.")
-        return
+# def print_today_schedule(username, today):
+#     if username not in schedule_data["users"]:
+#         print(f"No schedule found for {username}.")
+#         return
     
-    if is_day_off(today):
-        print(f"{today.strftime('%Y-%m-%d')}: No school today for {username}.")
-    else:
-        schedule = get_today_schedule(today)
-        print(f"{today.strftime('%Y-%m-%d')}: {username}'s schedule is:")
-        for block in schedule:
-            course = user_schedules[username].get(block, "Free period")
-            print(f"{block}: {course}")
+#     if is_day_off(today):
+#         print(f"{today.strftime('%Y-%m-%d')}: No school today for {username}.")
+#     else:
+#         schedule = get_today_schedule(today)
+#         print(f"{today.strftime('%Y-%m-%d')}: {username}'s schedule is:")
+#         for block in schedule:
+#             course = user_schedules[username].get(block, "Free period")
+#             print(f"{block}: {course}")
 
 
 
@@ -141,7 +154,7 @@ async def get_schedule(ctx):
     user_id = str(ctx.author.id) 
     today_schedule = get_today_schedule(today = datetime.now()) #datetime(2024,9,4)
     
-    if user_id not in user_schedules:
+    if user_id not in schedule_data["users"]:
         await ctx.respond("You haven't set any courses yet.")
         return
     
@@ -154,7 +167,7 @@ async def get_schedule(ctx):
         elif slot == '1C(A)':
             courses.append(f"{slot}: Advisory: Academics")
         else:
-            courses.append(f"{slot}: {user_schedules[user_id].get(slot,'Free period')}")
+            courses.append(f"{slot}: {schedule_data['users'][user_id].get(slot,'Free period')}")
     await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
 
 
