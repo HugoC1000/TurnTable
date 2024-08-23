@@ -96,11 +96,14 @@ schedule_input_cmds = bot.create_group("input", "input the courses you have for 
 
 @schedule_input_cmds.command(name = "1a", description = "Change your 1c block")
 async def test_text(ctx: discord.ApplicationContext, course_name : str):
-   
+   user_id = str(ctx.author.id)
+   schedule_data["users"][user_id]["1A"] = course_name
+   save_schedule_data()
    await ctx.respond(f"{course_name} saved to 1a")
 
 @schedule_input_cmds.command(name = "1b", description = "Change your 1c block")
 async def another_test(ctx: discord.ApplicationContext, course_name : str):
+   
    await ctx.respond(f"{course_name} saved to 1b")
 
 @schedule_input_cmds.command(name = "1c", description = "Change your 1c block")
@@ -129,6 +132,7 @@ async def another_test(ctx: discord.ApplicationContext, block1a : str, block1b :
     
     
     print(schedule_data["users"][user_id])
+    save_schedule_data()
     await ctx.respond(f"Saved")
 
 
