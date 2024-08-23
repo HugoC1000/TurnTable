@@ -168,6 +168,7 @@ async def get_schedule(ctx):
             courses.append(f"{slot}: Advisory: Academics")
         else:
             courses.append(f"{slot}: {schedule_data['users'][user_id].get(slot,'Free period')}")
+    print(f"Today's schedule:\n" + "\n".join(courses))
     await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
 
 
