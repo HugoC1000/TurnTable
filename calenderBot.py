@@ -323,9 +323,12 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
 
     await ctx.send(f"```\n{output}\n```")
 
+print("runs?")
 
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
 
 bot.run(os.getenv('TOKEN')) # run the bot with the token
+
+print("should connect")
