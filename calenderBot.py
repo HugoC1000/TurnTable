@@ -322,7 +322,7 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
         ],
         style=PresetStyle.thin_compact
     )
-    await ctx.send(f"```\n{output}\n```")
+    await ctx.respond(f"```\n{output}\n```")
 
 print("runs?")
 
