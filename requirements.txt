@@ -13,7 +13,7 @@ idna==3.4
 numpy==1.26.4
 psycopg2-binary==2.9.9
 py-cord==2.0.0b1
-pygame==2.0.1
+#pygame==2.0.1
 python-dotenv==1.0.1
 requests==2.31.0
 scipy==1.13.1
