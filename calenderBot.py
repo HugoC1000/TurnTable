@@ -18,7 +18,6 @@ session = Session()
 Base.metadata.create_all(engine)
 
 intents=discord.Intents.all()
-intents.members = True
 client=discord.Bot(intents=intents)
 
 schedule_pattern = [
