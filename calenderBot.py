@@ -2,7 +2,6 @@ import discord
 import os # default module
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from discord import Option
 from discord.ext import commands
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -308,7 +307,7 @@ async def display_schedule(ctx):
     await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
 
 @bot.slash_command(name = "compare_schedules", description = "Compare schedules for two people")
-async def compare_schedules(ctx, person1: Option(discord.Member,description = "Person 1"), person2: Option(discord.Member,description = "Person 2")):
+async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: Option(discord.Member,description = "Person 2")):
     schedule1, schedule2 = compare_schedule(person1.id, person2.id)
     # await ctx.send(f"User 1 Schedule: {schedule1}")
     # await ctx.send(f"User 2 Schedule: {schedule2}")
