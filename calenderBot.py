@@ -1,6 +1,7 @@
 import discord
 import os # default module
 from dotenv import load_dotenv
+from discord import Option
 from datetime import datetime, timedelta
 from discord.ext import commands
 from sqlalchemy.orm import sessionmaker
@@ -320,7 +321,6 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
         ],
         style=PresetStyle.thin_compact
     )
-
     await ctx.send(f"```\n{output}\n```")
 
 print("runs?")
