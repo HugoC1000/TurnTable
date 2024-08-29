@@ -264,7 +264,8 @@ async def change1c(ctx: discord.ApplicationContext, course_name : str):
 async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b : str, block1c : str, block1d : str, block1e : str, block2a : str, block2b : str, block2c : str, block2d : str, block2e : str):
    
     user_id = str(ctx.author.id)
-    username = ctx.message.author.name
+    username = ctx.author.name
+
     schedule_data = {
         'Username' : username,
         'A1': block1a,
