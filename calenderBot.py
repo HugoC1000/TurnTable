@@ -329,6 +329,6 @@ print("runs?")
 async def on_ready():
     print(f"{bot.user} is ready and online!")
 
-bot.run(os.getenv('MTI3NjAxNDYwNzAyNjIyNTE4Mw.GlNuGp.Z1I4EHYaD3K8D9sJ3qratBCbs3onkzrAQuRPFY')) # run the bot with the token
+bot.run('MTI3NjAxNDYwNzAyNjIyNTE4Mw.GlNuGp.Z1I4EHYaD3K8D9sJ3qratBCbs3onkzrAQuRPFY') # run the bot with the token
 
 print("should connect")
