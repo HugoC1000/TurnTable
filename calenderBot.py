@@ -286,8 +286,8 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b
 
 
 
-@bot.slash_command(name="get_schedule", description="Get your schedule for today.")
-async def display_schedule(ctx):
+@bot.slash_command(name="get_today_schedule", description="Get your schedule for today.")
+async def get_today_schedule(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
     today_schedule = get_today_schedule(today=datetime.now())
@@ -306,6 +306,28 @@ async def display_schedule(ctx):
             courses.append(f"{slot}: {user_schedule.get(slot, 'Free period')}")
     
     await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
+
+@bot.slash_command(name="get_tomorrow_schedule", description="Get your schedule for tomorrow.")
+async def get_tomorrow_schedule(ctx):
+    user_id = str(ctx.author.id)
+    user_schedule = get_user_schedule(user_id)
+    tomrrow_schedule = get_tomorrow_schedule()
+    
+    if not user_schedule:
+        await ctx.respond("You haven't set any courses yet.")
+        return
+    
+    courses = []
+    for slot in tomrrow_schedule:
+        if slot == '1C(P)':
+            courses.append(f"{slot}: Advisory: PEAKS")
+        elif slot == '1C(A)':
+            courses.append(f"{slot}: Advisory: Academics")
+        else:
+            courses.append(f"{slot}: {user_schedule.get(slot, 'Free period')}")
+    
+    await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
+
 
 @bot.slash_command(name = "compare_schedules", description = "Compare schedules for two people")
 async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: Option(discord.Member,description = "Person 2")):
