@@ -1,0 +1,38 @@
+
+
+# @bot.slash_command(name="hello", description="Say hello to the bot")
+# async def hello(ctx: discord.ApplicationContext):
+#     await ctx.respond("Hey!")
+
+# @bot.slash_command(name="animal")
+# async def animal_command(ctx: discord.ApplicationContext, animal_type: discord.Option(str, choices=['Marine', 'Land']), animal: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_animal_types))
+# ):
+#   await ctx.respond(f'You picked an animal type of `{animal_type}` that led you to pick `{animal}`!')
+
+# @testGroup.command(name = "sayhi")
+# async def test_text(ctx: discord.ApplicationContext):
+#    await ctx.respond("hi")
+
+# @testGroup.command(name = "sayhello")
+# async def another_test(ctx: discord.ApplicationContext):
+#    await ctx.respond("hello")
+
+
+# async def get_animal_types(ctx: discord.AutocompleteContext):
+#   """
+#   Here we will check if 'ctx.options['animal_type']' is a marine or land animal and return respective option choices
+#   """
+#   animal_type = ctx.options['animal_type']
+#   if animal_type == 'Marine':
+#     return ['Whale', 'Shark', 'Fish', 'Octopus', 'Turtle']
+#   else: # is land animal
+#     return ['Snake', 'Wolf', 'Lizard', 'Lion', 'Bird']
+
+# In your command:
+output = t2a(
+    header=["Rank", "Team", "Kills", "Position Pts", "Total"],
+    body=[[1, 'Team A', 2, 4, 6], [2, 'Team B', 3, 3, 6], [3, 'Team C', 4, 2, 6]],
+    style=PresetStyle.thin_compact
+)
+
+await ctx.send(f"```\n{output}\n```")
