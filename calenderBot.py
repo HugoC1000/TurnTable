@@ -479,7 +479,7 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
             ["2A", schedule1.get('2A'), schedule2.get('2A')],["2B", schedule1.get('2B'), schedule2.get('2B')],["2C", schedule1.get('2C'), schedule2.get('2C')],
             ["2D", schedule1.get('2D'), schedule2.get('2D')],["2E", schedule1.get('2E'), schedule2.get('2E')]
         ],
-        style=PresetStyle.thin_compact
+        style=PresetStyle.thin
     )
     await ctx.respond(f"```\n{output}\n```")
 
