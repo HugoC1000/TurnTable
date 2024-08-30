@@ -58,7 +58,8 @@ def is_day_off(date):
     return date.weekday() in days_off or date in custom_days_off
 
 # Helper function to get today's schedule
-def get_today_schedule(today):
+def get_today_blocks():
+    today = datetime.now()
     # Check for custom block order
     if today in custom_block_orders:
         return custom_block_orders[today]
@@ -76,7 +77,7 @@ def get_today_schedule(today):
     
     return schedule_pattern[day_index]
 
-def get_tomorrow_schedule():
+def get_tomorrow_blocks():
     # Check for custom block order
     tomorrow = datetime.now() + timedelta(days=1)
     if tomorrow in custom_block_orders:
@@ -161,8 +162,6 @@ def compare_schedule(discord_id1, discord_id2):
 
     # Return the schedules in a tuple
     return schedule1, schedule2
-
-
 
 def get_user_schedule(discord_id):
     user = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
@@ -259,6 +258,141 @@ async def change1c(ctx: discord.ApplicationContext, course_name : str):
 
     await ctx.respond(f"{course_name} saved to 1C")
 
+@schedule_input_cmds.command(name = "1d", description = "Change your 1d block")
+async def change1d(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 1D block with the new course name
+    user_schedule.D1 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 1D")
+
+@schedule_input_cmds.command(name = "1e", description = "Change your 1e block")
+async def change1e(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 1E block with the new course name
+    user_schedule.E1 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 1E")
+
+@schedule_input_cmds.command(name = "2a", description = "Change your 2a block")
+async def change2a(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 2A block with the new course name
+    user_schedule.A2 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 2A")
+
+@schedule_input_cmds.command(name = "2b", description = "Change your 2b block")
+async def change2b(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 2B block with the new course name
+    user_schedule.B2 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 2B")
+
+@schedule_input_cmds.command(name = "2c", description = "Change your 2c block")
+async def change2c(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 2C block with the new course name
+    user_schedule.C2 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 2C")
+
+@schedule_input_cmds.command(name = "2d", description = "Change your 2d block")
+async def change2d(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 2D block with the new course name
+    user_schedule.D2 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 2D")
+
+@schedule_input_cmds.command(name = "2e", description = "Change your 2e block")
+async def change2e(ctx: discord.ApplicationContext, course_name : str):
+    user_id = str(ctx.author.id)
+
+    # Retrieve the user’s current schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+
+    # Check if the user exists in the database
+    if not user_schedule:
+        # If the user does not exist, create a new record
+        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
+        session.add(user_schedule)
+
+    # Update the 2E block with the new course name
+    user_schedule.E2 = course_name
+    session.commit()
+
+    await ctx.respond(f"{course_name} saved to 2E")
+
+
+
 
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
 async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b : str, block1c : str, block1d : str, block1e : str, block2a : str, block2b : str, block2c : str, block2d : str, block2e : str):
@@ -290,8 +424,11 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b
 async def get_today_schedule(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
-    today_schedule = get_today_schedule(today=datetime.now())
-    
+    print("User Schedule: " )
+    print(user_schedule)
+    today_schedule = get_today_blocks()
+    print("Today Schedule: ")
+    print(today_schedule)
     if not user_schedule:
         await ctx.respond("You haven't set any courses yet.")
         return
@@ -311,7 +448,7 @@ async def get_today_schedule(ctx):
 async def get_tomorrow_schedule(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
-    tomrrow_schedule = get_tomorrow_schedule()
+    tomrrow_schedule = get_tomorrow_blocks()
     
     if not user_schedule:
         await ctx.respond("You haven't set any courses yet.")
