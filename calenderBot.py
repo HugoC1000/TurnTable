@@ -19,7 +19,40 @@ session = Session()
 Base.metadata.create_all(engine)
 
 intents=discord.Intents.all()
-client=discord.Bot(intents=intents)
+
+load_dotenv() # load all the variables from the env file
+bot = discord.Bot(intents = intents)
+
+time_slots = [
+    "08:20 - 09:30",
+    "09:35 - 10:45",
+    "11:05 - 12:15",
+    "13:05 - 14:15",
+    "14:20 - 15:30"
+]
+
+custom_block_times = {
+    datetime(2024,8,30).date() : ["09:35 - 10:40", 
+                          "10:55 - 11:35", 
+                          "11:40 - 12:20",
+                        "13:20 - 14:00", 
+                          "14:05 - 14:45", 
+                          "14:50 - 15:30"],
+    datetime(2024,9,3).date() : ["09:35 - 10:40", 
+                          "10:55 - 11:35", 
+                          "11:40 - 12:20",
+                        "13:20 - 14:00", 
+                          "14:05 - 14:45", 
+                          "14:50 - 15:30"],
+    datetime(2024,9,5).date() : ["08:20 - 09:20", 
+                          "09:25 - 10:25", 
+                          "10:45 - 11:45",
+                        "13:05 - 14:00", 
+                          "13:25 - 14:25", 
+                          "14:30 - 15:30"],
+
+}
+
 
 schedule_pattern = [
     ["1A","1B","1C(P)","1D","1E"],
@@ -37,16 +70,20 @@ schedule_pattern = [
 ]
 
 
-schedule_start = datetime(2024, 9, 3)
+schedule_start = datetime(2024, 9, 3).date()
 
 
 # Days off (no school)
 days_off = {5, 6}  # Saturday and Sunday
-custom_days_off = [datetime(2024, 10, 14)]  # Example: Thanksgiving Day
+custom_days_off = [datetime(2024, 10, 14).date()]  # Example: Thanksgiving Day
 
 
 custom_block_orders = {
-    datetime(2024, 12, 20): ["2A", "1A", "2B", "1B", "2C", "1C(P)", "2D", "1D", "2E", "1E"]  # Example: Last day before winter break
+    datetime(2024,8,30).date(): ["2A","2B","2C","school_event", "2D","2E"],
+    datetime(2024,9,3).date(): ["1C(PA)","2A","2B","2C","2D","2E"],
+    datetime(2024,9,5).date():["2A","2B","2C","school_event", "2D","2E"],
+    datetime(2024, 12, 20).date(): ["2A", "1A", "2B", "1B", "2C", "1C(P)", "2D", "1D", "2E", "1E"],
+      # Example: Last day before winter break
 }
 
 
@@ -59,7 +96,8 @@ def is_day_off(date):
 
 # Helper function to get today's schedule
 def get_today_blocks():
-    today = datetime.now()
+    today = datetime.now().date()
+    print(today)
     # Check for custom block order
     if today in custom_block_orders:
         return custom_block_orders[today]
@@ -67,7 +105,6 @@ def get_today_blocks():
     # Calculate the index in the repeating schedule pattern
     delta_days = (today - schedule_start).days
     day_index = delta_days % len(schedule_pattern)
-    print("Day index: ", day_index)
 
     # Adjust index if today is a day off
     while is_day_off(today):
@@ -77,9 +114,20 @@ def get_today_blocks():
     
     return schedule_pattern[day_index]
 
+def get_today_block_times():
+    today = datetime.now().date()
+    # Check for custom block order
+    if today in custom_block_times:
+        print("entered")
+        return custom_block_times[today]
+    else:
+        return time_slots
+
+
 def get_tomorrow_blocks():
     # Check for custom block order
     tomorrow = datetime.now() + timedelta(days=1)
+    tomorrow = tomorrow.date()
     if tomorrow in custom_block_orders:
         return custom_block_orders[tomorrow]
     
@@ -98,9 +146,14 @@ def get_tomorrow_blocks():
     
     return schedule_pattern[day_index]
 
-
-
-
+def get_tomorrow_block_times():
+    tomorrow =  datetime.now() + timedelta(days=1)
+    tomorrow = tomorrow.date()
+    # Check for custom block order
+    if tomorrow in custom_block_times:
+        return custom_block_times[tomorrow]
+    else:
+        return time_slots
 
 def compare_schedule(discord_id1, discord_id2): 
     """
@@ -193,8 +246,7 @@ def save_user_schedule(discord_id, schedule_data):
 
   
 
-load_dotenv() # load all the variables from the env file
-bot = discord.Bot(intents = intents)
+
 
 
 testGroup = bot.create_group("testgroup", "math related commands")
@@ -391,9 +443,6 @@ async def change2e(ctx: discord.ApplicationContext, course_name : str):
 
     await ctx.respond(f"{course_name} saved to 2E")
 
-
-
-
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
 async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b : str, block1c : str, block1d : str, block1e : str, block2a : str, block2b : str, block2c : str, block2d : str, block2e : str):
    
@@ -429,41 +478,51 @@ async def get_today_schedule(ctx):
     today_schedule = get_today_blocks()
     print("Today Schedule: ")
     print(today_schedule)
+    today_block_times = get_today_block_times()
     if not user_schedule:
         await ctx.respond("You haven't set any courses yet.")
         return
     
     courses = []
+    i = 0
     for slot in today_schedule:
-        if slot == '1C(P)':
-            courses.append(f"{slot}: Advisory: PEAKS")
+        if slot == '1C(PA)':
+            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: School Event")
+        elif slot == '1C(P)':
+            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: PEAKS")
         elif slot == '1C(A)':
-            courses.append(f"{slot}: Advisory: Academics")
+            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: Academics")
+        elif slot == 'school_event':
+            courses.append(f"**{today_block_times[i]}**    School Event")
         else:
-            courses.append(f"{slot}: {user_schedule.get(slot, 'Free period')}")
+            print(today_block_times[i])
+            courses.append(f"**{today_block_times[i]}**    {slot}: {user_schedule.get(slot, 'Free period')}")
+        i+= 1
     
-    await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
+    await ctx.respond(f"**## Today's schedule:**\n" +  "\n".join(courses))
 
 @bot.slash_command(name="get_tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
-    tomrrow_schedule = get_tomorrow_blocks()
-    
+    tomorrow_schedule = get_tomorrow_blocks()
+    tomorrow_block_times = get_tomorrow_block_times()
     if not user_schedule:
         await ctx.respond("You haven't set any courses yet.")
         return
     
     courses = []
-    for slot in tomrrow_schedule:
+    i = 0
+    for slot in tomorrow_schedule:
         if slot == '1C(P)':
-            courses.append(f"{slot}: Advisory: PEAKS")
+            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: PEAKS")
         elif slot == '1C(A)':
-            courses.append(f"{slot}: Advisory: Academics")
+            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: Academics")
         else:
-            courses.append(f"{slot}: {user_schedule.get(slot, 'Free period')}")
+            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: {user_schedule.get(slot, 'Free period')}")
+        i+= 1
     
-    await ctx.respond(f"Today's schedule:\n" + "\n".join(courses))
+    await ctx.respond(f"**## Tomorrow's schedule:**\n" +  "\n".join(courses))
 
 
 @bot.slash_command(name = "compare_schedules", description = "Compare schedules for two people")
