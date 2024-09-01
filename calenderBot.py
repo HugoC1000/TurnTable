@@ -88,16 +88,16 @@ custom_block_orders = {
 }
 
 
-block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "Concert Band 10", "CLE", "Entrepreneurship 12", "AP-Prep English 11", "Social Studies 10", "Pre-Calculus 12", "Theatre Company 10", "Web Development 10"]
+block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "AP-Prep English 11",  "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
 block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
 block_1c_courses = ["Advisory"]
-block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Study Block", "Pre-AP English 11", "Literary Studies 11", "Pre-Calculus 11", "Spanish 10", "Study Block", "WP"]
-block_1e_courses = ["CLE", "CLE(WP)", "EFP 10", "Drafting 11", "French 11 Enriched", "Mandarin 10 Accel", "Media Design 10", "Pre-Calculus 12", "Study Block" ]
-block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "Study Block", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11", "Science 10", "Social Studies 10"]
-block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chemistry 12", "PE 10 Brenko", "PE 10 Kimura", "Pre-Calculus 11", "Science 10", "Life Sciences 11", "Study Block"]
-block_2c_courses = ["AP Statistics", "AP Human Geography", "Film /TV 11",  "French 10 Enriched", "French 11 Enriched", "French 12",  "Jazz Performence 11", "Math 10", "Mandarin 11 Accel", "Mandarin 10", "Science 10H", "Social Studies 10", "Study Block", "Physics 11", "Pre-AP English 10"]
-block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Pre-Calculus 12", "Study Block", "Pre-AP English 10", "Life Sciences 11", "Web Development 10"]
-block_2e_courses = ["20th Century World History", "BC First Peoples 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Pre-Calculus 11", "Woodwork 10", "Study Block"]
+block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Literary Studies 11", "Pre-AP English 11",  "Pre-Calculus 11", "Spanish 10", "Study Block", "WP"]
+block_1e_courses = ["CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enriched", "Mandarin 10 Accel", "Media Design 10", "PE 11", "Pre-Calculus 12", "Study Block" ]
+block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11",  "Science 10", "Social Studies 10", "Study Block"]
+block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chemistry 12", "Life Sciences 11", "PE 10 Brenko", "PE 10 Kimura", "Pre-Calculus 11", "Science 10", "Study Block"]
+block_2c_courses = ["AP Statistics", "AP Human Geography", "Film /TV 11",  "French 10 Enriched", "French 11 Enriched", "French 12",  "Jazz Performence 11", "Math 10",  "Mandarin 10", "Mandarin 11 Accel", "Physics 11", "Pre-AP English 10", "Science 10H", "Social Studies 10", "Study Block"]
+block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Life Sciences 11", "Pre-AP English 10", "Pre-Calculus 12", "Study Block", "Web Development 10"]
+block_2e_courses = ["20th Century World History", "BC First Peoples 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Physics 12", "Pre-Calculus 11", "Study Block", "Woodwork 10"]
 
 
 # Dictionary to store multiple users' schedules
