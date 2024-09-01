@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from user_schedule_model import UserSchedule, Base 
 from table2ascii import table2ascii as t2a, PresetStyle
+import psycopg2
 
 
 #DATABASE_URL = os.environ['postgresql+psycopg2://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt']
@@ -244,10 +245,54 @@ def save_user_schedule(discord_id, schedule_data):
     
     session.commit()
 
-  
+def get_same_class(block, course_name):
+
+    block = '"' + block[1] + block[0] + '"'
+    print("Reversed block" + block)
+
+    conn = psycopg2.connect(
+        dbname='d66o2tq3s18vlt',
+        user='u5hsl3t8vpl42s',
+        password='pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295',
+        host='cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
+        port='5432'
+    )
+
+    # Create a cursor object
+    cursor = conn.cursor()
+
+    # Define the course name and query
+
+    query = f"SELECT discord_id FROM user_schedules WHERE {block} = %s;"   
+
+
+    # Execute the query
+    cursor.execute(query, (course_name,))
+
+    # Fetch the results
+    results = cursor.fetchall()
+
+    # Close the connection
+    cursor.close()
+    conn.close()
 
 
 
+    for row in results:
+        print(row[0])
+
+    return results
+
+def getUserById(user_id):
+    try:
+        # Fetch the user by their ID
+        user = bot.fetch_user(user_id)    
+        return user
+    except discord.NotFound:
+        return "User Not Found"
+    except discord.HTTPException as e:
+        print(f'Failed to fetch user. Error: {str(e)}')
+        return "Error"
 
 testGroup = bot.create_group("testgroup", "math related commands")
 
@@ -443,8 +488,20 @@ async def change2e(ctx: discord.ApplicationContext, course_name : str):
 
     await ctx.respond(f"{course_name} saved to 2E")
 
+block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "Concert Band 10", "CLE", "Entrepreneurship 12", "AP-Prep English 11", "Social Studies 10", "Pre-Calculus 12", "Theatre Company 10", "Web Development 10"]
+block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
+block_1c_courses = ["Advisory"]
+block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Study Block", "Pre-AP English 11", "Literary Studies 11", "Pre-Calculus 11", "Spanish 10", "Study Block", "WP"]
+block_1e_courses = ["CLE", "CLE(WP)", "EFP 10", "Drafting 11", "French 11 Enriched", "Mandarin 10 Accel", "Pre-Calculus 12", "Study Block" ]
+block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "Study Block", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11", "Science 10", "Social Studies 10"]
+block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chemistry 12", "PE 10 Brenko", "PE 10 Kimura", "Pre-Calculus 11", "Science 10", "Life Sciences 11", "Study Block"]
+block_2c_courses = ["AP Statistics", "AP Human Geography", "Film /TV 11",  "French 10 Enriched", "French 11 Enriched", "French 12",  "Math 10", "Mandarin 11 Accel", "Mandarin 10", "Science 10H", "Social Studies 10", "Study Block", "Physics 11", "Pre-AP English 10"]
+block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Pre-Calculus 12", "Study Block", "Pre-AP English 10", "Life Sciences 11", "Web Development 10"]
+block_2e_courses = ["20th Century World History", "BC First Peoples 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Pre-Calculus 11", "Woodwork 10", "Study Block"]
+
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
-async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b : str, block1c : str, block1d : str, block1e : str, block2a : str, block2b : str, block2c : str, block2d : str, block2e : str):
+async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = block_1a_courses), block1b : discord.Option(str, choices = block_1b_courses), block1c :  discord.Option(str, choices = block_1c_courses), block1d :  discord.Option(str, choices = block_1d_courses), block1e :  discord.Option(str, choices = block_1e_courses), 
+                         block2a : discord.Option(str, choices = block_2a_courses), block2b : discord.Option(str, choices = block_2b_courses), block2c : discord.Option(str, choices = block_2c_courses), block2d : discord.Option(str, choices = block_2d_courses), block2e : discord.Option(str, choices = block_2e_courses)):
    
     user_id = str(ctx.author.id)
     username = ctx.author.name
@@ -467,9 +524,61 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : str, block1b
     save_user_schedule(user_id, schedule_data)
     await ctx.respond("Schedule saved!")
 
+getCmds = bot.create_group("get", "Get information about schedules and courses")
+
+async def get_courses_from_block(ctx: discord.AutocompleteContext):
+
+    selectedBlock = ctx.options['block']
+    if selectedBlock == '1A':
+        return block_1a_courses
+    elif selectedBlock == '1B':
+        return block_1b_courses
+    elif selectedBlock == '1C':
+        return block_1c_courses
+    elif selectedBlock == '1D':
+        return block_1d_courses
+    elif selectedBlock == '1E':
+        return block_1e_courses
+    elif selectedBlock == '2A':
+        return block_2a_courses
+    elif selectedBlock == '2B':
+        return block_2b_courses
+    elif selectedBlock == '2C':
+        return block_2c_courses
+    elif selectedBlock == '2D':
+        return block_2d_courses
+    elif selectedBlock == '2E':
+        return block_2e_courses
+
+@getCmds.command(name = "people_in_class", description = "Gives a list of people who are in the class specified")
+async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B","1C","1D","1E","2A","2B","2C","2D","2E"]), course_name : discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
+
+    # Call your function to get users in the same class
+    output = get_same_class(block, course_name)  # Implement this function to query the database\
+
+    if not output:
+        await ctx.respond(f"No users found in {course_name} {block}.")
+        return
+
+    # Prepare the response message
+    response = f"Your classmates in {course_name} {block} are:\n"
+    
+    for theid in output:
+        # print(type(theid[0]))
+        # print(ctx.author.guild)
+        # print(ctx.author.guild.get_member(int(theid[0])))
+        try:
+            name = ctx.author.guild.get_member(int(theid[0])).name
+            # print(type(name))
+            response += f"- {name}\n"
+        except:
+            response += f"- {theid[0]} (Not in this server) \n"
+
+    # Send the response
+    await ctx.respond(response)
 
 
-@bot.slash_command(name="get_today_schedule", description="Get your schedule for today.")
+@getCmds.command(name="today_schedule", description="Get your schedule for today.")
 async def get_today_schedule(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
@@ -501,7 +610,7 @@ async def get_today_schedule(ctx):
     
     await ctx.respond(f"**## Today's schedule:**\n" +  "\n".join(courses))
 
-@bot.slash_command(name="get_tomorrow_schedule", description="Get your schedule for tomorrow.")
+@getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
@@ -525,7 +634,7 @@ async def get_tomorrow_schedule(ctx):
     await ctx.respond(f"**## Tomorrow's schedule:**\n" +  "\n".join(courses))
 
 
-@bot.slash_command(name = "compare_schedules", description = "Compare schedules for two people")
+@getCmds.command(name = "compare_schedules", description = "Compare schedules for two people")
 async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: Option(discord.Member,description = "Person 2")):
     schedule1, schedule2 = compare_schedule(person1.id, person2.id)
     # await ctx.send(f"User 1 Schedule: {schedule1}")
@@ -541,6 +650,27 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
         style=PresetStyle.thin
     )
     await ctx.respond(f"```\n{output}\n```")
+
+@bot.slash_command(name = "ping_class", description = "Pings everyone in this server whose in the class specifed")
+async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1D","1E","2A","2B","2C","2D","2E"]), course_name : discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
+     # Call your function to get users in the same class
+    output = get_same_class(block, course_name)  # Implement this function to query the database\
+
+    if not output:
+        await ctx.respond(f"No users found in {course_name} {block}.")
+        return
+    
+    response = ""
+    
+    for theid in output:
+        try:
+            # print(type(name))
+            response += f"<@{int(theid[0])}>"
+        except:
+            response += f"{theid[0]} (Not in this server) \n"
+
+    await ctx.respond(response)
+
 
 print("runs?")
 
