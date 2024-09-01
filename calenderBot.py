@@ -88,6 +88,18 @@ custom_block_orders = {
 }
 
 
+block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "Concert Band 10", "CLE", "Entrepreneurship 12", "AP-Prep English 11", "Social Studies 10", "Pre-Calculus 12", "Theatre Company 10", "Web Development 10"]
+block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
+block_1c_courses = ["Advisory"]
+block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Study Block", "Pre-AP English 11", "Literary Studies 11", "Pre-Calculus 11", "Spanish 10", "Study Block", "WP"]
+block_1e_courses = ["CLE", "CLE(WP)", "EFP 10", "Drafting 11", "French 11 Enriched", "Mandarin 10 Accel", "Pre-Calculus 12", "Study Block" ]
+block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "Study Block", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11", "Science 10", "Social Studies 10"]
+block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chemistry 12", "PE 10 Brenko", "PE 10 Kimura", "Pre-Calculus 11", "Science 10", "Life Sciences 11", "Study Block"]
+block_2c_courses = ["AP Statistics", "AP Human Geography", "Film /TV 11",  "French 10 Enriched", "French 11 Enriched", "French 12",  "Math 10", "Mandarin 11 Accel", "Mandarin 10", "Science 10H", "Social Studies 10", "Study Block", "Physics 11", "Pre-AP English 10"]
+block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Pre-Calculus 12", "Study Block", "Pre-AP English 10", "Life Sciences 11", "Web Development 10"]
+block_2e_courses = ["20th Century World History", "BC First Peoples 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Pre-Calculus 11", "Woodwork 10", "Study Block"]
+
+
 # Dictionary to store multiple users' schedules
 #user_schedules = {}
 
@@ -299,7 +311,7 @@ testGroup = bot.create_group("testgroup", "math related commands")
 schedule_input_cmds = bot.create_group("input", "input the courses you have for each block")
 
 @schedule_input_cmds.command(name = "1a", description = "Change your 1a block")
-async def change1a(ctx: discord.ApplicationContext, course_name : str):
+async def change1a(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1a_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -318,7 +330,7 @@ async def change1a(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 1A")
 
 @schedule_input_cmds.command(name = "1b", description = "Change your 1b block")
-async def change1b(ctx: discord.ApplicationContext, course_name : str):
+async def change1b(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1b_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -337,7 +349,7 @@ async def change1b(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 1B")
 
 @schedule_input_cmds.command(name = "1c", description = "Change your 1c block")
-async def change1c(ctx: discord.ApplicationContext, course_name : str):
+async def change1c(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1c_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -356,7 +368,7 @@ async def change1c(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 1C")
 
 @schedule_input_cmds.command(name = "1d", description = "Change your 1d block")
-async def change1d(ctx: discord.ApplicationContext, course_name : str):
+async def change1d(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1d_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -375,7 +387,7 @@ async def change1d(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 1D")
 
 @schedule_input_cmds.command(name = "1e", description = "Change your 1e block")
-async def change1e(ctx: discord.ApplicationContext, course_name : str):
+async def change1e(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1e_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -394,7 +406,7 @@ async def change1e(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 1E")
 
 @schedule_input_cmds.command(name = "2a", description = "Change your 2a block")
-async def change2a(ctx: discord.ApplicationContext, course_name : str):
+async def change2a(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2a_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -413,7 +425,7 @@ async def change2a(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 2A")
 
 @schedule_input_cmds.command(name = "2b", description = "Change your 2b block")
-async def change2b(ctx: discord.ApplicationContext, course_name : str):
+async def change2b(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2b_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -432,7 +444,7 @@ async def change2b(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 2B")
 
 @schedule_input_cmds.command(name = "2c", description = "Change your 2c block")
-async def change2c(ctx: discord.ApplicationContext, course_name : str):
+async def change2c(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2c_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -451,7 +463,7 @@ async def change2c(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 2C")
 
 @schedule_input_cmds.command(name = "2d", description = "Change your 2d block")
-async def change2d(ctx: discord.ApplicationContext, course_name : str):
+async def change2d(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2d_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -470,7 +482,7 @@ async def change2d(ctx: discord.ApplicationContext, course_name : str):
     await ctx.respond(f"{course_name} saved to 2D")
 
 @schedule_input_cmds.command(name = "2e", description = "Change your 2e block")
-async def change2e(ctx: discord.ApplicationContext, course_name : str):
+async def change2e(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2e_courses)):
     user_id = str(ctx.author.id)
 
     # Retrieve the user’s current schedule from the database
@@ -487,17 +499,6 @@ async def change2e(ctx: discord.ApplicationContext, course_name : str):
     session.commit()
 
     await ctx.respond(f"{course_name} saved to 2E")
-
-block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "Concert Band 10", "CLE", "Entrepreneurship 12", "AP-Prep English 11", "Social Studies 10", "Pre-Calculus 12", "Theatre Company 10", "Web Development 10"]
-block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
-block_1c_courses = ["Advisory"]
-block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Study Block", "Pre-AP English 11", "Literary Studies 11", "Pre-Calculus 11", "Spanish 10", "Study Block", "WP"]
-block_1e_courses = ["CLE", "CLE(WP)", "EFP 10", "Drafting 11", "French 11 Enriched", "Mandarin 10 Accel", "Pre-Calculus 12", "Study Block" ]
-block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "Study Block", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11", "Science 10", "Social Studies 10"]
-block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chemistry 12", "PE 10 Brenko", "PE 10 Kimura", "Pre-Calculus 11", "Science 10", "Life Sciences 11", "Study Block"]
-block_2c_courses = ["AP Statistics", "AP Human Geography", "Film /TV 11",  "French 10 Enriched", "French 11 Enriched", "French 12",  "Math 10", "Mandarin 11 Accel", "Mandarin 10", "Science 10H", "Social Studies 10", "Study Block", "Physics 11", "Pre-AP English 10"]
-block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Pre-Calculus 12", "Study Block", "Pre-AP English 10", "Life Sciences 11", "Web Development 10"]
-block_2e_courses = ["20th Century World History", "BC First Peoples 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Pre-Calculus 11", "Woodwork 10", "Study Block"]
 
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
 async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = block_1a_courses), block1b : discord.Option(str, choices = block_1b_courses), block1c :  discord.Option(str, choices = block_1c_courses), block1d :  discord.Option(str, choices = block_1d_courses), block1e :  discord.Option(str, choices = block_1e_courses), 
