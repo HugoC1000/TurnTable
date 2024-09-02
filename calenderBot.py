@@ -199,16 +199,16 @@ def compare_schedule(discord_id1, discord_id2):
     # Check if the first user exists and populate schedule1
     if user1:
         schedule1 = {
-            '1A': user1.A1,
-            '1B': user1.B1,
-            '1C': user1.C1,
-            '1D': user1.D1,
-            '1E': user1.E1,
-            '2A': user1.A2,
-            '2B': user1.B2,
-            '2C': user1.C2,
-            '2D': user1.D2,
-            '2E': user1.E2
+            '1A': user1.a1,
+            '1B': user1.b1,
+            '1C': user1.c1,
+            '1D': user1.d1,
+            '1E': user1.e1,
+            '2A': user1.a2,
+            '2B': user1.b2,
+            '2C': user1.c2,
+            '2D': user1.d2,
+            '2E': user1.e2
         }
     else:
         schedule1 = {'error': 'User 1 not found'}
@@ -216,16 +216,16 @@ def compare_schedule(discord_id1, discord_id2):
     # Check if the second user exists and populate schedule2
     if user2:
         schedule2 = {
-            '1A': user2.A1,
-            '1B': user2.B1,
-            '1C': user2.C1,
-            '1D': user2.D1,
-            '1E': user2.E1,
-            '2A': user2.A2,
-            '2B': user2.B2,
-            '2C': user2.C2,
-            '2D': user2.D2,
-            '2E': user2.E2
+            '1A': user2.a1,
+            '1B': user2.b1,
+            '1C': user2.c1,
+            '1D': user2.d1,
+            '1E': user2.e1,
+            '2A': user2.a2,
+            '2B': user2.b2,
+            '2C': user2.c2,
+            '2D': user2.d2,
+            '2E': user2.e2
         }
     else:
         schedule2 = {'error': 'User 2 not found'}
