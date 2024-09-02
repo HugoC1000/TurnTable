@@ -90,7 +90,7 @@ schedule_pattern = [
 ]
 
 
-schedule_start = datetime(2024, 9, 3).date()
+schedule_start = datetime(2024, 9, 2).date()
 
 
 # Days off (no school)
