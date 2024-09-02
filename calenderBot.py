@@ -268,11 +268,11 @@ def get_same_class(block, course_name):
 
     try:
         conn = psycopg2.connect(
-            dbname=os.getenv('DB_NAME'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            host=os.getenv('DB_HOST'),
-            port=os.getenv('DB_PORT')
+            dbname= "d66o2tq3s18vlt",
+            user="u5hsl3t8vpl42s",
+            password="pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295",
+            host="cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com",
+            port="5432"
         )
 
         cursor = conn.cursor()
