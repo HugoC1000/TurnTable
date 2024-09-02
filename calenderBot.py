@@ -1,8 +1,7 @@
 import discord
-import os # default module
+import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from discord import Option
 from discord.ext import commands
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -10,18 +9,21 @@ from user_schedule_model import UserSchedule, Base
 from table2ascii import table2ascii as t2a, PresetStyle
 import psycopg2
 
+# Load environment variables from .env file
+load_dotenv()
 
-#DATABASE_URL = os.environ['postgresql+psycopg2://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt']
-engine = create_engine('postgresql+psycopg2://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt')
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Create the engine
+engine = create_engine(DATABASE_URL)
+
+# Create a configured session class
 Session = sessionmaker(bind=engine)
-session = Session()
 
-
+# Create tables based on the model definitions if they don't exist
 Base.metadata.create_all(engine)
 
-intents=discord.Intents.all()
-
-load_dotenv() # load all the variables from the env file
+intents = discord.Intents.all()
 bot = discord.Bot(intents = intents)
 
 time_slots = [
@@ -262,38 +264,32 @@ def get_same_class(block, course_name):
     block = '"' + block[1] + block[0] + '"'
     print("Reversed block" + block)
 
-    conn = psycopg2.connect(
-        dbname='d66o2tq3s18vlt',
-        user='u5hsl3t8vpl42s',
-        password='pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295',
-        host='cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
-        port='5432'
-    )
+    try:
+        conn = psycopg2.connect(
+            dbname=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            host=os.getenv('DB_HOST'),
+            port=os.getenv('DB_PORT')
+        )
 
-    # Create a cursor object
-    cursor = conn.cursor()
+        cursor = conn.cursor()
+        query = f"SELECT discord_id FROM user_schedules WHERE {block} = %s;"
+        cursor.execute(query, (course_name,))
+        results = cursor.fetchall()
+        
+        for row in results:
+            print(row[0])
+        
+        return results
 
-    # Define the course name and query
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
 
-    query = f"SELECT discord_id FROM user_schedules WHERE {block} = %s;"   
-
-
-    # Execute the query
-    cursor.execute(query, (course_name,))
-
-    # Fetch the results
-    results = cursor.fetchall()
-
-    # Close the connection
-    cursor.close()
-    conn.close()
-
-
-
-    for row in results:
-        print(row[0])
-
-    return results
+    finally:
+        cursor.close()
+        conn.close()
 
 def getUserById(user_id):
     try:
