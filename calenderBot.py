@@ -609,30 +609,24 @@ async def get_today_schedule(ctx):
     
     courses = []
     i = 0
-
-    max_time_length = max(len(time) for time in today_block_times)
-    max_slot_length = max(len(slot) for slot in today_schedule)
-
     for slot in today_schedule:
-        time_str = today_block_times[i].ljust(max_time_length)  # Align time slots
-        if time_str.strip() == "-":
-            courses.append(" " * max_time_length + " " * (max_slot_length + 10) + "--------------")
-        elif slot == '1C(PA)':
-            courses.append(f"{time_str}    {slot.ljust(max_slot_length)}: Advisory: School Event")
+        if(today_block_times[i] == "-"):
+            courses.append("--------------")
+            i+=1
+        if slot == '1C(PA)':
+            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: School Event")
         elif slot == '1C(P)':
-            courses.append(f"{time_str}    {slot.ljust(max_slot_length)}: Advisory: PEAKS")
+            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: PEAKS")
         elif slot == '1C(A)':
-            courses.append(f"{time_str}    {slot.ljust(max_slot_length)}: Advisory: Academics")
+            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: Academics")
         elif slot == 'school_event':
-            courses.append(f"{time_str}    {'School Event'.ljust(max_slot_length)}")
+            courses.append(f"**{today_block_times[i]}**    School Event")
         else:
-            course_name = user_schedule.get(slot, 'Free period')
-            courses.append(f"{time_str}    {slot.ljust(max_slot_length)}: {course_name}")
-        i += 1
-
-    # Using a code block to format the text in Discord
-    await ctx.respond(f"```## Today's schedule:\n" + "\n".join(courses) + "```")
-
+            print(today_block_times[i])
+            courses.append(f"**{today_block_times[i]}**    {slot}: {user_schedule.get(slot, 'Free period')}")
+        i+= 1
+    
+    await ctx.respond(f"**## Today's schedule:**\n" +  "\n".join(courses))
 
 @getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
