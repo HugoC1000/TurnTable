@@ -733,6 +733,38 @@ async def get_uniform_for_today(ctx):
 
     await ctx.respond(response)
 
+@uniform_cmds.command(name = "tomorrow", description = "Get uniform for tomorrow")
+async def get_uniform_for_today(ctx):
+
+    
+
+    today = datetime.today()
+    
+    tomorrow = today + timedelta(days=1)
+
+    weekno = tomorrow.weekday()
+
+    if weekno  >= 5 or today.date() in custom_days_off:
+        response = "No school today"
+        await ctx.respond(response)
+
+ 
+    response = ""
+    if tomorrow.date() in special_uniform_dates:
+        if(special_uniform_dates[tomorrow] == "Ceremonial"):
+            respoonse += "Ceremonial Uniform\n"
+        else:
+            response += special_uniform_dates[tomorrow] + "\n"
+    else:
+        response += "Regular Uniform\n"
+
+    if weekno < 4:
+        pass
+    elif weekno == 4:
+        response += "Hoodie allowed (Exceptions apply)" 
+
+    await ctx.respond(response)
+
 print("runs?")
 
 @bot.event
