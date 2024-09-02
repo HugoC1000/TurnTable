@@ -611,7 +611,7 @@ async def get_today_schedule(ctx):
     i = 0
     for slot in today_schedule:
         if(today_block_times[i] == "--------"):
-            courses.append(tomorrow_block_times[i])
+            courses.append(today_block_times[i])
             i+=1
         if slot == '1C(PA)':
             courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: School Event")
