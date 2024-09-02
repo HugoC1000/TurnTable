@@ -710,12 +710,13 @@ uniform_cmds = bot.create_group("uniform", "Get information about uniform")
 async def get_uniform_for_today(ctx):
 
     weekno = datetime.today().weekday()
+    today = datetime.now().date()
 
-    if weekno >= 5 or datetime.now().date() in custom_days_off:
+    if weekno >= 5 or today in custom_days_off:
         response = "No school today"
         await ctx.respond(response)
 
-    today = datetime.now.date()
+ 
     response = ""
     if today in special_uniform_dates:
         if(special_uniform_dates[today] == "Ceremonial"):
