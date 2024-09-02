@@ -107,6 +107,12 @@ custom_block_orders = {
       # Example: Last day before winter break
 }
 
+special_uniform_dates = {
+    datetime(2024,9,3).date() : "Ceremonial",
+    datetime(2024,9,6).date() : "Ceremonial",
+    datetime(2024,9,27).date() : "Orange Shirt Day"
+}
+
 
 block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "AP-Prep English 11",  "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
 block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
@@ -698,6 +704,31 @@ async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1
 
     await ctx.respond(response)
 
+uniform_cmds = bot.create_group("uniform", "Get information about uniform")
+
+@uniform_cmds.command(name = "today", description = "Get uniform for today")
+async def get_uniform_for_today(ctx):
+
+    weekno = datetime.datetime.today().weekday()
+
+    if weekno >= 5 or datetime.now.date() in custom_days_off:
+        response = "No school today"
+        return response
+
+    today = datetime.now.date()
+    response = ""
+    if today in special_uniform_dates:
+        if(special_uniform_dates[today] == "Ceremonial"):
+            respoonse += "Ceremonial Uniform\n"
+        else:
+            response += special_uniform_dates[today] + "\n"
+    else:
+        response += "Regular Uniform\n"
+
+    if weekno < 4:
+        pass
+    elif weekno == 4:
+        response += "Hoodie allowed (Exceptions apply)" 
 
 print("runs?")
 
