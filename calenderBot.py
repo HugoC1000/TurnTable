@@ -751,10 +751,10 @@ async def get_uniform_for_today(ctx):
  
     response = ""
     if tomorrow.date() in special_uniform_dates:
-        if(special_uniform_dates[tomorrow] == "Ceremonial"):
+        if(special_uniform_dates[tomorrow.date()] == "Ceremonial"):
             respoonse += "Ceremonial Uniform\n"
         else:
-            response += special_uniform_dates[tomorrow] + "\n"
+            response += special_uniform_dates[tomorrow.date()] + "\n"
     else:
         response += "Regular Uniform\n"
 
