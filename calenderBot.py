@@ -20,6 +20,8 @@ engine = create_engine(DATABASE_URL)
 # Create a configured session class
 Session = sessionmaker(bind=engine)
 
+session = Session()
+
 # Create tables based on the model definitions if they don't exist
 Base.metadata.create_all(engine)
 
