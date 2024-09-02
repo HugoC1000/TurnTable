@@ -622,11 +622,16 @@ async def get_tomorrow_schedule(ctx):
     courses = []
     i = 0
     for slot in tomorrow_schedule:
-        if slot == '1C(P)':
+        if slot == '1C(PA)':
+            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: School Assembly/Event")
+        elif slot == '1C(P)':
             courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: PEAKS")
         elif slot == '1C(A)':
             courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: Academics")
+        elif slot == 'school_event':
+            courses.append(f"**{tomorrow_block_times[i]}**    School Event")
         else:
+            print(tomorrow_block_times[i])
             courses.append(f"**{tomorrow_block_times[i]}**    {slot}: {user_schedule.get(slot, 'Free period')}")
         i+= 1
     
