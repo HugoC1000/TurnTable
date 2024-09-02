@@ -709,20 +709,22 @@ uniform_cmds = bot.create_group("uniform", "Get information about uniform")
 @uniform_cmds.command(name = "today", description = "Get uniform for today")
 async def get_uniform_for_today(ctx):
 
-    weekno = datetime.today().weekday()
-    today = datetime.now().date()
+    today = datetime.today()
 
-    if weekno >= 5 or today in custom_days_off:
+    weekno = today.weekday()
+    today_date = today.date()
+
+    if weekno >= 5 or today_date in custom_days_off:
         response = "No school today"
         await ctx.respond(response)
 
  
     response = ""
-    if today in special_uniform_dates:
-        if(special_uniform_dates[today] == "Ceremonial"):
+    if today_date in special_uniform_dates:
+        if(special_uniform_dates[today_date] == "Ceremonial"):
             respoonse += "Ceremonial Uniform\n"
         else:
-            response += special_uniform_dates[today] + "\n"
+            response += special_uniform_dates[today_date] + "\n"
     else:
         response += "Regular Uniform\n"
 
@@ -741,6 +743,7 @@ async def get_uniform_for_today(ctx):
     today = datetime.today()
     
     tomorrow = today + timedelta(days=1)
+    tomorrow_date = tomorrow.date()
 
     weekno = tomorrow.weekday()
 
@@ -750,11 +753,11 @@ async def get_uniform_for_today(ctx):
 
  
     response = ""
-    if tomorrow.date() in special_uniform_dates:
-        if(special_uniform_dates[tomorrow.date()] == "Ceremonial"):
+    if tomorrow_date in special_uniform_dates:
+        if(special_uniform_dates[tomorrow_date] == "Ceremonial"):
             response += "Ceremonial Uniform\n"
         else:
-            response += special_uniform_dates[tomorrow.date()] + "\n"
+            response += special_uniform_dates[tomorrow_date] + "\n"
     else:
         response += "Regular Uniform\n"
 
