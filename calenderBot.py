@@ -733,6 +733,19 @@ async def get_uniform_for_today(ctx):
     elif weekno == 4:
         response += "Hoodie allowed (Exceptions apply)" 
 
+
+    user_id = str(ctx.author.id)
+    user_schedule = get_user_schedule(user_id)
+    today_schedule = get_today_blocks()
+    today_block_times = get_today_block_times()
+    if not user_schedule:
+        responses += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)"
+        await ctx.respond(response)
+    
+    for slot in today_schedule:
+        if user_schedule.get(slot,'Free period') == "PE 10" or user_schedule.get(slot,'Free period') == "PE 11" or user_schedule.get(slot,'Free period') == "PE 10 Brenko" or user_schedule.get(slot,'Free period') == "PE 10 Kimura":
+            response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply) \n"
+
     await ctx.respond(response)
 
 @uniform_cmds.command(name = "tomorrow", description = "Get uniform for tomorrow")
@@ -764,7 +777,9 @@ async def get_uniform_for_today(ctx):
     if weekno < 4:
         pass
     elif weekno == 4:
-        response += "Hoodie allowed (Exceptions apply)" 
+        response += "Hoodie allowed (Exceptions apply)\n" 
+
+
 
     await ctx.respond(response)
 
