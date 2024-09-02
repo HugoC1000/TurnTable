@@ -12,10 +12,10 @@ import psycopg2
 # Load environment variables from .env file
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+#DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create the engine
-engine = create_engine(DATABASE_URL)
+engine = create_engine("postgresql+psycopg2://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt#")
 
 # Create a configured session class
 Session = sessionmaker(bind=engine)
