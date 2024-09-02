@@ -737,14 +737,15 @@ async def get_uniform_for_today(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
     today_schedule = get_today_blocks()
-    today_block_times = get_today_block_times()
     if not user_schedule:
-        responses += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)"
+        responses += "(Unable to predict if you have PE today. Please input schedule to gain access to this feature)"
         await ctx.respond(response)
     
     for slot in today_schedule:
-        if user_schedule.get(slot,'Free period') == "PE 10" or user_schedule.get(slot,'Free period') == "PE 11" or user_schedule.get(slot,'Free period') == "PE 10 Brenko" or user_schedule.get(slot,'Free period') == "PE 10 Kimura":
-            response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply) \n"
+        course_name = user_schedule.get(slot, 'Free period')
+        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura":
+            print("Detected PE")
+            response += "PE Strip may be needed as you have PE today. (Exceptions apply) \n"
 
     await ctx.respond(response)
 
@@ -779,7 +780,18 @@ async def get_uniform_for_today(ctx):
     elif weekno == 4:
         response += "Hoodie allowed (Exceptions apply)\n" 
 
-
+    user_id = str(ctx.author.id)
+    user_schedule = get_user_schedule(user_id)
+    tomorrow_schedule = get_tomorrow_blocks()
+    if not user_schedule:
+        responses += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)"
+        await ctx.respond(response)
+    
+    for slot in tomorrow_schedule:
+        course_name = user_schedule.get(slot, 'Free period')
+        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura":
+            print("Detected PE")
+            response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply) \n"
 
     await ctx.respond(response)
 
