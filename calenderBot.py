@@ -31,29 +31,44 @@ bot = discord.Bot(intents = intents)
 time_slots = [
     "08:20 - 09:30",
     "09:35 - 10:45",
+    "--------",
     "11:05 - 12:15",
+    "--------",
     "13:05 - 14:15",
     "14:20 - 15:30"
 ]
 
 custom_block_times = {
     datetime(2024,8,30).date() : ["09:35 - 10:40", 
-                          "10:55 - 11:35", 
-                          "11:40 - 12:20",
-                        "13:20 - 14:00", 
-                          "14:05 - 14:45", 
-                          "14:50 - 15:30"],
+                                  "--------",
+                                "10:55 - 11:35", 
+                                "11:40 - 12:20",
+                                "--------",
+                                "13:20 - 14:00", 
+                                "14:05 - 14:45", 
+                                "14:50 - 15:30"],
     datetime(2024,9,3).date() : ["09:35 - 10:40", 
+                                 "--------",
                           "10:55 - 11:35", 
                           "11:40 - 12:20",
+                          "--------",
                         "13:20 - 14:00", 
                           "14:05 - 14:45", 
                           "14:50 - 15:30"],
     datetime(2024,9,5).date() : ["08:20 - 09:20", 
                           "09:25 - 10:25", 
+                          "--------",
                           "10:45 - 11:45",
-                        "13:05 - 14:00", 
+                        "11:50 - 12:30", 
+                        "--------",
                           "13:25 - 14:25", 
+                          "14:30 - 15:30"],
+    datetime(2024,9,6).date() : ["08:20 - 09:20", 
+                          "09:25 - 10:25", 
+                          "--------",
+                          "10:45 - 12:10",
+                        "--------",
+                          "13:05 - 14:25", 
                           "14:30 - 15:30"],
 
 }
@@ -87,6 +102,7 @@ custom_block_orders = {
     datetime(2024,8,30).date(): ["2A","2B","2C","school_event", "2D","2E"],
     datetime(2024,9,3).date(): ["1C(PA)","2A","2B","2C","2D","2E"],
     datetime(2024,9,5).date():["2A","2B","2C","school_event", "2D","2E"],
+    datetime(2024,9,6).date():["1A","1B","1C(PA)","1D","1E"],   
     datetime(2024, 12, 20).date(): ["2A", "1A", "2B", "1B", "2C", "1C(P)", "2D", "1D", "2E", "1E"],
       # Example: Last day before winter break
 }
@@ -622,6 +638,10 @@ async def get_tomorrow_schedule(ctx):
     courses = []
     i = 0
     for slot in tomorrow_schedule:
+        if(tomorrow_block_times[i] == "--------"):
+            courses.append(tomorrow_block_times[i])
+            i+=1
+        
         if slot == '1C(PA)':
             courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: School Assembly/Event")
         elif slot == '1C(P)':
