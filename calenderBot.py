@@ -709,7 +709,7 @@ uniform_cmds = bot.create_group("uniform", "Get information about uniform")
 @uniform_cmds.command(name = "today", description = "Get uniform for today")
 async def get_uniform_for_today(ctx):
 
-    weekno = datetime.datetime.today().weekday()
+    weekno = datetime.today().weekday()
 
     if weekno >= 5 or datetime.now.date() in custom_days_off:
         response = "No school today"
