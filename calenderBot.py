@@ -811,12 +811,14 @@ async def get_uniform_for_tomorrow(ctx):
 @bot.slash_command(name="help", description="List all available commands.")
 async def help_command(ctx):
     help_message = """
-    ## **Calendar Bot Help**
+    # **Calendar Bot Help**
 
-    **To get started:** Use `/input setup` and input your schedules.
+    ## **To get started:** Use `/input setup` and input your schedules.
 
     **Available Commands:**
 
+    All commands have autocomplete inside their options. 
+    
     `/input setup` - Set up your schedule with initial data.
 
     `/input [block]` - Update the course name for a specific block (e.g., `/input 1A`).
@@ -827,15 +829,13 @@ async def help_command(ctx):
 
     `/get compare_schedules <user1> <user2>` - Compares the schedules of two users.
 
-    `/get people_in_class <block>` - Lists all people in a specified class block.
+    `/get people_in_class <block> <class>` - Lists all people in a specified class block.
 
-    `/ping_class <block>` - Pings everyone in a specified class block.
+    `/ping_class <block> <class>` - Pings everyone in a specified class block.
 
-    `/uniform today` - Check if you need to wear your PE uniform today.
+    `/uniform today` - Check uniform needed today.
 
-    `/uniform tomorrow` - Check if you need to wear your PE uniform tomorrow.
-
-    Use these commands to manage and view your school schedule effectively!
+    `/uniform tomorrow` - Check uniform needed tomorrow.
     """
     await ctx.respond(help_message)
 
