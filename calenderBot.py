@@ -540,6 +540,10 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Opti
     save_user_schedule(user_id, schedule_data)
     await ctx.respond("Schedule saved!")
 
+
+
+
+
 getCmds = bot.create_group("get", "Get information about schedules and courses")
 
 async def get_courses_from_block(ctx: discord.AutocompleteContext):
@@ -670,7 +674,6 @@ async def get_tomorrow_schedule(ctx):
     
     await ctx.respond(f"**## Tomorrow's schedule:**\n" +  "\n".join(courses))
 
-
 @getCmds.command(name = "compare_schedules", description = "Compare schedules for two people")
 async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: discord.Option(discord.Member,description = "Person 2")):
     schedule1, schedule2 = compare_schedule(person1.id, person2.id)
@@ -687,6 +690,9 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
         style=PresetStyle.thin
     )
     await ctx.respond(f"```\n{output}\n```")
+
+
+
 
 @bot.slash_command(name = "ping_class", description = "Pings everyone in this server whose in the class specifed")
 async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1D","1E","2A","2B","2C","2D","2E"]), course_name : discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
@@ -707,6 +713,9 @@ async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1
             response += f"{theid[0]} (Not in this server) \n"
 
     await ctx.respond(response)
+
+
+
 
 uniform_cmds = bot.create_group("uniform", "Get information about uniform")
 
@@ -768,7 +777,7 @@ async def get_uniform_for_tomorrow(ctx):
 
     weekno = tomorrow.weekday()
 
-    if weekno  >= 5 or today.date() in custom_days_off:
+    if weekno  >= 5 or tomorrow_date in custom_days_off:
         response = "No school today"
         await ctx.respond(response)
         return
@@ -808,6 +817,8 @@ async def get_uniform_for_tomorrow(ctx):
 
     await ctx.respond(response)
 
+
+
 @bot.slash_command(name="help", description="List all available commands.")
 async def help_command(ctx):
     help_message = """
@@ -818,7 +829,7 @@ async def help_command(ctx):
     **Available Commands:**
 
     All commands have autocomplete inside their options. 
-    
+
     `/input setup` - Set up your schedule with initial data.
 
     `/input [block]` - Update the course name for a specific block (e.g., `/input 1A`).
