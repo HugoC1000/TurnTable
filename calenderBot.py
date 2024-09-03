@@ -761,7 +761,7 @@ async def get_uniform_for_today(ctx):
     
     for slot in today_schedule:
         course_name = user_schedule.get(slot, 'Free period')
-        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura":
+        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura" or course_name == "PE Aquatics":
             print("Detected PE")
             response += "PE Strip may be needed as you have PE today. (Exceptions apply) \n"
 
@@ -811,7 +811,7 @@ async def get_uniform_for_tomorrow(ctx):
     
     for slot in tomorrow_schedule:
         course_name = user_schedule.get(slot, 'Free period')
-        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura":
+        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura" or course_name == "PE Aquatics":
             print("Detected PE")
             response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply) \n"
 
