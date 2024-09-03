@@ -851,6 +851,18 @@ async def help_command(ctx):
     await ctx.respond(help_message)
 
 
+dev_cmds = bot.create_group("developer", "Developer commands")
+
+@dev_cmds.command(name = "say", description = "Says something")
+async def say(ctx, message : str):
+    developer_id = 826334880455589918
+    if ctx.author.id == developer_id:
+        await ctx.respond(message)
+    else:
+        await ctx.respond('This command is for developer only')
+
+
+
 print("runs?")
 
 @bot.event
