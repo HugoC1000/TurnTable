@@ -90,7 +90,7 @@ schedule_pattern = [
 ]
 
 
-schedule_start = datetime(2024, 9, 2).date()
+schedule_start = datetime(2024, 9, 4).date()
 
 
 # Days off (no school)
@@ -114,8 +114,8 @@ special_uniform_dates = {
 }
 
 
-block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "AP-Prep English 11",  "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
-block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
+block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
+block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "French 11", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
 block_1c_courses = ["Advisory"]
 block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Literary Studies 11", "Pre-AP English 11",  "Pre-Calculus 11","Pre-Calculus 12", "Spanish 10", "Study Block", "WP"]
 block_1e_courses = ["CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enriched", "Mandarin 10 Accel", "Media Design 10", "PE 11", "Pre-Calculus 12", "Study Block" ]
@@ -125,9 +125,14 @@ block_2c_courses = ["AP Human Geography","AP Statistics",  "Film /TV 11",  "Fren
 block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Life Sciences 11", "Pre-AP English 10", "Pre-Calculus 12", "Study Block", "Web Development 10"]
 block_2e_courses = ["20th Century World History", "BC First Peoples 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Physics 12", "Pre-Calculus 11", "Study Block", "Woodwork 10"]
 
+rooms_for_courses = {
+    "1A" : {"AP Chinese" : "S 021W","AP World History: Modern" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009" , "Entrepreneurship 12" : "S 114","Pre-Calculus 12" : "S 013" , "Social Studies 10" : "S 112" , "Theatre Company 10" : "J 013", "Web Development 10": "S 206"},
+    "1B" : {"AP Calculus BC" : "S 032E", "CLE" : "S 034E", "EFP 10" : "S 110" , "French 10 Enriched" : "S 023W" , "French 11" : "S 021W" , "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Social Studies 10" : "S 122", "Study Block" : "Location varies"},
+    "1C" : {"Advisory" : "Different advisories coming soon"},
+    "1D" : {"AP CSP" : "S 203", "Art Studio 10" : "J 010", "EFP 10" : "S 033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "S 032E" , "Pre-Calculus 12" : "S 031E", "Spanish 10" : "S 024E", "Study Block" : "Location varies","WP" : "S 013"},
 
-# Dictionary to store multiple users' schedules
-#user_schedules = {}
+}
+
 
 # Helper function to determine if a day is a day off
 def is_day_off(date):
@@ -713,8 +718,6 @@ async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1
             response += f"{theid[0]} (Not in this server) \n"
 
     await ctx.respond(response)
-
-
 
 
 uniform_cmds = bot.create_group("uniform", "Get information about uniform")
