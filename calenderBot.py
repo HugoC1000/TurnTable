@@ -95,7 +95,7 @@ schedule_start = datetime(2024, 9, 2).date()
 
 # Days off (no school)
 days_off = {5, 6}  # Saturday and Sunday
-custom_days_off = [datetime(2024, 10, 14).date()]  # Example: Thanksgiving Day
+custom_days_off = [datetime(2024, 9, 2).date()]  # Example: Thanksgiving Day
 
 
 custom_block_orders = {
@@ -145,11 +145,8 @@ def get_today_blocks():
     delta_days = (today - schedule_start).days
     day_index = delta_days % len(schedule_pattern)
 
-    # Adjust index if today is a day off
-    while is_day_off(today):
-        today += timedelta(days=1)
-        delta_days += 1
-        day_index = delta_days % len(schedule_pattern)
+    if is_day_off(today) or today in custom_days_off:
+        return "No school"
     
     return schedule_pattern[day_index]
 
@@ -178,10 +175,8 @@ def get_tomorrow_blocks():
     
 
     # Adjust index if today is a day off
-    while is_day_off(tomorrow):
-        tomorrow += timedelta(days=1)
-        delta_days += 1
-        day_index = delta_days % len(schedule_pattern)
+    if is_day_off(tomorrow) or tomorrow in custom_days_off:
+        return "No school"
     
     return schedule_pattern[day_index]
 
@@ -613,6 +608,11 @@ async def get_today_schedule(ctx):
         await ctx.respond("You haven't set any courses yet.")
         return
     
+        
+    if today_schedule == "No school":
+        await ctx.respond ("No school today.")
+        return 
+    
     courses = []
     i = 0
     for slot in today_schedule:
@@ -643,6 +643,10 @@ async def get_tomorrow_schedule(ctx):
     if not user_schedule:
         await ctx.respond("You haven't set any courses yet.")
         return
+    
+    if tomorrow_schedule == "No school":
+        await ctx.respond ("No school tomorrow.")
+        return 
     
     courses = []
     i = 0
