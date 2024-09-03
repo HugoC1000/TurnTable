@@ -721,6 +721,7 @@ async def get_uniform_for_today(ctx):
     if weekno >= 5 or today_date in custom_days_off:
         response = "No school today"
         await ctx.respond(response)
+        return
 
  
     response = ""
@@ -770,6 +771,7 @@ async def get_uniform_for_tomorrow(ctx):
     if weekno  >= 5 or today.date() in custom_days_off:
         response = "No school today"
         await ctx.respond(response)
+        return
 
  
     response = ""
