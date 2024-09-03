@@ -808,6 +808,38 @@ async def get_uniform_for_tomorrow(ctx):
 
     await ctx.respond(response)
 
+@bot.slash_command(name="help", description="List all available commands.")
+async def help_command(ctx):
+    help_message = """
+    ## **Calendar Bot Help**
+
+    **To get started:** Use `/input setup` and input your schedules.
+
+    **Available Commands:**
+
+    `/input setup` - Set up your schedule with initial data.
+
+    `/input [block]` - Update the course name for a specific block (e.g., `/input 1A`).
+
+    `/get schedule_today` - Displays your schedule for today.
+
+    `/get schedule_tomorrow` - Shows your schedule for tomorrow.
+
+    `/get compare_schedules <user1> <user2>` - Compares the schedules of two users.
+
+    `/get people_in_class <block>` - Lists all people in a specified class block.
+
+    `/ping_class <block>` - Pings everyone in a specified class block.
+
+    `/uniform today` - Check if you need to wear your PE uniform today.
+
+    `/uniform tomorrow` - Check if you need to wear your PE uniform tomorrow.
+
+    Use these commands to manage and view your school schedule effectively!
+    """
+    await ctx.respond(help_message)
+
+
 print("runs?")
 
 @bot.event
