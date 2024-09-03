@@ -851,7 +851,7 @@ async def help_command(ctx):
     await ctx.respond(help_message)
 
 
-dev_cmds = bot.create_group("developer", "Developer commands")
+dev_cmds = bot.create_group("zdeveloper", "Developer commands")
 
 @dev_cmds.command(name = "say", description = "Says something")
 async def say(ctx, message : str):
