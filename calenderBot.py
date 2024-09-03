@@ -741,6 +741,10 @@ async def get_uniform_for_today(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
     today_schedule = get_today_blocks()
+
+    if today_schedule == "No school":
+        await ctx.respond ("No school today.")
+        return 
     if not user_schedule:
         responses += "(Unable to predict if you have PE today. Please input schedule to gain access to this feature)"
         await ctx.respond(response)
@@ -754,9 +758,7 @@ async def get_uniform_for_today(ctx):
     await ctx.respond(response)
 
 @uniform_cmds.command(name = "tomorrow", description = "Get uniform for tomorrow")
-async def get_uniform_for_today(ctx):
-
-    
+async def get_uniform_for_tomorrow(ctx):
 
     today = datetime.today()
     
@@ -787,6 +789,11 @@ async def get_uniform_for_today(ctx):
     user_id = str(ctx.author.id)
     user_schedule = get_user_schedule(user_id)
     tomorrow_schedule = get_tomorrow_blocks()
+
+    if tomorrow_schedule == "No school":
+        await ctx.respond ("No school tomorrow.")
+        return 
+
     if not user_schedule:
         responses += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)"
         await ctx.respond(response)
