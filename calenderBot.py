@@ -116,7 +116,7 @@ special_uniform_dates = {
 
 block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
 block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "French 11", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
-block_1c_courses = ["Advisory"]
+block_1c_courses = ["Advisory Field", "Advisory Sjerven", "Advisory McGee", "Advisory O'Donnell"],
 block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Literary Studies 11", "Pre-AP English 11",  "Pre-Calculus 11","Pre-Calculus 12", "Spanish 10", "Study Block", "WP"]
 block_1e_courses = ["Chemistry 11", "CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enriched", "Mandarin 10 Accel", "Media Design 10", "PE 11", "Pre-Calculus 12", "Study Block" ]
 block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11",  "Science 10", "Social Studies 10", "Study Block"]
@@ -128,10 +128,10 @@ block_2e_courses = ["20th Century World History", "BC FP 12",  "Chemistry 11", "
 rooms_for_courses = {
     "1A" : {"AP Chinese" : "021W","AP World History: Modern" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","Pre-Calculus 12" : "S 013" , "Social Studies 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Development 10": "S 206/Holowka Room"},
     "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enriched" : "023W" , "French 11" : "021W" , "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Social Studies 10" : "S 122", "Study Block" : "Location varies"},
-    "1C" : {"Advisory" : "Different advisories coming soon"},
+    "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
     "1D" : {"AP CSP" : "S 203/ Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "032E" , "Pre-Calculus 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
     "1E" : {"Chemistry 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enriched" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "Pre-Calculus 12" : "031E" , "Study Block" : "Location varies"},
-    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/ Mr. Lu room" , "Chemistry 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"Pre-Calculus 11" : "032E" , "Science 10" : "S 208" , "Social Studies 10" : "S 114" , "Study Block" : "Location varies"},
+    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Mr. Lu room" , "Chemistry 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"Pre-Calculus 11" : "032E" , "Science 10" : "S 208" , "Social Studies 10" : "S 114" , "Study Block" : "Location varies"},
     "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chemistry 12" : "S 200", "Life Sciences 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "Pre-Calculus 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
     "2C" : {"AP Human Geography" : "S 216","AP Statistics" : "032E",  "Film /TV 11" : "S 211",  "French 10 Enriched" : "023W", "French 11 Enriched" : "S 013", "French 12" : "022W",  "Jazz Performence 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP English 10" : "S 112", "Science 10" : "S 200", "Social Studies 10" : "S 114", "Study Block" : "Location varies"},
     "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film and TV 11" : "S 221", "Life Sciences 11" : "S 200", "Pre-AP English 10" : "S 122", "Pre-Calculus 12" : "031E", "Study Block" : "Location varies", "Web Development 10" : "S 20/Holowka Room"},
@@ -634,11 +634,14 @@ async def get_today_schedule(ctx):
             courses.append("-" * 20)
             i+=1
         if slot == '1C(PA)':
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: School Event")
+            courses.append(f"{today_block_times[i]}   {slot}: Advisory: School Event"
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         elif slot == '1C(P)':
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: PEAKS")
+            courses.append(f"{today_block_times[i]}   {slot}: Advisory: PEAKS"
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         elif slot == '1C(A)':
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: Academics")
+            courses.append(f"{today_block_times[i]}   {slot}: Advisory: Academics"
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}   School Event")
         else:
