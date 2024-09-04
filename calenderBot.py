@@ -631,7 +631,7 @@ async def get_today_schedule(ctx):
     i = 0
     for slot in today_schedule:
         if(today_block_times[i] == "-"):
-            courses.append("-" * 24)
+            courses.append("-" * 36)
             i+=1
         if slot == '1C(PA)':
             courses.append(f"{today_block_times[i]}    {slot}: Advisory: School Event")
@@ -667,24 +667,23 @@ async def get_tomorrow_schedule(ctx):
     i = 0
     for slot in tomorrow_schedule:
         if(tomorrow_block_times[i] == "-"):
-            courses.append("--------------")
+            courses.append("-" * 36)
             i+=1
-        
         if slot == '1C(PA)':
-            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: School Assembly/Event")
+            courses.append(f"{tomorrow_block_times[i]}    {slot}: Advisory: School Event")
         elif slot == '1C(P)':
-            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: PEAKS")
+            courses.append(f"{tomorrow_block_times[i]}    {slot}: Advisory: PEAKS")
         elif slot == '1C(A)':
-            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: Advisory: Academics")
+            courses.append(f"{tomorrow_block_times[i]}    {slot}: Advisory: Academics")
         elif slot == 'school_event':
-            courses.append(f"**{tomorrow_block_times[i]}**    School Event")
+            courses.append(f"{tomorrow_block_times[i]}    School Event")
         else:
-            print(tomorrow_block_times[i])
             course_for_this_slot = user_schedule.get(slot, 'None')
-            courses.append(f"**{tomorrow_block_times[i]}**    {slot}: {course_for_this_slot}    {rooms_for_courses.get(slot).get(course_for_this_slot)}")
+            courses.append(f"{tomorrow_block_times[i]}    {slot}: {course_for_this_slot}"
+                            f"{' ' * (35 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         i+= 1
     
-    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**\n" +  "\n".join(courses))
+    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" +  "\n".join(courses) + "```")
 
 @getCmds.command(name = "compare_schedules", description = "Compare schedules for two people")
 async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: discord.Option(discord.Member,description = "Person 2")):
