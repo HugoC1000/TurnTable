@@ -631,7 +631,7 @@ async def get_today_schedule(ctx):
     i = 0
     for slot in today_schedule:
         if(today_block_times[i] == "-"):
-            courses.append("--------------")
+            courses.append("-" * 24)
             i+=1
         if slot == '1C(PA)':
             courses.append(f"{today_block_times[i]}    {slot}: Advisory: School Event")
@@ -643,7 +643,7 @@ async def get_today_schedule(ctx):
             courses.append(f"{today_block_times[i]}    School Event")
         else:
             course_for_this_slot = user_schedule.get(slot, 'None')
-            courses.append(f"{today_block_times[i]}   {slot}: {course_for_this_slot}"
+            courses.append(f"{today_block_times[i]}    {slot}: {course_for_this_slot}"
                             f"{' ' * (35 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         i+= 1
     
