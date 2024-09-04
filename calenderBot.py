@@ -591,7 +591,7 @@ async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B
         return
 
     # Prepare the response message
-    response = f"Your classmates in {course_name} {block} are:\n"
+    response = f"Those in {course_name} {block} are:\n"
     
     for theid in output:
         # print(type(theid[0]))
