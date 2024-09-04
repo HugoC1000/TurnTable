@@ -116,7 +116,7 @@ special_uniform_dates = {
 
 block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
 block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "French 11", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
-block_1c_courses = ["Advisory Field", "Advisory Sjerven", "Advisory McGee", "Advisory O'Donnell"]
+block_1c_courses = ["Advisory Field", "Advisory Harms", "Advisory McGee", "Advisory O'Donnell", "Advisory Sjerven" ]
 block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Literary Studies 11", "Pre-AP English 11",  "Pre-Calculus 11","Pre-Calculus 12", "Spanish 10", "Study Block", "WP"]
 block_1e_courses = ["Chemistry 11", "CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enriched", "Mandarin 10 Accel", "Media Design 10", "PE 11", "Pre-Calculus 12", "Study Block" ]
 block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11",  "Science 10", "Social Studies 10", "Study Block"]
