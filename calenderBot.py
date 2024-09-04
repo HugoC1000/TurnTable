@@ -634,20 +634,20 @@ async def get_today_schedule(ctx):
             courses.append("--------------")
             i+=1
         if slot == '1C(PA)':
-            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: School Event")
+            courses.append(f"{today_block_times[i]}    {slot}: Advisory: School Event")
         elif slot == '1C(P)':
-            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: PEAKS")
+            courses.append(f"{today_block_times[i]}    {slot}: Advisory: PEAKS")
         elif slot == '1C(A)':
-            courses.append(f"**{today_block_times[i]}**    {slot}: Advisory: Academics")
+            courses.append(f"{today_block_times[i]}    {slot}: Advisory: Academics")
         elif slot == 'school_event':
-            courses.append(f"**{today_block_times[i]}**    School Event")
+            courses.append(f"{today_block_times[i]}    School Event")
         else:
             course_for_this_slot = user_schedule.get(slot, 'None')
-            courses.append(f"{today_block_times[i]}**    {slot}: {course_for_this_slot}"
+            courses.append(f"{today_block_times[i]}   {slot}: {course_for_this_slot}"
                             f"{' ' * (35 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         i+= 1
     
-    await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" +  "\n```".join(courses))
+    await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" +  "\n".join(courses) + "```")
 
 @getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
