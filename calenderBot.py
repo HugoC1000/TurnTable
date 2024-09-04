@@ -643,7 +643,7 @@ async def get_today_schedule(ctx):
             courses.append(f"**{today_block_times[i]}**    School Event")
         else:
             course_for_this_slot = user_schedule.get(slot, 'None')
-            courses.append(f"**{today_block_times[i]}**    {slot}: {course_for_this_slot}" + " "*(35-len(course_for_this_slot)) + rooms_for_courses.get(slot).get(course_for_this_slot))
+            courses.append(f"`**{today_block_times[i]}**    {slot}: {course_for_this_slot} {' '*(35-len(course_for_this_slot))} rooms_for_courses.get(slot).get(course_for_this_slot`")
         i+= 1
     
     await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**\n" +  "\n".join(courses))
