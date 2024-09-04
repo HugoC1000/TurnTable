@@ -635,13 +635,13 @@ async def get_today_schedule(ctx):
             i+=1
         if slot == '1C(PA)':
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: School Event"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get("1C").get(course_for_this_slot)}")
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
         elif slot == '1C(P)':
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: PEAKS"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get("1C").get(course_for_this_slot)}")
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
         elif slot == '1C(A)':
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: Academics"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get("1C").get(course_for_this_slot)}")
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}   School Event")
         else:
