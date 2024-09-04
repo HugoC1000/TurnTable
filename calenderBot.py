@@ -634,12 +634,15 @@ async def get_today_schedule(ctx):
             courses.append("-" * 20)
             i+=1
         if slot == '1C(PA)':
+            course_for_this_slot = user_schedule.get('1C', 'None')
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: School Event"
                             f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
         elif slot == '1C(P)':
+            course_for_this_slot = user_schedule.get('1C', 'None')
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: PEAKS"
                             f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
         elif slot == '1C(A)':
+            course_for_this_slot = user_schedule.get('1C', 'None')
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: Academics"
                             f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
         elif slot == 'school_event':
