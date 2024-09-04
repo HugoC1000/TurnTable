@@ -631,7 +631,7 @@ async def get_today_schedule(ctx):
     i = 0
     for slot in today_schedule:
         if(today_block_times[i] == "-"):
-            courses.append("-" * 36)
+            courses.append("-" * 24)
             i+=1
         if slot == '1C(PA)':
             courses.append(f"{today_block_times[i]}    {slot}: Advisory: School Event")
@@ -644,7 +644,7 @@ async def get_today_schedule(ctx):
         else:
             course_for_this_slot = user_schedule.get(slot, 'None')
             courses.append(f"{today_block_times[i]}    {slot}: {course_for_this_slot}"
-                            f"{' ' * (35 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         i+= 1
     
     await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" +  "\n".join(courses) + "```")
@@ -667,7 +667,7 @@ async def get_tomorrow_schedule(ctx):
     i = 0
     for slot in tomorrow_schedule:
         if(tomorrow_block_times[i] == "-"):
-            courses.append("-" * 36)
+            courses.append("-" * 24)
             i+=1
         if slot == '1C(PA)':
             courses.append(f"{tomorrow_block_times[i]}    {slot}: Advisory: School Event")
@@ -680,7 +680,7 @@ async def get_tomorrow_schedule(ctx):
         else:
             course_for_this_slot = user_schedule.get(slot, 'None')
             courses.append(f"{tomorrow_block_times[i]}    {slot}: {course_for_this_slot}"
-                            f"{' ' * (30 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
+                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
         i+= 1
     
     await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" +  "\n".join(courses) + "```")
