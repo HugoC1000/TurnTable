@@ -467,18 +467,18 @@ async def get_today_schedule(ctx):
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            print(f"{today_block_times[i]}   Advisory:  {advisory_type}"
+            print(f"{today_block_times[i]}  Advisory:  {advisory_type}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
-            courses.append(f"{today_block_times[i]}   Advisory:  {advisory_type}"
+            courses.append(f"{today_block_times[i]}  Advisory:  {advisory_type}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
         elif slot == 'school_event':
-            courses.append(f"{today_block_times[i]}   School Event")
+            courses.append(f"{today_block_times[i]}  School Event")
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             print(course_for_this_slot)
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             
-            courses.append(f"{today_block_times[i]}   {course_for_this_slot}"
+            courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
         i += 1
 
@@ -518,16 +518,16 @@ async def get_tomorrow_schedule(ctx):
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{tomorrow_block_times[i]}   Advisory:  {advisory_type}"
+            courses.append(f"{tomorrow_block_times[i]}  Advisory:  {advisory_type}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
         elif slot == 'school_event':
-            courses.append(f"{tomorrow_block_times[i]}   School Event")
+            courses.append(f"{tomorrow_block_times[i]}  School Event")
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             
-            courses.append(f"{tomorrow_block_times[i]}   {course_for_this_slot}"
+            courses.append(f"{tomorrow_block_times[i]}  {course_for_this_slot}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
         i += 1
 
