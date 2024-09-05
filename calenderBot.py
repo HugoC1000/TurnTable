@@ -470,7 +470,7 @@ async def get_today_schedule(ctx):
             courses.append(f"{today_block_times[i]}   School Event")
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            
+            print(course_for_this_slot)
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             
             courses.append(f"{today_block_times[i]}   {slot}: {course_for_this_slot}"
