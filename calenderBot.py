@@ -114,7 +114,7 @@ special_uniform_dates = {
 }
 
 
-block_1a_courses = ["AP Chinese", "AP Stats", "AP Modern World", "CLE", "Concert Band 10", "Entrepreneurship 12",  "PC 12", "Socials 10","Theatre Company 10", "Web Dev 10"]
+block_1a_courses = ["AP Chinese", "AP Stats", "AP Modern World", "CLE", "Concert Band 10", "Entrepreneurship 12",  "PC 12", "Socials 10","Theatre Comp. 10", "Web Dev 10"]
 block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enr", "French 11", "Lit Studies 11", "Pre-AP Eng. 11", "Science 10", "Socials 10", "Study Block"]
 block_1c_courses = ["Advisory Field", "Advisory Harms", "Advisory McGee", "Advisory O'Donnell", "Advisory Sjerven" ]
 block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Lit Studies 11", "Pre-AP Eng. 11",  "PC 11","PC 12", "Spanish 10", "Study Block", "WP"]
@@ -123,7 +123,7 @@ block_2a_courses = ["Active Living 11",  "AP Economics", "Chem 11", "Eng. Studie
 block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chem 12", "Life Science 11", "PE 10 Brenko", "PE 10 Kimura", "PC 11", "Science 10", "Study Block"]
 block_2c_courses = ["AP Human Geo","AP Stats",  "Film/TV 11",  "French 10 Enr", "French 11 Enr", "French 12",  "Jazz Perf. 11", "Math 10",  "Mandarin 10", "Mandarin 11 Accel", "Physics 11", "Pre-AP Eng. 10", "Science 10H", "Socials 10", "Study Block"]
 block_2d_courses = ["Art Studio 10", "CLE", "Film/TV 11", "Life Science 11", "Pre-AP Eng. 10", "PC 12", "Study Block", "Web Dev 10"]
-block_2e_courses = ["20 Cent. World History", "BC FP 12",  "Chem 11", "French 10", "Math 10", "Physics 11", "Physics 12", "PC 11", "Study Block", "Woodwork 10"]
+block_2e_courses = ["20 Cent. History", "BC FP 12",  "Chem 11", "French 10", "Math 10", "Physics 11", "Physics 12", "PC 11", "Study Block", "Woodwork 10"]
 
 
 
@@ -339,7 +339,7 @@ def getUserById(user_id):
 
 def get_rooms_for_courses():
     rooms_for_courses = {
-    "1A" : {"AP Chinese" : "021W","AP Modern World" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","PC 12" : "S 013" , "Socials 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Dev 10": "S 206/Holowka Room"},
+    "1A" : {"AP Chinese" : "021W","AP Modern World" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","PC 12" : "S 013" , "Socials 10" : "S 112" , "Theatre Comp. 10" : "J 013/Drama Room", "Web Dev 10": "S 206/Holowka Room"},
     "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enr" : "023W" , "French 11" : "021W" , "Lit Studies 11" : "S 112", "Pre-AP Eng. 11" : "S 114", "Science 10" : "S 200", "Socials 10" : "S 122", "Study Block" : "Location varies"},
     "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
     "1D" : {"AP CSP" : "S 203/Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Lit Studies 11" : "S 112", "Pre-AP Eng. 11" : "S 114", "PC 11" : "032E" , "PC 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
@@ -348,7 +348,7 @@ def get_rooms_for_courses():
     "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chem 12" : "S 200", "Life Science 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "PC 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
     "2C" : {"AP Human Geo" : "S 216","AP Stats" : "032E",  "Film/TV 11" : "S 211",  "French 10 Enr" : "023W", "French 11 Enr" : "S 013", "French 12" : "022W",  "Jazz Perf. 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP Eng. 10" : "S 112", "Science 10" : "S 200", "Socials 10" : "S 114", "Study Block" : "Location varies"},
     "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film/TV 11" : "S 221", "Life Science 11" : "S 200", "Pre-AP Eng. 10" : "S 122", "PC 12" : "031E", "Study Block" : "Location varies", "Web Dev 10" : "S 20/Holowka Room"},
-    "2E" : {"20th Cent. World History" : "S 114", "BC FP 12" : "S 216",  "Chem 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "PC 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
+    "2E" : {"20 Cent. History" : "S 114", "BC FP 12" : "S 216",  "Chem 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "PC 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
 }
     return rooms_for_courses
 
@@ -456,6 +456,23 @@ async def get_today_schedule(ctx):
     
     print(today_schedule)
     
+    max_whitespace_after_courses = 0
+    
+    course_for_this_slot = ""
+    
+    for slot in today_schedule:
+        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
+            course_for_this_slot = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
+
+        elif slot == 'school_event':
+            course_for_this_slot = "School Event"
+        else:
+            course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
+            
+        max_whitespace_after_courses =  max(max_whitespace_after_courses,len(course_for_this_slot))
+
+    max_whitespace_after_courses += 3
+    
     for slot in today_schedule:
         if today_block_times[i] == "-":
             courses.append("-" * 20)
@@ -466,18 +483,16 @@ async def get_today_schedule(ctx):
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{today_block_times[i]}  Advisory:  {advisory_type}"
-                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
+            courses.append(f"{today_block_times[i]}  {advisory_type}"
+                           f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}  School Event")
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            print(course_for_this_slot)
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
-            print(room)
             
             courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
-                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
+                           f"{' ' * (max_whitespace_after_courses - len(course_for_this_slot))}{room}")
         i += 1
 
     await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
@@ -504,7 +519,27 @@ async def get_tomorrow_schedule(ctx):
 
     courses = []
     rooms_for_courses = get_rooms_for_courses() 
+    
+    course_for_first_for_loop_slot = ""
+    
+    max_whitespace_after_courses = 0
+    
+    for slot in tomorrow_schedule:
+        print("Slot " + slot)
+        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
+            course_for_first_for_loop_slot = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
+
+        elif slot == 'school_event':
+            course_for_first_for_loop_slot = "School Event"
+        else:
+            course_for_first_for_loop_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
+            
+        max_whitespace_after_courses = max(max_whitespace_after_courses,len(course_for_first_for_loop_slot))
+
+        
     i = 0
+    
+    
     
     for slot in tomorrow_schedule:
         if tomorrow_block_times[i] == "-":
@@ -514,19 +549,19 @@ async def get_tomorrow_schedule(ctx):
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
-            print(room)
+            
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{tomorrow_block_times[i]}  Advisory:  {advisory_type}"
-                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
+            courses.append(f"{tomorrow_block_times[i]}  {advisory_type}"
+                           f"{' ' * (course_for_this_slot - len(advisory_type))}{room}")
         elif slot == 'school_event':
             courses.append(f"{tomorrow_block_times[i]}  School Event")
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
-            
+            whitespace = ' ' * (max_whitespace_after_courses - len(course_for_this_slot))
             courses.append(f"{tomorrow_block_times[i]}  {course_for_this_slot}"
-                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
+                           f"{whitespace}{room}")
         i += 1
 
     await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
