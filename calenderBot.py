@@ -455,6 +455,8 @@ async def get_today_schedule(ctx):
     rooms_for_courses = get_rooms_for_courses() 
     i = 0
     
+    print(today_schedule)
+    
     for slot in today_schedule:
         if today_block_times[i] == "-":
             courses.append("-" * 20)
@@ -475,7 +477,7 @@ async def get_today_schedule(ctx):
                            f"{' ' * (24 - len(course_for_this_slot))}{room}")
         i += 1
 
-    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
+    await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
 
 @getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
