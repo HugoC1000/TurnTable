@@ -114,16 +114,16 @@ special_uniform_dates = {
 }
 
 
-block_1a_courses = ["AP Chinese", "AP Statistics", "AP World History: Modern", "CLE", "Concert Band 10", "Entrepreneurship 12",  "Pre-Calculus 12", "Social Studies 10","Theatre Company 10", "Web Development 10"]
-block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enriched", "French 11", "Literary Studies 11", "Pre-AP English 11", "Science 10", "Social Studies 10", "Study Block"]
+block_1a_courses = ["AP Chinese", "AP Stats", "AP Modern World", "CLE", "Concert Band 10", "Entrepreneurship 12",  "PC 12", "Socials 10","Theatre Company 10", "Web Dev 10"]
+block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enr", "French 11", "Lit Studies 11", "Pre-AP English 11", "Science 10", "Socials 10", "Study Block"]
 block_1c_courses = ["Advisory Field", "Advisory Harms", "Advisory McGee", "Advisory O'Donnell", "Advisory Sjerven" ]
-block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Literary Studies 11", "Pre-AP English 11",  "Pre-Calculus 11","Pre-Calculus 12", "Spanish 10", "Study Block", "WP"]
-block_1e_courses = ["Chemistry 11", "CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enriched", "Mandarin 10 Accel", "Media Design 10", "PE 11", "Pre-Calculus 12", "Study Block" ]
-block_2a_courses = ["Active Living 11",  "AP Economics", "Chemistry 11", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "Pre-Calculus 11",  "Science 10", "Social Studies 10", "Study Block"]
-block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chemistry 12", "Life Sciences 11", "PE 10 Brenko", "PE 10 Kimura", "Pre-Calculus 11", "Science 10", "Study Block"]
-block_2c_courses = ["AP Human Geography","AP Statistics",  "Film /TV 11",  "French 10 Enriched", "French 11 Enriched", "French 12",  "Jazz Performence 11", "Math 10",  "Mandarin 10", "Mandarin 11 Accel", "Physics 11", "Pre-AP English 10", "Science 10H", "Social Studies 10", "Study Block"]
-block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Life Sciences 11", "Pre-AP English 10", "Pre-Calculus 12", "Study Block", "Web Development 10"]
-block_2e_courses = ["20th Century World History", "BC FP 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Physics 12", "Pre-Calculus 11", "Study Block", "Woodwork 10"]
+block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Lit Studies 11", "Pre-AP English 11",  "PC 11","PC 12", "Spanish 10", "Study Block", "WP"]
+block_1e_courses = ["Chem 11", "CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enr", "Mandarin 10 Accel", "Media Design 10", "PE 11", "PC 12", "Study Block" ]
+block_2a_courses = ["Active Living 11",  "AP Economics", "Chem 11", "English Studies 12", "French 10", "PE 10", "PE Aquatics", "PC 11",  "Science 10", "Socials 10", "Study Block"]
+block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chem 12", "Life Science 11", "PE 10 Brenko", "PE 10 Kimura", "PC 11", "Science 10", "Study Block"]
+block_2c_courses = ["AP Human Geo","AP Stats",  "Film/TV 11",  "French 10 Enr", "French 11 Enr", "French 12",  "Jazz Perf. 11", "Math 10",  "Mandarin 10", "Mandarin 11 Accel", "Physics 11", "Pre-AP English 10", "Science 10H", "Socials 10", "Study Block"]
+block_2d_courses = ["Art Studio 10", "CLE", "Film/TV 11", "Life Science 11", "Pre-AP English 10", "PC 12", "Study Block", "Web Dev 10"]
+block_2e_courses = ["20 Cent. World History", "BC FP 12",  "Chem 11", "French 10", "Math 10", "Physics 11", "Physics 12", "PC 11", "Study Block", "Woodwork 10"]
 
 
 
@@ -339,16 +339,16 @@ def getUserById(user_id):
 
 def get_rooms_for_courses():
     rooms_for_courses = {
-    "1A" : {"AP Chinese" : "021W","AP World History: Modern" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","Pre-Calculus 12" : "S 013" , "Social Studies 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Development 10": "S 206/Holowka Room"},
-    "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enriched" : "023W" , "French 11" : "021W" , "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Social Studies 10" : "S 122", "Study Block" : "Location varies"},
+    "1A" : {"AP Chinese" : "021W","AP Modern World" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","PC 12" : "S 013" , "Socials 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Dev 10": "S 206/Holowka Room"},
+    "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enr" : "023W" , "French 11" : "021W" , "Lit Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Socials 10" : "S 122", "Study Block" : "Location varies"},
     "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
-    "1D" : {"AP CSP" : "S 203/Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "032E" , "Pre-Calculus 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
-    "1E" : {"Chemistry 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enriched" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "Pre-Calculus 12" : "031E" , "Study Block" : "Location varies"},
-    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Mr. Lu room" , "Chemistry 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"Pre-Calculus 11" : "032E" , "Science 10" : "S 208" , "Social Studies 10" : "S 114" , "Study Block" : "Location varies"},
-    "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chemistry 12" : "S 200", "Life Sciences 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "Pre-Calculus 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
-    "2C" : {"AP Human Geography" : "S 216","AP Statistics" : "032E",  "Film /TV 11" : "S 211",  "French 10 Enriched" : "023W", "French 11 Enriched" : "S 013", "French 12" : "022W",  "Jazz Performence 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP English 10" : "S 112", "Science 10" : "S 200", "Social Studies 10" : "S 114", "Study Block" : "Location varies"},
-    "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film and TV 11" : "S 221", "Life Sciences 11" : "S 200", "Pre-AP English 10" : "S 122", "Pre-Calculus 12" : "031E", "Study Block" : "Location varies", "Web Development 10" : "S 20/Holowka Room"},
-    "2E" : {"20th Century World History" : "S 114", "BC FP 12" : "S 216",  "Chemistry 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "Pre-Calculus 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
+    "1D" : {"AP CSP" : "S 203/Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Lit Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "PC 11" : "032E" , "PC 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
+    "1E" : {"Chem 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enr" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "PC 12" : "031E" , "Study Block" : "Location varies"},
+    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Mr. Lu room" , "Chem 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"PC 11" : "032E" , "Science 10" : "S 208" , "Socials 10" : "S 114" , "Study Block" : "Location varies"},
+    "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chem 12" : "S 200", "Life Science 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "PC 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
+    "2C" : {"AP Human Geo" : "S 216","AP Stats" : "032E",  "Film/TV 11" : "S 211",  "French 10 Enr" : "023W", "French 11 Enr" : "S 013", "French 12" : "022W",  "Jazz Perf. 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP English 10" : "S 112", "Science 10" : "S 200", "Socials 10" : "S 114", "Study Block" : "Location varies"},
+    "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film/TV 11" : "S 221", "Life Science 11" : "S 200", "Pre-AP English 10" : "S 122", "PC 12" : "031E", "Study Block" : "Location varies", "Web Dev 10" : "S 20/Holowka Room"},
+    "2E" : {"20th Century World History" : "S 114", "BC FP 12" : "S 216",  "Chem 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "PC 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
 }
     return rooms_for_courses
 
@@ -467,10 +467,10 @@ async def get_today_schedule(ctx):
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            print(f"{today_block_times[i]}   1C: Advisory:  {advisory_type}"
-                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
-            courses.append(f"{today_block_times[i]}   1C: Advisory:  {advisory_type}"
-                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+            print(f"{today_block_times[i]}   Advisory:  {advisory_type}"
+                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
+            courses.append(f"{today_block_times[i]}   Advisory:  {advisory_type}"
+                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}   School Event")
         else:
@@ -478,8 +478,8 @@ async def get_today_schedule(ctx):
             print(course_for_this_slot)
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             
-            courses.append(f"{today_block_times[i]}   {slot}: {course_for_this_slot}"
-                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+            courses.append(f"{today_block_times[i]}   {course_for_this_slot}"
+                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
         i += 1
 
     await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
@@ -518,10 +518,8 @@ async def get_tomorrow_schedule(ctx):
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            print(f"{tomorrow_block_times[i]}   1C: Advisory:  {advisory_type}"
-                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
-            courses.append(f"{tomorrow_block_times[i]}   1C: Advisory:  {advisory_type}"
-                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+            courses.append(f"{tomorrow_block_times[i]}   Advisory:  {advisory_type}"
+                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
         elif slot == 'school_event':
             courses.append(f"{tomorrow_block_times[i]}   School Event")
         else:
@@ -529,8 +527,8 @@ async def get_tomorrow_schedule(ctx):
             
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             
-            courses.append(f"{tomorrow_block_times[i]}   {slot}: {course_for_this_slot}"
-                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+            courses.append(f"{tomorrow_block_times[i]}   {course_for_this_slot}"
+                           f"{' ' * (20 - len(course_for_this_slot))}{room}")
         i += 1
 
     await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
