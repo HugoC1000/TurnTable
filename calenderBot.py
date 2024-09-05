@@ -348,7 +348,7 @@ def get_rooms_for_courses():
     "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chem 12" : "S 200", "Life Science 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "PC 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
     "2C" : {"AP Human Geo" : "S 216","AP Stats" : "032E",  "Film/TV 11" : "S 211",  "French 10 Enr" : "023W", "French 11 Enr" : "S 013", "French 12" : "022W",  "Jazz Perf. 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP Eng. 10" : "S 112", "Science 10" : "S 200", "Socials 10" : "S 114", "Study Block" : "Location varies"},
     "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film/TV 11" : "S 221", "Life Science 11" : "S 200", "Pre-AP Eng. 10" : "S 122", "PC 12" : "031E", "Study Block" : "Location varies", "Web Dev 10" : "S 20/Holowka Room"},
-    "2E" : {"20th Century World History" : "S 114", "BC FP 12" : "S 216",  "Chem 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "PC 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
+    "2E" : {"20th Cent. World History" : "S 114", "BC FP 12" : "S 216",  "Chem 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "PC 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
 }
     return rooms_for_courses
 
@@ -465,7 +465,6 @@ async def get_today_schedule(ctx):
             print("Entered advisory")
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
             room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
-            print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{today_block_times[i]}  Advisory:  {advisory_type}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
@@ -475,6 +474,7 @@ async def get_today_schedule(ctx):
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             print(course_for_this_slot)
             room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            print(room)
             
             courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
                            f"{' ' * (20 - len(course_for_this_slot))}{room}")
