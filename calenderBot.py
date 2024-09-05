@@ -125,23 +125,36 @@ block_2c_courses = ["AP Human Geography","AP Statistics",  "Film /TV 11",  "Fren
 block_2d_courses = ["Art Studio 10", "CLE", "Film and TV 11", "Life Sciences 11", "Pre-AP English 10", "Pre-Calculus 12", "Study Block", "Web Development 10"]
 block_2e_courses = ["20th Century World History", "BC FP 12",  "Chemistry 11", "French 10", "Math 10", "Physics 11", "Physics 12", "Pre-Calculus 11", "Study Block", "Woodwork 10"]
 
-rooms_for_courses = {
-    "1A" : {"AP Chinese" : "021W","AP World History: Modern" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","Pre-Calculus 12" : "S 013" , "Social Studies 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Development 10": "S 206/Holowka Room"},
-    "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enriched" : "023W" , "French 11" : "021W" , "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Social Studies 10" : "S 122", "Study Block" : "Location varies"},
-    "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
-    "1D" : {"AP CSP" : "S 203/ Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "032E" , "Pre-Calculus 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
-    "1E" : {"Chemistry 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enriched" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "Pre-Calculus 12" : "031E" , "Study Block" : "Location varies"},
-    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Mr. Lu room" , "Chemistry 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"Pre-Calculus 11" : "032E" , "Science 10" : "S 208" , "Social Studies 10" : "S 114" , "Study Block" : "Location varies"},
-    "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chemistry 12" : "S 200", "Life Sciences 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "Pre-Calculus 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
-    "2C" : {"AP Human Geography" : "S 216","AP Statistics" : "032E",  "Film /TV 11" : "S 211",  "French 10 Enriched" : "023W", "French 11 Enriched" : "S 013", "French 12" : "022W",  "Jazz Performence 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP English 10" : "S 112", "Science 10" : "S 200", "Social Studies 10" : "S 114", "Study Block" : "Location varies"},
-    "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film and TV 11" : "S 221", "Life Sciences 11" : "S 200", "Pre-AP English 10" : "S 122", "Pre-Calculus 12" : "031E", "Study Block" : "Location varies", "Web Development 10" : "S 20/Holowka Room"},
-    "2E" : {"20th Century World History" : "S 114", "BC FP 12" : "S 216",  "Chemistry 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "Pre-Calculus 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
-}
+
 
 
 # Helper function to determine if a day is a day off
 def is_day_off(date):
     return date.weekday() in days_off or date in custom_days_off
+
+async def get_courses_from_block(ctx: discord.AutocompleteContext):
+
+    selectedBlock = ctx.options['block']
+    if selectedBlock == '1A':
+        return block_1a_courses
+    elif selectedBlock == '1B':
+        return block_1b_courses
+    elif selectedBlock == '1C':
+        return block_1c_courses
+    elif selectedBlock == '1D':
+        return block_1d_courses
+    elif selectedBlock == '1E':
+        return block_1e_courses
+    elif selectedBlock == '2A':
+        return block_2a_courses
+    elif selectedBlock == '2B':
+        return block_2b_courses
+    elif selectedBlock == '2C':
+        return block_2c_courses
+    elif selectedBlock == '2D':
+        return block_2d_courses
+    elif selectedBlock == '2E':
+        return block_2e_courses
 
 # Helper function to get today's schedule
 def get_today_blocks():
@@ -168,7 +181,6 @@ def get_today_block_times():
         return custom_block_times[today]
     else:
         return time_slots
-
 
 def get_tomorrow_blocks():
     # Check for custom block order
@@ -260,22 +272,17 @@ def compare_schedule(discord_id1, discord_id2):
     # Return the schedules in a tuple
     return schedule1, schedule2
 
-def get_user_schedule(discord_id):
-    user = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
-    if user:
-        return {
-            '1A': user.A1,
-            '1B': user.B1,
-            '1C': user.C1,
-            '1D': user.D1,
-            '1E': user.E1,
-            '2A': user.A2,
-            '2B': user.B2,
-            '2C': user.C2,
-            '2D': user.D2,
-            '2E': user.E2
-        }
-    return {}
+def get_or_create_user_schedule(discord_id, username=None):
+    # Attempt to retrieve the user's schedule from the database
+    user_schedule = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
+
+    # If the user does not exist, create a new record
+    if not user_schedule:
+        user_schedule = UserSchedule(discord_id=discord_id, username=username or "Placeholder")
+        session.add(user_schedule)
+        session.commit()
+
+    return user_schedule
 
 def save_user_schedule(discord_id, schedule_data):
     user = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
@@ -331,199 +338,40 @@ def getUserById(user_id):
         print(f'Failed to fetch user. Error: {str(e)}')
         return "Error"
 
+def get_rooms_for_courses():
+    rooms_for_courses = {
+    "1A" : {"AP Chinese" : "021W","AP World History: Modern" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","Pre-Calculus 12" : "S 013" , "Social Studies 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Development 10": "S 206/Holowka Room"},
+    "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enriched" : "023W" , "French 11" : "021W" , "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Social Studies 10" : "S 122", "Study Block" : "Location varies"},
+    "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
+    "1D" : {"AP CSP" : "S 203/ Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "032E" , "Pre-Calculus 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
+    "1E" : {"Chemistry 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enriched" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "Pre-Calculus 12" : "031E" , "Study Block" : "Location varies"},
+    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Mr. Lu room" , "Chemistry 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"Pre-Calculus 11" : "032E" , "Science 10" : "S 208" , "Social Studies 10" : "S 114" , "Study Block" : "Location varies"},
+    "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chemistry 12" : "S 200", "Life Sciences 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "Pre-Calculus 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
+    "2C" : {"AP Human Geography" : "S 216","AP Statistics" : "032E",  "Film /TV 11" : "S 211",  "French 10 Enriched" : "023W", "French 11 Enriched" : "S 013", "French 12" : "022W",  "Jazz Performence 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP English 10" : "S 112", "Science 10" : "S 200", "Social Studies 10" : "S 114", "Study Block" : "Location varies"},
+    "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film and TV 11" : "S 221", "Life Sciences 11" : "S 200", "Pre-AP English 10" : "S 122", "Pre-Calculus 12" : "031E", "Study Block" : "Location varies", "Web Development 10" : "S 20/Holowka Room"},
+    "2E" : {"20th Century World History" : "S 114", "BC FP 12" : "S 216",  "Chemistry 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "Pre-Calculus 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
+}
+    return rooms_for_courses
+
 testGroup = bot.create_group("testgroup", "math related commands")
 
 schedule_input_cmds = bot.create_group("input", "input the courses you have for each block")
 
-@schedule_input_cmds.command(name = "1a", description = "Change your 1a block")
-async def change1a(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1a_courses)):
+@schedule_input_cmds.command(name="change", description="Change one of your blocks")
+async def change(ctx: discord.ApplicationContext, block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"]), course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
     user_id = str(ctx.author.id)
 
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
+    # Fetch or create the user's schedule
+    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
 
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
+    # Map the block to the correct attribute (e.g., "1A" -> "A1")
+    block_attr = block[1] + block[0]
 
-    # Update the 1C block with the new course name
-    user_schedule.A1 = course_name
+    # Update the corresponding block with the new course name
+    setattr(user_schedule, block_attr, course_name)
     session.commit()
 
-    await ctx.respond(f"{course_name} saved to 1A")
-
-@schedule_input_cmds.command(name = "1b", description = "Change your 1b block")
-async def change1b(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1b_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 1C block with the new course name
-    user_schedule.B1 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 1B")
-
-@schedule_input_cmds.command(name = "1c", description = "Change your 1c block")
-async def change1c(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1c_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 1C block with the new course name
-    user_schedule.C1 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 1C")
-
-@schedule_input_cmds.command(name = "1d", description = "Change your 1d block")
-async def change1d(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1d_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 1D block with the new course name
-    user_schedule.D1 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 1D")
-
-@schedule_input_cmds.command(name = "1e", description = "Change your 1e block")
-async def change1e(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_1e_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 1E block with the new course name
-    user_schedule.E1 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 1E")
-
-@schedule_input_cmds.command(name = "2a", description = "Change your 2a block")
-async def change2a(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2a_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 2A block with the new course name
-    user_schedule.A2 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 2A")
-
-@schedule_input_cmds.command(name = "2b", description = "Change your 2b block")
-async def change2b(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2b_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 2B block with the new course name
-    user_schedule.B2 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 2B")
-
-@schedule_input_cmds.command(name = "2c", description = "Change your 2c block")
-async def change2c(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2c_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 2C block with the new course name
-    user_schedule.C2 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 2C")
-
-@schedule_input_cmds.command(name = "2d", description = "Change your 2d block")
-async def change2d(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2d_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 2D block with the new course name
-    user_schedule.D2 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 2D")
-
-@schedule_input_cmds.command(name = "2e", description = "Change your 2e block")
-async def change2e(ctx: discord.ApplicationContext, course_name : discord.Option(str, choices = block_2e_courses)):
-    user_id = str(ctx.author.id)
-
-    # Retrieve the user’s current schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
-
-    # Check if the user exists in the database
-    if not user_schedule:
-        # If the user does not exist, create a new record
-        user_schedule = UserSchedule(discord_id=user_id, username=str(ctx.author))
-        session.add(user_schedule)
-
-    # Update the 2E block with the new course name
-    user_schedule.E2 = course_name
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to 2E")
+    await ctx.respond(f"{course_name} saved to {block}")
 
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
 async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = block_1a_courses), block1b : discord.Option(str, choices = block_1b_courses), block1c :  discord.Option(str, choices = block_1c_courses), block1d :  discord.Option(str, choices = block_1d_courses), block1e :  discord.Option(str, choices = block_1e_courses), 
@@ -552,33 +400,9 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Opti
 
 
 
-
-
 getCmds = bot.create_group("get", "Get information about schedules and courses")
 
-async def get_courses_from_block(ctx: discord.AutocompleteContext):
 
-    selectedBlock = ctx.options['block']
-    if selectedBlock == '1A':
-        return block_1a_courses
-    elif selectedBlock == '1B':
-        return block_1b_courses
-    elif selectedBlock == '1C':
-        return block_1c_courses
-    elif selectedBlock == '1D':
-        return block_1d_courses
-    elif selectedBlock == '1E':
-        return block_1e_courses
-    elif selectedBlock == '2A':
-        return block_2a_courses
-    elif selectedBlock == '2B':
-        return block_2b_courses
-    elif selectedBlock == '2C':
-        return block_2c_courses
-    elif selectedBlock == '2D':
-        return block_2d_courses
-    elif selectedBlock == '2E':
-        return block_2e_courses
 
 @getCmds.command(name = "people_in_class", description = "Gives a list of people who are in the class specified")
 async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B","1C","1D","1E","2A","2B","2C","2D","2E"]), course_name : discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
@@ -611,85 +435,93 @@ async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B
 @getCmds.command(name="today_schedule", description="Get your schedule for today.")
 async def get_today_schedule(ctx):
     user_id = str(ctx.author.id)
-    user_schedule = get_user_schedule(user_id)
-    print("User Schedule: " )
-    print(user_schedule)
-    today_schedule = get_today_blocks()
-    print("Today Schedule: ")
-    print(today_schedule)
+    
+    # Fetch or create the user's schedule
+    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
+    
+    today_schedule = get_today_schedule()
     today_block_times = get_today_block_times()
-    if not user_schedule:
+
+    if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
+                user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
         await ctx.respond("You haven't set any courses yet.")
         return
     
-        
     if today_schedule == "No school":
-        await ctx.respond ("No school today.")
+        await ctx.respond("No school tomorrow.")
         return 
-    
+
     courses = []
+    rooms_for_courses = get_rooms_for_courses() 
     i = 0
+    
     for slot in today_schedule:
-        if(today_block_times[i] == "-"):
+        if today_block_times[i] == "-":
             courses.append("-" * 20)
-            i+=1
-        if slot == '1C(PA)':
-            course_for_this_slot = user_schedule.get('1C', 'None')
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: School Event"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
-        elif slot == '1C(P)':
-            course_for_this_slot = user_schedule.get('1C', 'None')
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: PEAKS"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
-        elif slot == '1C(A)':
-            course_for_this_slot = user_schedule.get('1C', 'None')
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: Academics"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get('1C').get(course_for_this_slot)}")
+            i += 1
+            continue
+
+        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
+            advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
+            courses.append(f"{today_block_times[i]}   {slot}: Advisory: {advisory_type}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}   School Event")
         else:
-            course_for_this_slot = user_schedule.get(slot, 'None')
+            course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
+            
+            room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            
             courses.append(f"{today_block_times[i]}   {slot}: {course_for_this_slot}"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
-        i+= 1
-    
-    await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" +  "\n".join(courses) + "```")
+                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+        i += 1
+
+    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
 
 @getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
     user_id = str(ctx.author.id)
-    user_schedule = get_user_schedule(user_id)
+    
+    # Fetch or create the user's schedule
+    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
+    
     tomorrow_schedule = get_tomorrow_blocks()
     tomorrow_block_times = get_tomorrow_block_times()
-    if not user_schedule:
+
+    if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
+                user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
         await ctx.respond("You haven't set any courses yet.")
         return
     
     if tomorrow_schedule == "No school":
-        await ctx.respond ("No school tomorrow.")
+        await ctx.respond("No school tomorrow.")
         return 
-    
+
     courses = []
+    rooms_for_courses = get_rooms_for_courses() 
     i = 0
+    
     for slot in tomorrow_schedule:
-        if(tomorrow_block_times[i] == "-"):
+        if tomorrow_block_times[i] == "-":
             courses.append("-" * 20)
-            i+=1
-        if slot == '1C(PA)':
-            courses.append(f"{tomorrow_block_times[i]}   {slot}: Advisory: School Event")
-        elif slot == '1C(P)':
-            courses.append(f"{tomorrow_block_times[i]}   {slot}: Advisory: PEAKS")
-        elif slot == '1C(A)':
-            courses.append(f"{tomorrow_block_times[i]}   {slot}: Advisory: Academics")
+            i += 1
+            continue
+
+        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
+            advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
+            courses.append(f"{tomorrow_block_times[i]}   {slot}: Advisory: {advisory_type}")
         elif slot == 'school_event':
             courses.append(f"{tomorrow_block_times[i]}   School Event")
         else:
-            course_for_this_slot = user_schedule.get(slot, 'None')
+            course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
+            
+            room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            
             courses.append(f"{tomorrow_block_times[i]}   {slot}: {course_for_this_slot}"
-                            f"{' ' * (24 - len(course_for_this_slot))}{rooms_for_courses.get(slot).get(course_for_this_slot)}")
-        i+= 1
-    
-    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" +  "\n".join(courses) + "```")
+                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+        i += 1
+
+    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
+
 
 @getCmds.command(name = "compare_schedules", description = "Compare schedules for two people")
 async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: discord.Option(discord.Member,description = "Person 2")):
@@ -734,103 +566,113 @@ async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1
 
 uniform_cmds = bot.create_group("uniform", "Get information about uniform")
 
-@uniform_cmds.command(name = "today", description = "Get uniform for today")
-async def get_uniform_for_today(ctx):
-
+@uniform_cmds.command(name="today", description="Get uniform for today")
+async def get_uniform_for_today(ctx: discord.ApplicationContext):
     today = datetime.today()
-
     weekno = today.weekday()
     today_date = today.date()
 
+    # Initialize response
+    response = ""
+
+    # Check for no school days
     if weekno >= 5 or today_date in custom_days_off:
         response = "No school today"
         await ctx.respond(response)
         return
 
- 
-    response = ""
+    # Determine uniform based on special dates
     if today_date in special_uniform_dates:
-        if(special_uniform_dates[today_date] == "Ceremonial"):
-            response += "Ceremonial Uniform\n"
-        else:
-            response += special_uniform_dates[today_date] + "\n"
+        special_uniform = special_uniform_dates[today_date]
+        response += f"{special_uniform}\n" if special_uniform != "Ceremonial" else "Ceremonial Uniform\n"
     else:
         response += "Regular Uniform\n"
 
-    if weekno < 4:
-        pass
-    elif weekno == 4:
-        response += "Hoodie allowed (Exceptions apply)" 
+    # Add hoodie allowance based on day of the week
+    if weekno == 4:
+        response += "Hoodie allowed (Exceptions apply)\n"
 
-
+    # Get user schedule
     user_id = str(ctx.author.id)
-    user_schedule = get_user_schedule(user_id)
+    user_schedule = get_or_create_user_schedule(user_id)
+
+    # Check for no school scenario
     today_schedule = get_today_blocks()
-
     if today_schedule == "No school":
-        await ctx.respond ("No school today.")
-        return 
+        await ctx.respond("No school today.")
+        return
+
+    # Handle cases where the user schedule is missing
     if not user_schedule:
-        responses += "(Unable to predict if you have PE today. Please input schedule to gain access to this feature)"
-        await ctx.respond(response)
-    
-    for slot in today_schedule:
-        course_name = user_schedule.get(slot, 'Free period')
-        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura" or course_name == "PE Aquatics":
-            print("Detected PE")
-            response += "PE Strip may be needed as you have PE today. (Exceptions apply) \n"
-
-    await ctx.respond(response)
-
-@uniform_cmds.command(name = "tomorrow", description = "Get uniform for tomorrow")
-async def get_uniform_for_tomorrow(ctx):
-
-    today = datetime.today()
-    
-    tomorrow = today + timedelta(days=1)
-    tomorrow_date = tomorrow.date()
-
-    weekno = tomorrow.weekday()
-
-    if weekno  >= 5 or tomorrow_date in custom_days_off:
-        response = "No school today"
+        response += "(Unable to predict if you have PE today. Please input schedule to gain access to this feature)\n"
         await ctx.respond(response)
         return
 
- 
+    # Check for PE classes in the user's schedule
+    pe_courses = {"PE 10", "PE 11", "PE 10 Brenko", "PE 10 Kimura", "PE Aquatics"}
+    for slot in today_schedule:
+        course_name = getattr(user_schedule, slot[1] + slot[0], 'Free period')
+        if course_name in pe_courses:
+            response += "PE Strip may be needed as you have PE today. (Exceptions apply)\n"
+            break  # PE detected, no need to check further slots
+
+    await ctx.respond(response)
+
+
+@uniform_cmds.command(name="tomorrow", description="Get uniform for tomorrow")
+async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
+    # Calculate tomorrow's date and weekday
+    today = datetime.today()
+    tomorrow = today + timedelta(days=1)
+    tomorrow_date = tomorrow.date()
+    weekno = tomorrow.weekday()
+
+    # Initialize response
     response = ""
+
+    # Check for no school days
+    if weekno >= 5 or tomorrow_date in custom_days_off:
+        response = "No school tomorrow."
+        await ctx.respond(response)
+        return
+
+    # Determine uniform based on special dates
     if tomorrow_date in special_uniform_dates:
-        if(special_uniform_dates[tomorrow_date] == "Ceremonial"):
-            response += "Ceremonial Uniform\n"
-        else:
-            response += special_uniform_dates[tomorrow_date] + "\n"
+        special_uniform = special_uniform_dates[tomorrow_date]
+        response += f"{special_uniform}\n" if special_uniform != "Ceremonial" else "Ceremonial Uniform\n"
     else:
         response += "Regular Uniform\n"
 
-    if weekno < 4:
-        pass
-    elif weekno == 4:
-        response += "Hoodie allowed (Exceptions apply)\n" 
+    # Add hoodie allowance based on day of the week
+    if weekno == 4:
+        response += "Hoodie allowed (Exceptions apply)\n"
 
+    # Get user schedule
     user_id = str(ctx.author.id)
-    user_schedule = get_user_schedule(user_id)
+    user_schedule = get_or_create_user_schedule(user_id)
+
+    # Check for no school scenario
     tomorrow_schedule = get_tomorrow_blocks()
-
     if tomorrow_schedule == "No school":
-        await ctx.respond ("No school tomorrow.")
-        return 
+        await ctx.respond("No school tomorrow.")
+        return
 
+    # Handle cases where the user schedule is missing
     if not user_schedule:
-        responses += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)"
+        response += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)\n"
         await ctx.respond(response)
-    
+        return
+
+    # Check for PE classes in the user's schedule
+    pe_courses = {"PE 10", "PE 11", "PE 10 Brenko", "PE 10 Kimura", "PE Aquatics"}
     for slot in tomorrow_schedule:
-        course_name = user_schedule.get(slot, 'Free period')
-        if course_name == "PE 10" or course_name == "PE 11" or course_name == "PE 10 Brenko" or course_name == "PE 10 Kimura" or course_name == "PE Aquatics":
-            print("Detected PE")
-            response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply) \n"
+        course_name = getattr(user_schedule, slot[1] + slot[0], 'Free period')
+        if course_name in pe_courses:
+            response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply)\n"
+            break  # PE detected, no need to check further slots
 
     await ctx.respond(response)
+
 
 
 
