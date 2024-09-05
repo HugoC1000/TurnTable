@@ -553,7 +553,7 @@ async def get_tomorrow_schedule(ctx):
             
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{tomorrow_block_times[i]}  {advisory_type}"
-                           f"{' ' * (course_for_this_slot - len(advisory_type))}{room}")
+                           f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
         elif slot == 'school_event':
             courses.append(f"{tomorrow_block_times[i]}  School Event")
         else:
