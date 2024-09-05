@@ -536,6 +536,7 @@ async def get_tomorrow_schedule(ctx):
             
         max_whitespace_after_courses = max(max_whitespace_after_courses,len(course_for_first_for_loop_slot))
 
+    max_whitespace_after_courses += 3
         
     i = 0
     
