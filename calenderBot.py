@@ -461,9 +461,9 @@ async def get_today_schedule(ctx):
         if today_block_times[i] == "-":
             courses.append("-" * 20)
             i += 1
-            continue
 
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
+            print("Entered advisory")
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{today_block_times[i]}   {slot}: Advisory: {advisory_type}")
         elif slot == 'school_event':
@@ -478,6 +478,7 @@ async def get_today_schedule(ctx):
         i += 1
 
     await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
+    return
 
 @getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
@@ -506,7 +507,6 @@ async def get_tomorrow_schedule(ctx):
         if tomorrow_block_times[i] == "-":
             courses.append("-" * 20)
             i += 1
-            continue
 
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
@@ -523,6 +523,7 @@ async def get_tomorrow_schedule(ctx):
         i += 1
 
     await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
+    return
 
 
 @getCmds.command(name = "compare_schedules", description = "Compare schedules for two people")
