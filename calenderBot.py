@@ -133,7 +133,6 @@ def is_day_off(date):
     return date.weekday() in days_off or date in custom_days_off
 
 async def get_courses_from_block(ctx: discord.AutocompleteContext):
-
     selectedBlock = ctx.options['block']
     if selectedBlock == '1A':
         return block_1a_courses
@@ -343,7 +342,7 @@ def get_rooms_for_courses():
     "1A" : {"AP Chinese" : "021W","AP World History: Modern" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","Pre-Calculus 12" : "S 013" , "Social Studies 10" : "S 112" , "Theatre Company 10" : "J 013/Drama Room", "Web Development 10": "S 206/Holowka Room"},
     "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enriched" : "023W" , "French 11" : "021W" , "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Science 10" : "S 200", "Social Studies 10" : "S 122", "Study Block" : "Location varies"},
     "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
-    "1D" : {"AP CSP" : "S 203/ Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "032E" , "Pre-Calculus 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
+    "1D" : {"AP CSP" : "S 203/Mr. Lu Room", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Literary Studies 11" : "S 112", "Pre-AP English 11" : "S 114", "Pre-Calculus 11" : "032E" , "Pre-Calculus 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
     "1E" : {"Chemistry 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enriched" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "Pre-Calculus 12" : "031E" , "Study Block" : "Location varies"},
     "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Mr. Lu room" , "Chemistry 11" : "S 200" , "English Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"Pre-Calculus 11" : "032E" , "Science 10" : "S 208" , "Social Studies 10" : "S 114" , "Study Block" : "Location varies"},
     "2B" : {"AP Economics" : "S 203/Mr. Lu room", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chemistry 12" : "S 200", "Life Sciences 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "Pre-Calculus 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
@@ -464,8 +463,14 @@ async def get_today_schedule(ctx):
 
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             print("Entered advisory")
+            course_for_this_slot = getattr(user_schedule, "C1", 'None')
+            room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{today_block_times[i]}   {slot}: Advisory: {advisory_type}")
+            print(f"{today_block_times[i]}   1C: Advisory:  {advisory_type}"
+                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+            courses.append(f"{today_block_times[i]}   1C: Advisory:  {advisory_type}"
+                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}   School Event")
         else:
@@ -509,8 +514,14 @@ async def get_tomorrow_schedule(ctx):
             i += 1
 
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
+            course_for_this_slot = getattr(user_schedule, "C1", 'None')
+            room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            print(room)
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{tomorrow_block_times[i]}   {slot}: Advisory: {advisory_type}")
+            print(f"{tomorrow_block_times[i]}   1C: Advisory:  {advisory_type}"
+                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
+            courses.append(f"{tomorrow_block_times[i]}   1C: Advisory:  {advisory_type}"
+                           f"{' ' * (24 - len(course_for_this_slot))}{room}")
         elif slot == 'school_event':
             courses.append(f"{tomorrow_block_times[i]}   School Event")
         else:
