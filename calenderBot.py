@@ -439,7 +439,7 @@ async def get_today_schedule(ctx):
     # Fetch or create the user's schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
     
-    today_schedule = get_today_schedule()
+    today_schedule = get_today_blocks()
     today_block_times = get_today_block_times()
 
     if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
