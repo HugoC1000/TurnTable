@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from user_schedule_model import UserSchedule, Base 
 from table2ascii import table2ascii as t2a, PresetStyle
 import psycopg2
+import numpy as np
 
 # Load environment variables from .env file
 load_dotenv()
@@ -75,18 +76,18 @@ custom_block_times = {
 
 
 schedule_pattern = [
-    ["1A","1B","1C(P)","1D","1E"],
-    ["2A","2B","2C","2D","2E"],
-    ["1A","1B","1E","1C(A)","1D"],
-    ["2A","2B","2E","2C","2D"],
-    ["1A","1B","1D","1E","1C(P)"],
-    ["2A","2B","2D","2E","2C"],
     ["1A","1B","1C(A)","1D","1E"],
     ["2A","2B","2C","2D","2E"],
-    ["1A","1B","1E","1C(P)","1D"],
+    ["1A","1B","1D","1E","1C(P)"],
+    ["2A","2B","2D","2E","2C"],
+    ["1A","1B","1E","1C(A)","1D"],
     ["2A","2B","2E","2C","2D"],
+    ["1A","1B","1C(P)","1D","1E"],
+    ["2A","2B","2C","2D","2E"],
     ["1A","1B","1D","1E","1C(A)"],
     ["2A","2B","2D","2E","2C"],
+    ["1A","1B","1E","1C(P)","1D"],
+    ["2A","2B","2E","2C","2D"],
 ]
 
 
@@ -103,6 +104,7 @@ custom_block_orders = {
     datetime(2024,9,3).date(): ["1C(PA)","2A","2B","2C","2D","2E"],
     datetime(2024,9,5).date():["2A","2B","2C","school_event", "2D","2E"],
     datetime(2024,9,6).date():["1A","1B","1C(PA)","1D","1E"],   
+    datetime(2024,9,10).date() : ['1A','1B','1E','2E','1D'],
     datetime(2024, 12, 20).date(): ["2A", "1A", "2B", "1B", "2C", "1C(P)", "2D", "1D", "2E", "1E"],
       # Example: Last day before winter break
 }
@@ -165,8 +167,8 @@ def get_today_blocks():
         return custom_block_orders[today]
     
     # Calculate the index in the repeating schedule pattern
-    delta_days = (today - schedule_start).days
-    day_index = delta_days % len(schedule_pattern)
+    delta_week_days = np.busday_count(schedule_start, today)
+    day_index = delta_week_days % len(schedule_pattern)
 
     if is_day_off(today) or today in custom_days_off:
         return "No school"
@@ -190,8 +192,8 @@ def get_tomorrow_blocks():
         return custom_block_orders[tomorrow]
     
     # Calculate the index in the repeating schedule pattern
-    delta_days = (tomorrow - schedule_start).days
-    day_index = delta_days % len(schedule_pattern)
+    delta_week_days = np.busday_count(schedule_start, tomorrow)
+    day_index = delta_week_days % len(schedule_pattern)
     print("Day index: ", day_index)
 
     
@@ -448,7 +450,7 @@ async def get_today_schedule(ctx):
         return
     
     if today_schedule == "No school":
-        await ctx.respond("No school tomorrow.")
+        await ctx.respond("No school today.")
         return 
 
     courses = []
