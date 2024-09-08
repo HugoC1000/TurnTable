@@ -5,10 +5,15 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from user_schedule_model import UserSchedule, Base 
+from models import UserSchedule, Base 
 from table2ascii import table2ascii as t2a, PresetStyle
 import psycopg2
 import numpy as np
+
+from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
+from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule
+from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date
 
 # Load environment variables from .env file
 load_dotenv()
@@ -29,305 +34,32 @@ Base.metadata.create_all(engine)
 intents = discord.Intents.all()
 bot = discord.Bot(intents = intents)
 
-time_slots = [
-    "08:20 - 09:30",
-    "09:35 - 10:45",
-    "-",
-    "11:05 - 12:15",
-    "-",
-    "13:05 - 14:15",
-    "14:20 - 15:30"
-]
 
-custom_block_times = {
-    datetime(2024,8,30).date() : ["09:35 - 10:40", 
-                                  "-",
-                                "10:55 - 11:35", 
-                                "11:40 - 12:20",
-                                "-",
-                                "13:20 - 14:00", 
-                                "14:05 - 14:45", 
-                                "14:50 - 15:30"],
-    datetime(2024,9,3).date() : ["09:35 - 10:40", 
-                                 "-",
-                          "10:55 - 11:35", 
-                          "11:40 - 12:20",
-                          "-",
-                        "13:20 - 14:00", 
-                          "14:05 - 14:45", 
-                          "14:50 - 15:30"],
-    datetime(2024,9,5).date() : ["08:20 - 09:20", 
-                          "09:25 - 10:25", 
-                          "-",
-                          "10:45 - 11:45",
-                        "11:50 - 12:30", 
-                        "-",
-                          "13:25 - 14:25", 
-                          "14:30 - 15:30"],
-    datetime(2024,9,6).date() : ["08:20 - 09:20", 
-                          "09:25 - 10:25", 
-                          "-",
-                          "10:45 - 12:10",
-                        "-",
-                          "13:05 - 14:25", 
-                          "14:30 - 15:30"],
-
-}
-
-
-schedule_pattern = [
-    ["1A","1B","1C(A)","1D","1E"],
-    ["2A","2B","2C","2D","2E"],
-    ["1A","1B","1D","1E","1C(P)"],
-    ["2A","2B","2D","2E","2C"],
-    ["1A","1B","1E","1C(A)","1D"],
-    ["2A","2B","2E","2C","2D"],
-    ["1A","1B","1C(P)","1D","1E"],
-    ["2A","2B","2C","2D","2E"],
-    ["1A","1B","1D","1E","1C(A)"],
-    ["2A","2B","2D","2E","2C"],
-    ["1A","1B","1E","1C(P)","1D"],
-    ["2A","2B","2E","2C","2D"],
-]
-
-
-schedule_start = datetime(2024, 9, 4).date()
-
-
-# Days off (no school)
-days_off = {5, 6}  # Saturday and Sunday
-custom_days_off = [datetime(2024, 9, 2).date()]  # Example: Thanksgiving Day
-
-
-custom_block_orders = {
-    datetime(2024,8,30).date(): ["2A","2B","2C","school_event", "2D","2E"],
-    datetime(2024,9,3).date(): ["1C(PA)","2A","2B","2C","2D","2E"],
-    datetime(2024,9,5).date():["2A","2B","2C","school_event", "2D","2E"],
-    datetime(2024,9,6).date():["1A","1B","1C(PA)","1D","1E"],   
-    datetime(2024,9,10).date() : ['1A','1B','1E','2E','1D'],
-    datetime(2024, 12, 20).date(): ["2A", "1A", "2B", "1B", "2C", "1C(P)", "2D", "1D", "2E", "1E"],
-      # Example: Last day before winter break
-}
-
-special_uniform_dates = {
-    datetime(2024,9,3).date() : "Ceremonial",
-    datetime(2024,9,6).date() : "Ceremonial",
-    datetime(2024,9,27).date() : "Orange Shirt Day",
-    datetime(2024,9,13).date() : "PE Uniform allowed all day. Else, regular uniform"
-}
-
-
-block_1a_courses = ["AP Chinese", "AP Stats", "AP Modern World", "CLE", "Concert Band 10", "Entrepreneurship 12",  "PC 12", "Socials 10","Theatre Comp. 10", "Web Dev 10"]
-block_1b_courses = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enr", "French 11", "Lit Studies 11", "Pre-AP Eng. 11", "Science 10", "Socials 10", "Study Block"]
-block_1c_courses = ["Advisory Field", "Advisory Harms", "Advisory McGee", "Advisory O'Donnell", "Advisory Sjerven" ]
-block_1d_courses = ["AP CSP", "Art Studio 10", "EFP 10", "French 10", "Lit Studies 11", "Pre-AP Eng. 11",  "PC 11","PC 12", "Spanish 10", "Study Block", "WP"]
-block_1e_courses = ["Chem 11", "CLE", "CLE(WP)", "Drafting 11", "EFP 10", "French 11 Enr", "Mandarin 10 Accel", "Media Design 10", "PE 11", "PC 12", "Study Block" ]
-block_2a_courses = ["Active Living 11",  "AP Economics", "Chem 11", "Eng. Studies 12", "French 10", "PE 10", "PE Aquatics", "PC 11",  "Science 10", "Socials 10", "Study Block"]
-block_2b_courses = ["AP Economics", "AP French", "AP Music Theory", "Chem 12", "Life Science 11", "PE 10 Brenko", "PE 10 Kimura", "PC 11", "Science 10", "Study Block"]
-block_2c_courses = ["AP Human Geo","AP Stats",  "Film/TV 11",  "French 10 Enr", "French 11 Enr", "French 12",  "Jazz Perf. 11", "Math 10",  "Mandarin 10", "Mandarin 11 Accel", "Physics 11", "Pre-AP Eng. 10", "Science 10H", "Socials 10", "Study Block"]
-block_2d_courses = ["Art Studio 10", "CLE", "Film/TV 11", "Life Science 11", "Pre-AP Eng. 10", "PC 12", "Study Block", "Web Dev 10"]
-block_2e_courses = ["20 Cent. History", "BC FP 12",  "Chem 11", "French 10", "Math 10", "Physics 11", "Physics 12", "PC 11", "Study Block", "Woodwork 10"]
-
-
-
-
-# Helper function to determine if a day is a day off
-def is_day_off(date):
-    return date.weekday() in days_off or date in custom_days_off
 
 async def get_courses_from_block(ctx: discord.AutocompleteContext):
     selectedBlock = ctx.options['block']
     if selectedBlock == '1A':
-        return block_1a_courses
+        return BLOCK_1A_COURSES
     elif selectedBlock == '1B':
-        return block_1b_courses
+        return BLOCK_1B_COURSES
     elif selectedBlock == '1C':
-        return block_1c_courses
+        return BLOCK_1C_COURSES
     elif selectedBlock == '1D':
-        return block_1d_courses
+        return BLOCK_1D_COURSES
     elif selectedBlock == '1E':
-        return block_1e_courses
+        return BLOCK_1E_COURSES
     elif selectedBlock == '2A':
-        return block_2a_courses
+        return BLOCK_2A_COURSES
     elif selectedBlock == '2B':
-        return block_2b_courses
+        return BLOCK_2B_COURSES
     elif selectedBlock == '2C':
-        return block_2c_courses
+        return BLOCK_2C_COURSES
     elif selectedBlock == '2D':
-        return block_2d_courses
+        return BLOCK_2D_COURSES
     elif selectedBlock == '2E':
-        return block_2e_courses
+        return BLOCK_2E_COURSES
 
-# Helper function to get today's schedule
-def get_today_blocks():
-    today = datetime.now().date()
-    print(today)
-    # Check for custom block order
-    if today in custom_block_orders:
-        return custom_block_orders[today]
-    
-    # Calculate the index in the repeating schedule pattern
-    delta_week_days = np.busday_count(schedule_start, today)
-    day_index = delta_week_days % len(schedule_pattern)
 
-    if is_day_off(today) or today in custom_days_off:
-        return "No school"
-    
-    return schedule_pattern[day_index]
-
-def get_today_block_times():
-    today = datetime.now().date()
-    # Check for custom block order
-    if today in custom_block_times:
-        print("entered")
-        return custom_block_times[today]
-    else:
-        return time_slots
-
-def get_tomorrow_blocks():
-    # Check for custom block order
-    tomorrow = datetime.now() + timedelta(days=1)
-    tomorrow = tomorrow.date()
-    if tomorrow in custom_block_orders:
-        return custom_block_orders[tomorrow]
-    
-    # Calculate the index in the repeating schedule pattern
-    delta_week_days = np.busday_count(schedule_start, tomorrow)
-    day_index = delta_week_days % len(schedule_pattern)
-    print("Day index: ", day_index)
-
-    
-
-    # Adjust index if today is a day off
-    if is_day_off(tomorrow) or tomorrow in custom_days_off:
-        return "No school"
-    
-    return schedule_pattern[day_index]
-
-def get_tomorrow_block_times():
-    tomorrow =  datetime.now() + timedelta(days=1)
-    tomorrow = tomorrow.date()
-    # Check for custom block order
-    if tomorrow in custom_block_times:
-        return custom_block_times[tomorrow]
-    else:
-        return time_slots
-
-def compare_schedule(discord_id1, discord_id2): 
-    """
-    Compare the course schedules of two users and return their schedules in two separate dictionaries.
-
-    Args:
-        discord_id1 (str): The Discord ID of the first user.
-        discord_id2 (str): The Discord ID of the second user.
-
-    Returns:
-        tuple: A tuple containing two dictionaries. 
-                The first dictionary has the course schedule for the first user,
-                and the second dictionary has the course schedule for the second user.
-    """
-
-    discord_id1 = str(discord_id1)
-    discord_id2 = str(discord_id2)
-    # Retrieve user schedules from the database
-    user1 = session.query(UserSchedule).filter_by(discord_id=discord_id1).first()
-    user2 = session.query(UserSchedule).filter_by(discord_id=discord_id2).first()
-
-    # Initialize dictionaries to store schedules
-    schedule1 = {}
-    schedule2 = {}
-
-    # Check if the first user exists and populate schedule1
-    if user1:
-        schedule1 = {
-            '1A': user1.A1,
-            '1B': user1.B1,
-            '1C': user1.C1,
-            '1D': user1.D1,
-            '1E': user1.E1,
-            '2A': user1.A2,
-            '2B': user1.B2,
-            '2C': user1.C2,
-            '2D': user1.D2,
-            '2E': user1.E2
-        }
-    else:
-        schedule1 = {'error': 'User 1 not found'}
-
-    # Check if the second user exists and populate schedule2
-    if user2:
-        schedule2 = {
-            '1A': user2.A1,
-            '1B': user2.B1,
-            '1C': user2.C1,
-            '1D': user2.D1,
-            '1E': user2.E1,
-            '2A': user2.A2,
-            '2B': user2.B2,
-            '2C': user2.C2,
-            '2D': user2.D2,
-            '2E': user2.E2
-        }
-    else:
-        schedule2 = {'error': 'User 2 not found'}
-
-    # Return the schedules in a tuple
-    return schedule1, schedule2
-
-def get_or_create_user_schedule(discord_id, username=None):
-    # Attempt to retrieve the user's schedule from the database
-    user_schedule = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
-
-    # If the user does not exist, create a new record
-    if not user_schedule:
-        user_schedule = UserSchedule(discord_id=discord_id, username=username or "Placeholder")
-        session.add(user_schedule)
-        session.commit()
-
-    return user_schedule
-
-def save_user_schedule(discord_id, schedule_data):
-    user = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
-    if not user:
-        user = UserSchedule(discord_id=discord_id, username="Placeholder")  # Username can be updated later
-        session.add(user)
-    
-    for block, course in schedule_data.items():
-        setattr(user, block, course)
-    
-    session.commit()
-
-def get_same_class(block, course_name):
-
-    block = '"' + block[1] + block[0] + '"'
-    print("Reversed block" + block)
-
-    try:
-        conn = psycopg2.connect(
-            dbname= "d66o2tq3s18vlt",
-            user="u5hsl3t8vpl42s",
-            password="pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295",
-            host="cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com",
-            port="5432"
-        )
-
-        cursor = conn.cursor()
-        query = f"SELECT discord_id FROM user_schedules WHERE {block} = %s;"
-        cursor.execute(query, (course_name,))
-        results = cursor.fetchall()
-        
-        for row in results:
-            print(row[0])
-        
-        return results
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return []
-
-    finally:
-        cursor.close()
-        conn.close()
 
 def getUserById(user_id):
     try:
@@ -340,22 +72,6 @@ def getUserById(user_id):
         print(f'Failed to fetch user. Error: {str(e)}')
         return "Error"
 
-def get_rooms_for_courses():
-    rooms_for_courses = {
-    "1A" : {"AP Chinese" : "021W","AP Modern World" : "S 215" , "CLE" : "S 101", "Concert Band 10" : "J 009/Band Room" , "Entrepreneurship 12" : "S 114","PC 12" : "S 013" , "Socials 10" : "S 112" , "Theatre Comp. 10" : "J 013/Drama Room", "Web Dev 10": "S 206/Holowka Room"},
-    "1B" : {"AP Calculus BC" : "032E", "CLE" : "034E", "EFP 10" : "S 110" , "French 10 Enr" : "023W" , "French 11" : "021W" , "Lit Studies 11" : "S 112", "Pre-AP Eng. 11" : "S 114", "Science 10" : "S 200", "Socials 10" : "S 122", "Study Block" : "Location varies"},
-    "1C" : {"Advisory Field" : "S 013", "Advisory Sjerven" : "S 110" , "Advisory McGee" : "S 112", "Advisory O'Donnell" : "S 122"},
-    "1D" : {"AP CSP" : "S 203/Lu's Lab", "Art Studio 10" : "J 010/Art Room", "EFP 10" : "033E", "French 10" : "S 216", "Lit Studies 11" : "S 112", "Pre-AP Eng. 11" : "S 114", "PC 11" : "032E" , "PC 12" : "031E", "Spanish 10" : "024E", "Study Block" : "Location varies","WP" : "S 013"},
-    "1E" : {"Chem 11" : "S 200", "CLE" : "034E" , "CLE(WP)" : "S 013" , "Drafting 11" : "J 010/Art Room", "EFP 10" : "032E" , "French 11 Enr" : "S 013", "Mandarin 10 Accel" : "021W" , "Media Design 10" : "S 216", "PE 11" : "Location varies" , "PC 12" : "031E" , "Study Block" : "Location varies"},
-    "2A" : {"Active Living 11" : "Location varies" ,"AP Economics" : "S 203/Lu's Lab" , "Chem 11" : "S 200" , "Eng. Studies 12" : "S 108" , "French 10" : "S 013" , "PE 10" : "Location varies" , "PE Aquatics" : "A body of water" ,"PC 11" : "032E" , "Science 10" : "S 208" , "Socials 10" : "S 114" , "Study Block" : "Location varies"},
-    "2B" : {"AP Economics" : "S 203/Lu's Lab", "AP French" : "022W", "AP Music Theory" : "J 009/Band Room", "Chem 12" : "S 200", "Life Science 11" : "S 204", "PE 10 Brenko" : "Location varies", "PE 10 Kimura" : "Location varies", "PC 11" : "034E", "Science 10" : "S 208", "Study Block" : "Location varies"},
-    "2C" : {"AP Human Geo" : "S 216","AP Stats" : "032E",  "Film/TV 11" : "S 211",  "French 10 Enr" : "023W", "French 11 Enr" : "S 013", "French 12" : "022W",  "Jazz Perf. 11" : "J 009/Band Room", "Math 10" : "033E",  "Mandarin 10" : "021W", "Mandarin 11 Accel" : "021W", "Physics 11" : "S 208", "Pre-AP Eng. 10" : "S 112", "Science 10" : "S 200", "Socials 10" : "S 114", "Study Block" : "Location varies"},
-    "2D" : {"Art Studio 10" : "J 010/Art Room", "CLE" : "032E", "Film/TV 11" : "S 221", "Life Science 11" : "S 200", "Pre-AP Eng. 10" : "S 122", "PC 12" : "031E", "Study Block" : "Location varies", "Web Dev 10" : "S 20/Holowka Room"},
-    "2E" : {"20 Cent. History" : "S 114", "BC FP 12" : "S 216",  "Chem 11" : "S 200", "French 10" : "S 013", "Math 10" : "031E", "Physics 11" : "S 208", "Physics 12" : "S 206/Holowka Room", "PC 11" : "034E", "Study Block" : "Location varies", "Woodwork 10" : "J 012/Woodshop"}
-}
-    return rooms_for_courses
-
-testGroup = bot.create_group("testgroup", "math related commands")
 
 schedule_input_cmds = bot.create_group("input", "input the courses you have for each block")
 
@@ -376,8 +92,8 @@ async def change(ctx: discord.ApplicationContext, block: discord.Option(str, cho
     await ctx.respond(f"{course_name} saved to {block}")
 
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
-async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = block_1a_courses), block1b : discord.Option(str, choices = block_1b_courses), block1c :  discord.Option(str, choices = block_1c_courses), block1d :  discord.Option(str, choices = block_1d_courses), block1e :  discord.Option(str, choices = block_1e_courses), 
-                         block2a : discord.Option(str, choices = block_2a_courses), block2b : discord.Option(str, choices = block_2b_courses), block2c : discord.Option(str, choices = block_2c_courses), block2d : discord.Option(str, choices = block_2d_courses), block2e : discord.Option(str, choices = block_2e_courses)):
+async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = BLOCK_1A_COURSES), block1b : discord.Option(str, choices = BLOCK_1B_COURSES), block1c :  discord.Option(str, choices = BLOCK_1C_COURSES), block1d :  discord.Option(str, choices = BLOCK_1D_COURSES), block1e :  discord.Option(str, choices = BLOCK_1E_COURSES), 
+                         block2a : discord.Option(str, choices = BLOCK_2A_COURSES), block2b : discord.Option(str, choices = BLOCK_2B_COURSES), block2c : discord.Option(str, choices = BLOCK_2C_COURSES), block2d : discord.Option(str, choices = BLOCK_2D_COURSES), block2e : discord.Option(str, choices = BLOCK_2E_COURSES)):
    
     user_id = str(ctx.author.id)
     username = ctx.author.name
@@ -404,13 +120,11 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Opti
 
 getCmds = bot.create_group("get", "Get information about schedules and courses")
 
-
-
 @getCmds.command(name = "people_in_class", description = "Gives a list of people who are in the class specified")
 async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B","1C","1D","1E","2A","2B","2C","2D","2E"]), course_name : discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
 
     # Call your function to get users in the same class
-    output = get_same_class(block, course_name)  # Implement this function to query the database\
+    output = get_same_class(block, course_name) 
 
     if not output:
         await ctx.respond(f"No users found in {course_name} {block}.")
@@ -441,8 +155,8 @@ async def get_today_schedule(ctx):
     # Fetch or create the user's schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
     
-    today_schedule = get_today_blocks()
-    today_block_times = get_today_block_times()
+    today_schedule = get_blocks_for_date(datetime.now().date())
+    today_block_times = get_block_times_for_date(datetime.now().date())
 
     if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
                 user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
@@ -454,7 +168,6 @@ async def get_today_schedule(ctx):
         return 
 
     courses = []
-    rooms_for_courses = get_rooms_for_courses() 
     i = 0
     
     print(today_schedule)
@@ -484,7 +197,7 @@ async def get_today_schedule(ctx):
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             print("Entered advisory")
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
-            room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{today_block_times[i]}  {advisory_type}"
                            f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
@@ -492,7 +205,7 @@ async def get_today_schedule(ctx):
             courses.append(f"{today_block_times[i]}  School Event")
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             
             courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
                            f"{' ' * (max_whitespace_after_courses - len(course_for_this_slot))}{room}")
@@ -508,8 +221,11 @@ async def get_tomorrow_schedule(ctx):
     # Fetch or create the user's schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
     
-    tomorrow_schedule = get_tomorrow_blocks()
-    tomorrow_block_times = get_tomorrow_block_times()
+    tomorrow = datetime.now() + timedelta(days=1)
+    tomorrow = tomorrow.date()
+    
+    tomorrow_schedule = get_blocks_for_date(tomorrow)
+    tomorrow_block_times = get_block_times_for_date(tomorrow)
 
     if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
                 user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
@@ -521,7 +237,6 @@ async def get_tomorrow_schedule(ctx):
         return 
 
     courses = []
-    rooms_for_courses = get_rooms_for_courses() 
     
     course_for_first_for_loop_slot = ""
     
@@ -552,7 +267,7 @@ async def get_tomorrow_schedule(ctx):
 
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
-            room = rooms_for_courses.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{tomorrow_block_times[i]}  {advisory_type}"
@@ -562,7 +277,7 @@ async def get_tomorrow_schedule(ctx):
         else:
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             
-            room = rooms_for_courses.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             whitespace = ' ' * (max_whitespace_after_courses - len(course_for_this_slot))
             courses.append(f"{tomorrow_block_times[i]}  {course_for_this_slot}"
                            f"{whitespace}{room}")
@@ -625,14 +340,14 @@ async def get_uniform_for_today(ctx: discord.ApplicationContext):
     response = ""
 
     # Check for no school days
-    if weekno >= 5 or today_date in custom_days_off:
+    if weekno >= 5 or today_date in CUSTOM_DAYS_OFF:
         response = "No school today"
         await ctx.respond(response)
         return
 
     # Determine uniform based on special dates
-    if today_date in special_uniform_dates:
-        special_uniform = special_uniform_dates[today_date]
+    if today_date in SPECIAL_UNIFORM_DATES:
+        special_uniform = SPECIAL_UNIFORM_DATES[today_date]
         response += f"{special_uniform}\n" if special_uniform != "Ceremonial" else "Ceremonial Uniform\n"
     else:
         response += "Regular Uniform\n"
@@ -646,7 +361,7 @@ async def get_uniform_for_today(ctx: discord.ApplicationContext):
     user_schedule = get_or_create_user_schedule(user_id)
 
     # Check for no school scenario
-    today_schedule = get_today_blocks()
+    today_schedule = get_blocks_for_date(datetime.now().date())
     if today_schedule == "No school":
         await ctx.respond("No school today.")
         return
@@ -680,14 +395,14 @@ async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
     response = ""
 
     # Check for no school days
-    if weekno >= 5 or tomorrow_date in custom_days_off:
+    if weekno >= 5 or tomorrow_date in CUSTOM_DAYS_OFF:
         response = "No school tomorrow."
         await ctx.respond(response)
         return
 
     # Determine uniform based on special dates
-    if tomorrow_date in special_uniform_dates:
-        special_uniform = special_uniform_dates[tomorrow_date]
+    if tomorrow_date in SPECIAL_UNIFORM_DATES:
+        special_uniform = SPECIAL_UNIFORM_DATES[tomorrow_date]
         response += f"{special_uniform}\n" if special_uniform != "Ceremonial" else "Ceremonial Uniform\n"
     else:
         response += "Regular Uniform\n"
@@ -700,8 +415,11 @@ async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
     user_id = str(ctx.author.id)
     user_schedule = get_or_create_user_schedule(user_id)
 
+    tomorrow = datetime.now() + timedelta(days=1)
+    tomorrow = tomorrow.date()
+    
     # Check for no school scenario
-    tomorrow_schedule = get_tomorrow_blocks()
+    tomorrow_schedule = get_blocks_for_date(tomorrow)
     if tomorrow_schedule == "No school":
         await ctx.respond("No school tomorrow.")
         return
@@ -738,7 +456,7 @@ async def help_command(ctx):
 
     `/input setup` - Set up your schedule with initial data.
 
-    `/input [block]` - Update the course name for a specific block (e.g., `/input 1A`).
+    `/input change [block]` - Update the course name for a specific block (e.g., `/input change 1A`).
 
     `/get schedule_today` - Displays your schedule for today.
 
@@ -777,4 +495,3 @@ async def on_ready():
 
 bot.run('MTI3NjAxNDYwNzAyNjIyNTE4Mw.GlNuGp.Z1I4EHYaD3K8D9sJ3qratBCbs3onkzrAQuRPFY') # run the bot with the token
 
-print("should connect")
