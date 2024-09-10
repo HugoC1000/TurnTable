@@ -23,6 +23,9 @@ class UserSchedule(Base):
     C2 = Column(String)
     D2 = Column(String)
     E2 = Column(String)
+    
+class dates(Base):
+    __tablename__ = 
 
 # Connect to the Heroku PostgreSQL database
 #DATABASE_URL = os.environ['postgresql://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt']

@@ -54,15 +54,6 @@ def get_same_class(block, course_name):
 def compare_schedule(discord_id1, discord_id2): 
     """
     Compare the course schedules of two users and return their schedules in two separate dictionaries.
-
-    Args:
-        discord_id1 (str): The Discord ID of the first user.
-        discord_id2 (str): The Discord ID of the second user.
-
-    Returns:
-        tuple: A tuple containing two dictionaries. 
-                The first dictionary has the course schedule for the first user,
-                and the second dictionary has the course schedule for the second user.
     """
 
     discord_id1 = str(discord_id1)
