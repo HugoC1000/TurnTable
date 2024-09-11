@@ -68,6 +68,7 @@ SPECIAL_UNIFORM_DATES = {
     datetime(2024,9,3).date() : "Ceremonial",
     datetime(2024,9,6).date() : "Ceremonial",
     datetime(2024,9,27).date() : "Orange Shirt Day",
+    datetime(2024,9,12).date() : "Ceremonial",
     datetime(2024,9,13).date() : "PE Uniform allowed all day. Else, regular uniform"
 }
 
