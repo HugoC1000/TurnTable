@@ -181,7 +181,7 @@ def edit_block_order_for_date(date,new_block_order):
         # Update the block order
         
         print(new_block_order)
-        schedule_entry.new_block_order = new_block_order
+        schedule_entry.block_order = new_block_order
 
         # Commit the changes to the database
         session.commit()
@@ -201,7 +201,7 @@ def edit_block_times_for_date(date,new_block_times):
 
     try:
         # Update the uniform
-        schedule_entry.new_block_times = new_block_times
+        schedule_entry.block_times = new_block_times
 
         # Commit the changes to the database
         session.commit()
