@@ -12,7 +12,7 @@ import numpy as np
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date
 
 # Load environment variables from .env file
@@ -517,6 +517,63 @@ async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(
         await ctx.respond(f"Uniform for {date_str} has been updated to {new_uniform}.")
     elif status == None:
         await ctx.respond(f"An error occured. ")
+      
+@set_cmds.command(name="block_order", description="Set the block order for a specific day")
+async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Option(str, description="YYYY-MM-DD"),block_order_str: discord.Option(str, description= "Block order seperated by commas")):
+    """
+    Set the block order for a given date.
+    
+    Args:
+        ctx (discord.ApplicationContext): The context of the command call.
+        date_str (str): The date in "YYYY-MM-DD" format for which to set the uniform.
+        block_order_str (str): The new block order with each block seperated by commas.
+    """
+    
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    
+    
+    block_order_list = block_order_str.strip().split(',')
+    
+    status = edit_block_order_for_date(date_obj, block_order_list)
+    
+    if status == 1:
+        await ctx.respond("No school on that day")
+    elif status == 2:
+        await ctx.respond(f"Block order for {date_str} has been updated to {block_order_list}.")
+    elif status == None:
+        await ctx.respond(f"An error occured. ")
+
+@set_cmds.command(name="block_times", description="Set the uniform for a specific day")
+async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block_times_str: discord.Option(str, description= "Block times seperated by commas")):
+    """
+    Set the uniform for a given date.
+    
+    Args:
+        ctx (discord.ApplicationContext): The context of the command call.
+        date_str (str): The date in "YYYY-MM-DD" format for which to set the uniform.
+        block_times_str (str): The new block order with each block seperated by commas.
+    """
+    # Convert the string date to a datetime object
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    
+    block_order_list = block_times_str.strip().split(',')
+    
+    status = edit_block_times_for_date(date_obj, block_times_str)
+    
+    if status == 1:
+        await ctx.respond("No school on that day")
+    elif status == 2:
+        await ctx.respond(f"Block time for {date_str} has been updated to {block_order_list}.")
+    elif status == None:
+        await ctx.respond(f"An error occured. ")    
         
 @set_cmds.command(name="general", description="Set the all the info for a specific day")
 async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), uniform: str, is_school: bool, block_order: discord.Option(str, description= "Block order seperated by commas"), block_times: discord.Option(str, description= "Block times seperated by comma. Type default for 'default' times")):
