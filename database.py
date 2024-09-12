@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
 from models import UserSchedule, SchoolSchedule  # Import models
+from datetime import datetime 
 
 # Setup SQLAlchemy session
 engine = create_engine('postgresql://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt')
@@ -100,3 +101,110 @@ def compare_schedule(discord_id1, discord_id2):
 
     # Return the schedules in a tuple
     return schedule1, schedule2
+
+def create_new_date(date_str, is_school_open, courses, block_order, block_times,uniform):
+    """
+    Create a new entry in the school_schedule table.
+    
+    Args:
+        date_str (str): Date in "YYYY-MM-DD" format.
+        is_school_open (bool): Whether the school is open on that date.
+        courses (dict): Dictionary containing course names and alternate rooms. Example: {"Math": "Room 101"}.
+        block_order (list): List of block order for the day. Example: ["A1", "B2", "C1", "D2"].
+        block_times (list): List of block times for the day. Example: ["08:00-09:00", "09:10-10:10", ...].
+        uniform(str): The uniform. 
+    """
+    # Convert string date to a datetime object
+    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+    
+    try:
+        # Check if the date already exists
+        existing_date = session.query(SchoolSchedule).filter_by(schedule_date=date_obj).first()
+        if existing_date:
+            print(f"Date {date_str} already exists in the database.")
+            return None
+
+        # Create a new ScheduleDate entry
+        new_date = SchoolSchedule(
+            schedule_date=date_obj,
+            uniform = uniform,
+            school_open=is_school_open,
+            courses=courses,
+            block_order=block_order,
+            block_times=block_times,
+            
+        )
+        
+        # Add the new entry to the session and commit it to the database
+        session.add(new_date)
+        session.commit()
+        
+        print(f"New date {date_str} added successfully.")
+        return new_date
+
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred on line 144: {e}")
+        return None
+
+def get_school_info_from_date(date):
+    return session.query(SchoolSchedule).filter_by(schedule_date=date).first()
+
+def edit_uniform_for_date(date,new_uniform):
+        # Query the database for the existing schedule entry for that date
+    schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date).first()
+
+    if not schedule_entry:
+        return 1
+
+    try:
+        # Update the uniform
+        schedule_entry.uniform = new_uniform
+
+        # Commit the changes to the database
+        session.commit()
+
+        return 2
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        print(f"An error occurred while updating the uniform: {e}")
+        return None
+
+def modify_or_create_new_date(date_obj, uniform, is_school, block_order_list, block_times_list):
+        # Check if the date already exists
+    schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date_obj).first()
+
+    if schedule_entry:
+        # Update existing entry
+        try:
+            schedule_entry.uniform = uniform
+            schedule_entry.school_open = is_school
+            schedule_entry.block_order = block_order_list
+            schedule_entry.block_times = block_times_list
+
+            session.commit()
+            return 1
+        except Exception as e:
+            session.rollback()  # Rollback in case of error
+            print(f"An error occurred while updating the schedule: {e}")
+            return 0
+    else:
+        # Create new entry
+        try:
+            new_schedule = SchoolSchedule(
+                schedule_date=date_obj,
+                uniform=uniform,
+                school_open=is_school,
+                block_order=block_order_list,
+                block_times=block_times_list
+            )
+
+            session.add(new_schedule)
+            session.commit()
+            return 1
+        except Exception as e:
+            session.rollback()  # Rollback in case of error
+            print(f"An error occurred while creating the schedule: {e}")
+            return 0
+
+create_new_date("2024-09-13",True,{"2B": {"PE 10 Brenko" : "Lawn Bowling Place"}},["2A","2B","2C","2D","school_event"],["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"],"PE Uniform allowed all day")

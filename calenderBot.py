@@ -12,8 +12,8 @@ import numpy as np
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule
-from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date
+from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date
 
 # Load environment variables from .env file
 load_dotenv()
@@ -156,17 +156,18 @@ async def get_today_schedule(ctx):
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
     
     today_schedule = get_blocks_for_date(datetime.now().date())
+    
+    if not today_schedule:
+        await ctx.respond("No school today.")
+        return
     today_block_times = get_block_times_for_date(datetime.now().date())
 
     if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
                 user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
         await ctx.respond("You haven't set any courses yet.")
         return
-    
-    if today_schedule == "No school":
-        await ctx.respond("No school today.")
-        return 
 
+    print(today_schedule)
     courses = []
     i = 0
     
@@ -225,6 +226,10 @@ async def get_tomorrow_schedule(ctx):
     tomorrow = tomorrow.date()
     
     tomorrow_schedule = get_blocks_for_date(tomorrow)
+        
+    if not tomorrow_schedule:
+        await ctx.respond("No school today.")
+        return
     tomorrow_block_times = get_block_times_for_date(tomorrow)
 
     if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
@@ -237,6 +242,8 @@ async def get_tomorrow_schedule(ctx):
         return 
 
     courses = []
+    
+    print(tomorrow_schedule)
     
     course_for_first_for_loop_slot = ""
     
@@ -339,32 +346,30 @@ async def get_uniform_for_today(ctx: discord.ApplicationContext):
     # Initialize response
     response = ""
 
+    # Query the database for today's schedule
+    
+    today_block_order_info = get_blocks_for_date(today_date)
+    today_uniform_info = get_uniform_for_date(today_date)
+
     # Check for no school days
-    if weekno >= 5 or today_date in CUSTOM_DAYS_OFF:
-        response = "No school today"
+    if not today_block_order_info:
+        response = "No school today."
         await ctx.respond(response)
         return
 
-    # Determine uniform based on special dates
-    if today_date in SPECIAL_UNIFORM_DATES:
-        special_uniform = SPECIAL_UNIFORM_DATES[today_date]
-        response += f"{special_uniform}\n" if special_uniform != "Ceremonial" else "Ceremonial Uniform\n"
+    # Add uniform details
+    if today_uniform_info == "Ceremonial":
+        response += "Ceremonial Uniform\n"
     else:
-        response += "Regular Uniform\n"
+        response += f"{today_uniform_info}\n"
 
-    # Add hoodie allowance based on day of the week
-    if weekno == 4:
+    # Add hoodie allowance based on the day of the week
+    if weekno == 4:  # Assuming Friday is the 5th weekday (index 4)
         response += "Hoodie allowed (Exceptions apply)\n"
 
     # Get user schedule
     user_id = str(ctx.author.id)
     user_schedule = get_or_create_user_schedule(user_id)
-
-    # Check for no school scenario
-    today_schedule = get_blocks_for_date(datetime.now().date())
-    if today_schedule == "No school":
-        await ctx.respond("No school today.")
-        return
 
     # Handle cases where the user schedule is missing
     if not user_schedule:
@@ -374,8 +379,10 @@ async def get_uniform_for_today(ctx: discord.ApplicationContext):
 
     # Check for PE classes in the user's schedule
     pe_courses = {"PE 10", "PE 11", "PE 10 Brenko", "PE 10 Kimura", "PE Aquatics"}
-    for slot in today_schedule:
-        course_name = getattr(user_schedule, slot[1] + slot[0], 'Free period')
+    
+    # Extract the block order for the day from the DB and match with user's schedule
+    for block in today_block_order_info:
+        course_name = getattr(user_schedule, block[1] + block[0], 'Free period')
         if course_name in pe_courses:
             response += "PE Strip may be needed as you have PE today. (Exceptions apply)\n"
             break  # PE detected, no need to check further slots
@@ -383,9 +390,10 @@ async def get_uniform_for_today(ctx: discord.ApplicationContext):
     await ctx.respond(response)
 
 
+
 @uniform_cmds.command(name="tomorrow", description="Get uniform for tomorrow")
 async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
-    # Calculate tomorrow's date and weekday
+    
     today = datetime.today()
     tomorrow = today + timedelta(days=1)
     tomorrow_date = tomorrow.date()
@@ -394,46 +402,43 @@ async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
     # Initialize response
     response = ""
 
+    # Query the database for today's schedule
+    
+    tomorrow_block_order_info = get_blocks_for_date(tomorrow_date)
+    tomorrow_uniform_info = get_uniform_for_date(tomorrow_date)
+
     # Check for no school days
-    if weekno >= 5 or tomorrow_date in CUSTOM_DAYS_OFF:
-        response = "No school tomorrow."
+    if not tomorrow_block_order_info:
+        response = "No school today."
         await ctx.respond(response)
         return
 
-    # Determine uniform based on special dates
-    if tomorrow_date in SPECIAL_UNIFORM_DATES:
-        special_uniform = SPECIAL_UNIFORM_DATES[tomorrow_date]
-        response += f"{special_uniform}\n" if special_uniform != "Ceremonial" else "Ceremonial Uniform\n"
+    # Add uniform details
+    if tomorrow_uniform_info == "Ceremonial":
+        response += "Ceremonial Uniform\n"
     else:
-        response += "Regular Uniform\n"
+        response += f"{tomorrow_uniform_info}\n"
 
-    # Add hoodie allowance based on day of the week
-    if weekno == 4:
+    # Add hoodie allowance based on the day of the week
+    if weekno == 4:  # Assuming Friday is the 5th weekday (index 4)
         response += "Hoodie allowed (Exceptions apply)\n"
 
     # Get user schedule
     user_id = str(ctx.author.id)
     user_schedule = get_or_create_user_schedule(user_id)
 
-    tomorrow = datetime.now() + timedelta(days=1)
-    tomorrow = tomorrow.date()
-    
-    # Check for no school scenario
-    tomorrow_schedule = get_blocks_for_date(tomorrow)
-    if tomorrow_schedule == "No school":
-        await ctx.respond("No school tomorrow.")
-        return
-
     # Handle cases where the user schedule is missing
     if not user_schedule:
-        response += "(Unable to predict if you have PE tomorrow. Please input schedule to gain access to this feature)\n"
+        response += "(Unable to predict if you have PE today. Please input schedule to gain access to this feature)\n"
         await ctx.respond(response)
         return
 
     # Check for PE classes in the user's schedule
     pe_courses = {"PE 10", "PE 11", "PE 10 Brenko", "PE 10 Kimura", "PE Aquatics"}
-    for slot in tomorrow_schedule:
-        course_name = getattr(user_schedule, slot[1] + slot[0], 'Free period')
+    
+    # Extract the block order for the day from the DB and match with user's schedule
+    for block in tomorrow_block_order_info:
+        course_name = getattr(user_schedule, block[1] + block[0], 'Free period')
         if course_name in pe_courses:
             response += "PE Strip may be needed as you have PE tomorrow. (Exceptions apply)\n"
             break  # PE detected, no need to check further slots
@@ -485,6 +490,69 @@ async def say(ctx, message : str):
     else:
         await ctx.respond('This command is for developer only')
 
+set_cmds = bot.create_group("set", "Set information aobut tables")
+
+@set_cmds.command(name="uniform", description="Set the uniform for a specific day")
+async def set_uniform(ctx: discord.ApplicationContext, date_str: str, new_uniform: str):
+    """
+    Set the uniform for a given date.
+    
+    Args:
+        ctx (discord.ApplicationContext): The context of the command call.
+        date_str (str): The date in "YYYY-MM-DD" format for which to set the uniform.
+        new_uniform (str): The new uniform value to set.
+    """
+    # Convert the string date to a datetime object
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    
+    status = edit_uniform_for_date(date_obj, new_uniform)
+    
+    if status == 1:
+        await ctx.respond("No school on that day")
+    elif status == 2:
+        await ctx.respond(f"Uniform for {date_str} has been updated to {new_uniform}.")
+    elif status == None:
+        await ctx.respond(f"An error occured. ")
+        
+@set_cmds.command(name="general", description="Set the all the info for a specific day")
+async def update_schedule(ctx: discord.ApplicationContext, date_str: str, uniform: str, is_school: bool, block_order: str, block_times: str):
+    """
+    Update or create a schedule entry for a given date.
+    
+    Args:
+        ctx (discord.ApplicationContext): The context of the command call.
+        date_str (str): The date in "YYYY-MM-DD" format for which to update/create the schedule.
+        uniform (str): The uniform for the day.
+        is_school (bool): Whether the school is open on that date.
+        block_order (str): Comma-separated list of block order. Example: "A1,B2,C1,D2".
+        block_times (str): Comma-separated list of block times. Example: "08:00-09:00,09:10-10:10,...".
+    """
+    # Convert string date to a datetime object
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    # Parse block order and block times
+    try:
+        block_order_list = [block.strip() for block in block_order.split(',')]
+        block_times_list = [time.strip() for time in block_times.split(',')]
+    except Exception as e:
+        await ctx.respond(f"Error parsing block order or block times: {e}")
+        return
+    
+    status = modify_or_create_new_date(date_obj, uniform, is_school, block_order_list, block_times_list)
+    
+    if not status:
+        await ctx.respond("An error occurred while creating an entry")
+        return
+    else:
+        await ctx.respond("Entry added succesfully")
+    
 
 
 print("runs?")
