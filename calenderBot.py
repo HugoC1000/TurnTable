@@ -223,6 +223,8 @@ async def get_today_schedule(ctx):
                 room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
             else:
                 room = list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room")
+                print(list_of_alt_rooms)
+                print(room)
         
             
             courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
