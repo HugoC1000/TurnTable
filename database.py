@@ -170,6 +170,46 @@ def edit_uniform_for_date(date,new_uniform):
         print(f"An error occurred while updating the uniform: {e}")
         return None
 
+def edit_block_order_for_date(date,new_block_order):
+        # Query the database for the existing schedule entry for that date
+    schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date).first()
+
+    if not schedule_entry:
+        return 1
+
+    try:
+        # Update the uniform
+        schedule_entry.new_block_order = new_block_order
+
+        # Commit the changes to the database
+        session.commit()
+
+        return 2
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        print(f"An error occurred while updating the block order: {e}")
+        return None
+    
+def edit_block_times_for_date(date,new_block_times):
+        # Query the database for the existing schedule entry for that date
+    schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date).first()
+
+    if not schedule_entry:
+        return 1
+
+    try:
+        # Update the uniform
+        schedule_entry.new_block_times = new_block_times
+
+        # Commit the changes to the database
+        session.commit()
+
+        return 2
+    except Exception as e:
+        session.rollback()  # Rollback in case of an error
+        print(f"An error occurred while updating the uniform: {e}")
+        return None
+
 def modify_or_create_new_date(date_obj, uniform, is_school, block_order_list, block_times_list):
         # Check if the date already exists
     schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date_obj).first()

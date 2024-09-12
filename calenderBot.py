@@ -493,7 +493,7 @@ async def say(ctx, message : str):
 set_cmds = bot.create_group("set", "Set information aobut tables")
 
 @set_cmds.command(name="uniform", description="Set the uniform for a specific day")
-async def set_uniform(ctx: discord.ApplicationContext, date_str: str, new_uniform: str):
+async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), new_uniform: str):
     """
     Set the uniform for a given date.
     
@@ -519,7 +519,7 @@ async def set_uniform(ctx: discord.ApplicationContext, date_str: str, new_unifor
         await ctx.respond(f"An error occured. ")
         
 @set_cmds.command(name="general", description="Set the all the info for a specific day")
-async def update_schedule(ctx: discord.ApplicationContext, date_str: str, uniform: str, is_school: bool, block_order: str, block_times: str):
+async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), uniform: str, is_school: bool, block_order: discord.Option(str, description= "Block order seperated by commas"), block_times: discord.Option(str, description= "Block times seperated by comma. Type default for 'default' times")):
     """
     Update or create a schedule entry for a given date.
     
