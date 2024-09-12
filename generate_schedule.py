@@ -18,7 +18,7 @@ def create_schedules_for_dates(start_date, end_date):
     current_date = start_date
     uniform = "Regular uniform"
     is_school = True
-    block_times_list = ["08:20-09:30", "09:35-10:45", "11:05-12:15", "13:05-14:15", "14:20-15:30"]
+    block_times_list = ["08:20-09:30", "09:35-10:45","-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"]
     
     while current_date <= end_date:
         block_order_list = get_block_order_for_date(current_date)

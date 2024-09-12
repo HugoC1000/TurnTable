@@ -37,8 +37,9 @@ def get_uniform_for_date(date):
     # return SCHEDULE_PATTERN[day_index]
 
 def get_block_times_for_date(date):
-    if date in CUSTOM_BLOCK_TIMES:
-        print("entered")
-        return CUSTOM_BLOCK_TIMES[date]
-    else:
-        return TIME_SLOTS
+    school_info = get_school_info_from_date(date)
+    
+    if not school_info:
+        return None
+    
+    return school_info.block_times
