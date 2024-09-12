@@ -3,7 +3,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
-from models import UserSchedule  # Import models
+from models import UserSchedule, SchoolSchedule  # Import models
 
 # Setup SQLAlchemy session
 engine = create_engine('postgresql://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt')
@@ -30,26 +30,24 @@ def save_user_schedule(discord_id, schedule_data):
     session.commit()
 
 def get_same_class(block, course_name):
-    block = '"' + block[1] + block[0] + '"'
+    # Convert the block format (e.g., '1A' to 'A1') Colums in database are in A1,B1,C1, etc
+    block =  block[1] + block[0]
+    # block  = block.lower()
+    # Perform the query using SQLAlchemy ORM
     try:
-        conn = psycopg2.connect(
-            dbname= "d66o2tq3s18vlt",
-            user="u5hsl3t8vpl42s",
-            password="pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295",
-            host="cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com",
-            port="5432"
-        )
-        cursor = conn.cursor()
-        query = f"SELECT discord_id FROM user_schedules WHERE {block} = %s;"
-        cursor.execute(query, (course_name,))
-        results = cursor.fetchall()
-        return results
+        # Check if the block exists in the UserSchedule model
+        if hasattr(UserSchedule, block):
+            # Query for users in the same class for that block
+            results = session.query(UserSchedule.discord_id).filter(getattr(UserSchedule, block) == course_name).all()
+            
+            # Extract discord_id from the result set
+            return [result.discord_id for result in results]
+        else:
+            print(f"Block {block} does not exist in the UserSchedule model")
+            return []
     except Exception as e:
         print(f"An error occurred: {e}")
         return []
-    finally:
-        cursor.close()
-        conn.close()
 
 def compare_schedule(discord_id1, discord_id2): 
     """

@@ -3,6 +3,7 @@ load_dotenv()
 
 import os
 from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import Date, Text, Boolean, JSON, ARRAY
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -24,9 +25,16 @@ class UserSchedule(Base):
     D2 = Column(String)
     E2 = Column(String)
     
-# class dates(Base):
-#     __tablename__ = 'dates'
-#     id = Column(String, primary_key= True)
+class SchoolSchedule(Base):
+    __tablename__ = 'school_schedules'
+
+    id = Column(Integer, primary_key=True)
+    schedule_date = Column(Date, nullable=False)
+    uniform = Column(Text, nullable=False)
+    school_open = Column(Boolean, nullable=False)
+    courses = Column(JSON, nullable=True)  # Dictionary of course names and alternate rooms. Also implementation of AP Flex
+    block_order = Column(ARRAY(Text), nullable=True)  # New column for block order (list of blocks, e.g., ['1A', '1B', '1C'])
+    block_times = Column(ARRAY(Text), nullable=True)
     
 
 # Connect to the Heroku PostgreSQL database

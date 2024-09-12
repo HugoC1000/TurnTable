@@ -136,13 +136,13 @@ async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B
     for theid in output:
         # print(type(theid[0]))
         # print(ctx.author.guild)
-        # print(ctx.author.guild.get_member(int(theid[0])))
+        # print(ctx.author.guild.get_member(int(theid)))
         try:
-            name = ctx.author.guild.get_member(int(theid[0])).name
+            name = ctx.author.guild.get_member(int(theid)).name
             # print(type(name))
             response += f"- {name}\n"
         except:
-            response += f"- {theid[0]} (Not in this server) \n"
+            response += f"- {theid} (Not in this server) \n"
 
     # Send the response
     await ctx.respond(response)
