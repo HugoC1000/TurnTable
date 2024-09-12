@@ -2,7 +2,7 @@ from datetime import datetime
 
 SCHEDULE_START = datetime(2024, 9, 4).date()
 # Time slots
-TIME_SLOTS = ["08:20 - 09:30", "09:35 - 10:45", "-", "11:05 - 12:15", "-", "13:05 - 14:15", "14:20 - 15:30"]
+TIME_SLOTS = ["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"]
 
 CUSTOM_BLOCK_TIMES = {
     datetime(2024,8,30).date() : ["09:35 - 10:40", 

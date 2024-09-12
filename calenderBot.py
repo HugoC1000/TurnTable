@@ -565,18 +565,19 @@ async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Opt
         await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
         return
     
-    block_order_list = []
+    block_times_list = []
     if block_times_str.strip().lower() == "default":
-        block_order_list = TIME_SLOTS
+        block_times_list = TIME_SLOTS
     else:
-        block_order_list = block_times_str.strip().split(',')
+        block_times_list = block_times_str.split(',')
     
-    status = edit_block_times_for_date(date_obj, block_times_str)
+    print("e")
+    status = edit_block_times_for_date(date_obj, block_times_list)
     
     if status == 1:
         await ctx.respond("No school on that day")
     elif status == 2:
-        await ctx.respond(f"Block time for {date_str} has been updated to {block_order_list}.")
+        await ctx.respond(f"Block time for {date_str} has been updated to {block_times_list}.")
     elif status == None:
         await ctx.respond(f"An error occured. ")    
         
