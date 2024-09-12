@@ -171,14 +171,16 @@ def edit_uniform_for_date(date,new_uniform):
         return None
 
 def edit_block_order_for_date(date,new_block_order):
-        # Query the database for the existing schedule entry for that date
+    # Query the database for the existing schedule entry for that date
     schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date).first()
 
     if not schedule_entry:
         return 1
 
     try:
-        # Update the uniform
+        # Update the block order
+        
+        print(new_block_order)
         schedule_entry.new_block_order = new_block_order
 
         # Commit the changes to the database

@@ -548,7 +548,7 @@ async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Op
         await ctx.respond(f"An error occured. ")
 
 @set_cmds.command(name="block_times", description="Set the uniform for a specific day")
-async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block_times_str: discord.Option(str, description= "Block times seperated by commas")):
+async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block_times_str: discord.Option(str, description= "Block times seperated by commas. Use default for default block times")):
     """
     Set the uniform for a given date.
     
@@ -558,13 +558,18 @@ async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Opt
         block_times_str (str): The new block order with each block seperated by commas.
     """
     # Convert the string date to a datetime object
+    
     try:
         date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
         await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
         return
     
-    block_order_list = block_times_str.strip().split(',')
+    block_order_list = []
+    if block_times_str.strip().lower() == "default":
+        block_order_list = TIME_SLOTS
+    else:
+        block_order_list = block_times_str.strip().split(',')
     
     status = edit_block_times_for_date(date_obj, block_times_str)
     
