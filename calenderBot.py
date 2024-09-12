@@ -13,7 +13,7 @@ import numpy as np
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
 from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date
-from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date
+from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date
 
 # Load environment variables from .env file
 load_dotenv()
@@ -198,15 +198,32 @@ async def get_today_schedule(ctx):
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             print("Entered advisory")
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
-            room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            list_of_alt_rooms = get_alt_rooms_for_date(datetime.now().date())
+            
+            room = ""
+            
+            if list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
+                room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            else:
+                room = list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room")
+                
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{today_block_times[i]}  {advisory_type}"
                            f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}  School Event")
         else:
+            list_of_alt_rooms = get_alt_rooms_for_date(datetime.now().date())
+            
+            room = ""
+            
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            
+            if list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
+                room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            else:
+                room = list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room")
+        
             
             courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
                            f"{' ' * (max_whitespace_after_courses - len(course_for_this_slot))}{room}")

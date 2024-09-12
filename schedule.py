@@ -36,6 +36,13 @@ def get_uniform_for_date(date):
     
     # return SCHEDULE_PATTERN[day_index]
 
+def get_alt_rooms_for_date(date):
+    school_info = get_school_info_from_date(date)
+    
+    if not school_info:
+        return None
+    
+    return school_info.courses
 def get_block_times_for_date(date):
     school_info = get_school_info_from_date(date)
     
