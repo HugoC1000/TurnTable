@@ -364,9 +364,9 @@ async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1
     for theid in output:
         try:
             # print(type(name))
-            response += f"<@{int(theid[0])}>"
+            response += f"<@{int(theid)}>"
         except:
-            response += f"{theid[0]} (Not in this server) \n"
+            response += f"{theid} (Not in this server) \n"
 
     await ctx.respond(response)
 
