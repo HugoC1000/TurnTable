@@ -180,7 +180,6 @@ async def get_today_schedule(ctx):
     for slot in today_schedule:
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             course_for_this_slot = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-
         elif slot == 'school_event':
             course_for_this_slot = "School Event"
         else:
@@ -190,6 +189,8 @@ async def get_today_schedule(ctx):
 
     max_whitespace_after_courses += 3
     
+    list_of_alt_rooms = get_alt_rooms_for_date(datetime.now().date())
+    
     for slot in today_schedule:
         if today_block_times[i] == "-":
             courses.append("-" * 20)
@@ -198,7 +199,7 @@ async def get_today_schedule(ctx):
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             print("Entered advisory")
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
-            list_of_alt_rooms = get_alt_rooms_for_date(datetime.now().date())
+            
             
             room = ""
             
@@ -213,14 +214,13 @@ async def get_today_schedule(ctx):
         elif slot == 'school_event':
             courses.append(f"{today_block_times[i]}  School Event")
         else:
-            list_of_alt_rooms = get_alt_rooms_for_date(datetime.now().date())
             
             room = ""
             
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             
             if list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
-                room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+                room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
             else:
                 room = list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room")
                 print(list_of_alt_rooms)
@@ -268,6 +268,8 @@ async def get_tomorrow_schedule(ctx):
     
     max_whitespace_after_courses = 0
     
+    list_of_alt_rooms = get_alt_rooms_for_date(tomorrow)
+    
     for slot in tomorrow_schedule:
         print("Slot " + slot)
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
@@ -293,20 +295,35 @@ async def get_tomorrow_schedule(ctx):
 
         if slot in ['1C(PA)', '1C(P)', '1C(A)']:
             course_for_this_slot = getattr(user_schedule, "C1", 'None')
-            room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+
+            room = ""
             
+            if list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
+                room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
+            else:
+                room = list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room")
+                
             advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
             courses.append(f"{tomorrow_block_times[i]}  {advisory_type}"
                            f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
+            
         elif slot == 'school_event':
             courses.append(f"{tomorrow_block_times[i]}  School Event")
         else:
+            room = ""
+            
             course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
             
-            room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
-            whitespace = ' ' * (max_whitespace_after_courses - len(course_for_this_slot))
+            if list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
+                room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
+            else:
+                room = list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room")
+                print(list_of_alt_rooms)
+                print(room)
+        
+            
             courses.append(f"{tomorrow_block_times[i]}  {course_for_this_slot}"
-                           f"{whitespace}{room}")
+                           f"{' ' * (max_whitespace_after_courses - len(course_for_this_slot))}{room}")
         i += 1
 
     await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
