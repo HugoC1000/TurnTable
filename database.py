@@ -19,6 +19,22 @@ def get_or_create_user_schedule(discord_id, username=None):
         session.commit()
     return user_schedule
 
+def change_one_block(user_id,username,block,course_name):  
+    
+    try:
+        # Fetch or create the user's schedule
+        user_schedule = get_or_create_user_schedule(user_id, username=username)
+        
+        # Map the block to the correct attribute (e.g., "1A" -> "A1")
+        block_attr = block[1] + block[0]
+
+        # Update the corresponding block with the new course name
+        setattr(user_schedule, block_attr, course_name)
+        session.commit()
+        return 1
+    except:
+        return 0
+
 def save_user_schedule(discord_id, schedule_data):
     user = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
     if not user:
@@ -248,5 +264,48 @@ def modify_or_create_new_date(date_obj, uniform, is_school, block_order_list, bl
             session.rollback()  # Rollback in case of error
             print(f"An error occurred while creating the schedule: {e}")
             return 0
+
+def add_or_update_alternate_room(date_obj, block, course_name, alternate_room):
+    """
+    Update or add an alternate room for a specific course in a block on a given date.
+    
+    Args:
+        date_obj (datetime.date): The date for which the alternate room is to be updated.
+        block (str): The block in which the course is taking place (e.g., 'A1', 'B2').
+        course_name (str): The name of the course for which the alternate room is being set.
+        alternate_room (str): The new alternate room for the course.
+    
+    Returns:
+        int: 1 if successful, 0 if failed.
+    """
+    try:
+        # Retrieve the existing schedule entry for the given date
+        schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date_obj).first()
+
+        if not schedule_entry:
+            print(f"No schedule found for {date_obj}.")
+            return 0
+
+        # Load the existing courses JSON data
+        courses = schedule_entry.courses or {}
+
+        # Update or add the alternate room in the relevant block
+        if block not in courses:
+            courses[block] = {}
+        
+        # Update or add the course and alternate room
+        courses[block][course_name] = alternate_room
+
+        # Update the database entry
+        schedule_entry.courses = courses
+        session.commit()
+
+        print(f"Successfully updated alternate room for {course_name} in block {block} on {date_obj}.")
+        return 1
+
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred while updating alternate room: {e}")
+        return 0
 
 create_new_date("2024-09-13",True,{"2B": {"PE 10 Brenko" : "Lawn Bowling Place"}},["2A","2B","2C","2D","school_event"],["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"],"PE Uniform allowed all day")

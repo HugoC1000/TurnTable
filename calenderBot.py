@@ -12,7 +12,7 @@ import numpy as np
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date
 
 # Load environment variables from .env file
@@ -77,19 +77,15 @@ schedule_input_cmds = bot.create_group("input", "input the courses you have for 
 
 @schedule_input_cmds.command(name="change", description="Change one of your blocks")
 async def change(ctx: discord.ApplicationContext, block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"]), course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
+
     user_id = str(ctx.author.id)
-
-    # Fetch or create the user's schedule
-    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
-
-    # Map the block to the correct attribute (e.g., "1A" -> "A1")
-    block_attr = block[1] + block[0]
-
-    # Update the corresponding block with the new course name
-    setattr(user_schedule, block_attr, course_name)
-    session.commit()
-
-    await ctx.respond(f"{course_name} saved to {block}")
+    username=str(ctx.author)
+    
+    result = change_one_block(user_id,username,block,course_name)
+    if(result):
+        await ctx.respond(f"{course_name} saved to {block}")
+    else:
+        await ctx.respond("An error occured")
 
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
 async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = BLOCK_1A_COURSES), block1b : discord.Option(str, choices = BLOCK_1B_COURSES), block1c :  discord.Option(str, choices = BLOCK_1C_COURSES), block1d :  discord.Option(str, choices = BLOCK_1D_COURSES), block1e :  discord.Option(str, choices = BLOCK_1E_COURSES), 
@@ -651,8 +647,26 @@ async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Opt
         return
     else:
         await ctx.respond("Entry added succesfully")
-    
 
+@set_cmds.command(name="add_alt_room", description="Add an alternate room for a course on a specific day")
+async def add_alt_room(ctx:discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"]), course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block)), new_room: str):
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    
+    block = block[1] + block[0]
+    
+    result = add_or_update_alternate_room(date_obj, block, course_name, new_room)
+    
+    if(result):
+        await ctx.respond("Alt room succesfully updated")
+        return
+    else:
+        await ctx.respond("An error occured")
+        return
+    
 
 print("runs?")
 
