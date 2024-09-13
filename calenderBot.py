@@ -656,8 +656,6 @@ async def add_alt_room(ctx:discord.ApplicationContext, date_str: discord.Option(
         await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
         return
     
-    block = block[1] + block[0]
-    
     result = add_or_update_alternate_room(date_obj, block, course_name, new_room)
     
     if(result):

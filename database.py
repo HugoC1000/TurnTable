@@ -6,9 +6,13 @@ import psycopg2
 from models import UserSchedule, SchoolSchedule  # Import models
 from datetime import datetime 
 
+# import logging
+# logging.basicConfig()
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
 # Setup SQLAlchemy session
 engine = create_engine('postgresql://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt')
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 session = Session()
 
 def get_or_create_user_schedule(discord_id, username=None):
@@ -266,18 +270,6 @@ def modify_or_create_new_date(date_obj, uniform, is_school, block_order_list, bl
             return 0
 
 def add_or_update_alternate_room(date_obj, block, course_name, alternate_room):
-    """
-    Update or add an alternate room for a specific course in a block on a given date.
-    
-    Args:
-        date_obj (datetime.date): The date for which the alternate room is to be updated.
-        block (str): The block in which the course is taking place (e.g., 'A1', 'B2').
-        course_name (str): The name of the course for which the alternate room is being set.
-        alternate_room (str): The new alternate room for the course.
-    
-    Returns:
-        int: 1 if successful, 0 if failed.
-    """
     try:
         # Retrieve the existing schedule entry for the given date
         schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date_obj).first()
@@ -296,16 +288,29 @@ def add_or_update_alternate_room(date_obj, block, course_name, alternate_room):
         # Update or add the course and alternate room
         courses[block][course_name] = alternate_room
 
-        # Update the database entry
+        print("Courses before commit:", courses)
+
+        # Reassign the updated courses to the entry
         schedule_entry.courses = courses
+        
+        # Force SQLAlchemy to recognize changes in the JSON field
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(schedule_entry, "courses")
+
+        # Flush and commit
+        session.flush()  # Force flush before commit
         session.commit()
 
-        print(f"Successfully updated alternate room for {course_name} in block {block} on {date_obj}.")
+        # Verify the changes were committed
+        schedule_entry = session.query(SchoolSchedule).filter_by(schedule_date=date_obj).first()
+        print("Courses after commit:", schedule_entry.courses)
+        
         return 1
 
     except Exception as e:
         session.rollback()
         print(f"An error occurred while updating alternate room: {e}")
         return 0
+
 
 create_new_date("2024-09-13",True,{"2B": {"PE 10 Brenko" : "Lawn Bowling Place"}},["2A","2B","2C","2D","school_event"],["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"],"PE Uniform allowed all day")
