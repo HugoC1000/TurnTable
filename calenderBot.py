@@ -216,7 +216,7 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
 @bot.slash_command(name="upnxt", description="Quickly get your next course for today.")
 async def up_next(ctx):
     user_id = str(ctx.author.id)
-    today = "2024-09-16"
+    today = datetime.now().date()
     current_time = datetime.now().time()
     
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
