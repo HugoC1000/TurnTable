@@ -35,6 +35,7 @@ class SchoolSchedule(Base):
     courses = Column(JSON, nullable=True)  # Dictionary of course names and alternate rooms. Also implementation of AP Flex
     block_order = Column(ARRAY(Text), nullable=True)  # New column for block order (list of blocks, e.g., ['1A', '1B', '1C'])
     block_times = Column(ARRAY(Text), nullable=True)
+    ap_flexes = Column(JSON, nullable=True)
     
 
 # Connect to the Heroku PostgreSQL database

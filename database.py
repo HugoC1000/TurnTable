@@ -5,15 +5,22 @@ from sqlalchemy import create_engine
 import psycopg2
 from models import UserSchedule, SchoolSchedule  # Import models
 from datetime import datetime 
+import os
+from dotenv import load_dotenv
 
 # import logging
 # logging.basicConfig()
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 # Setup SQLAlchemy session
-engine = create_engine('postgresql://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt')
+load_dotenv()
+
+DB_URL = os.getenv("CORRECT_DATABASE_URL")
+engine = create_engine(DB_URL)
 Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 session = Session()
+
+
 
 def get_or_create_user_schedule(discord_id, username=None):
     user_schedule = session.query(UserSchedule).filter_by(discord_id=discord_id).first()

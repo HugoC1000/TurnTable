@@ -13,28 +13,15 @@ import numpy as np
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
 from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block
-from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date
+from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
 
 # Load environment variables from .env file
 load_dotenv()
 
-#DATABASE_URL = os.getenv("DATABASE_URL")
-
-# # Create the engine
-# engine = create_engine("postgresql+psycopg2://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt")
-
-# # Create a configured session class
-# Session = sessionmaker(bind=engine)
-
-# session = Session()
-
-# # Create tables based on the model definitions if they don't exist
-# Base.metadata.create_all(engine)
-
 intents = discord.Intents.all()
 bot = discord.Bot(intents = intents)
 
-
+DISCORD_TOKEN = os.getenv("TOKEN")
 
 async def get_courses_from_block(ctx: discord.AutocompleteContext):
     selectedBlock = ctx.options['block']
@@ -147,184 +134,66 @@ async def people_in_my_class(ctx, block: discord.Option(str, choices = ["1A","1B
 @getCmds.command(name="today_schedule", description="Get your schedule for today.")
 async def get_today_schedule(ctx):
     user_id = str(ctx.author.id)
+    today = datetime.now().date()
     
-    # Fetch or create the user's schedule
+    # Fetch the user schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
     
-    today_schedule = get_blocks_for_date(datetime.now().date())
-    
+    # Get today's schedule and block times
+    today_schedule = get_blocks_for_date(today)
     if not today_schedule:
         await ctx.respond("No school today.")
         return
-    today_block_times = get_block_times_for_date(datetime.now().date())
-
-    if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
-                user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
+    
+    if not has_set_courses(user_schedule):
         await ctx.respond("You haven't set any courses yet.")
         return
-
+    
+    # Fetch other necessary data
+    user_courses = get_user_courses(user_schedule)
+    today_block_times = get_block_times_for_date(today)
+    alt_rooms = get_alt_rooms_for_date(today)
+    ap_flex_courses = get_ap_flex_courses_for_date(today)
+    
+    # Generate the schedule
     print(today_schedule)
-    courses = []
-    i = 0
+    courses_output = generate_schedule(user_schedule, today_schedule, today_block_times, alt_rooms, ap_flex_courses, user_courses)
     
-    print(today_schedule)
-    
-    max_whitespace_after_courses = 0
-    
-    course_for_this_slot = ""
-    
-    for slot in today_schedule:
-        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
-            course_for_this_slot = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-        elif slot == 'school_event':
-            course_for_this_slot = "School Event"
-        else:
-            course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            
-        max_whitespace_after_courses =  max(max_whitespace_after_courses,len(course_for_this_slot))
+    await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses_output) + "```")
 
-    max_whitespace_after_courses += 3
-    
-    list_of_alt_rooms = get_alt_rooms_for_date(datetime.now().date())
-    
-    for slot in today_schedule:
-        if today_block_times[i] == "-":
-            courses.append("-" * 20)
-            i += 1
-
-        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
-            print("Entered advisory")
-            course_for_this_slot = getattr(user_schedule, "C1", 'None')
-            
-            
-            room = ""
-            
-            if list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
-                room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
-            else:
-                room = list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room")
-                
-            advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{today_block_times[i]}  {advisory_type}"
-                           f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
-        elif slot == 'school_event':
-            courses.append(f"{today_block_times[i]}  School Event")
-        else:
-            
-            room = ""
-            
-            course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            
-            if list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
-                room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
-            else:
-                room = list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room")
-                print(list_of_alt_rooms)
-                print(room)
-        
-            
-            courses.append(f"{today_block_times[i]}  {course_for_this_slot}"
-                           f"{' ' * (max_whitespace_after_courses - len(course_for_this_slot))}{room}")
-        i += 1
-
-    await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
-    return
 
 @getCmds.command(name="tomorrow_schedule", description="Get your schedule for tomorrow.")
 async def get_tomorrow_schedule(ctx):
     user_id = str(ctx.author.id)
-    
-    # Fetch or create the user's schedule
-    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
-    
-    tomorrow = datetime.now() + timedelta(days=1)
+    today = datetime.now()
+    tomorrow = today + timedelta(days=1)
     tomorrow = tomorrow.date()
     
+    # Fetch the user schedule
+    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
+    
+    # Get today's schedule and block times
     tomorrow_schedule = get_blocks_for_date(tomorrow)
-        
     if not tomorrow_schedule:
-        await ctx.respond("No school today.")
+        await ctx.respond("No school tomorrow.")
         return
-    tomorrow_block_times = get_block_times_for_date(tomorrow)
-
-    if not any([user_schedule.A1, user_schedule.B1, user_schedule.C1, user_schedule.D1, user_schedule.E1,
-                user_schedule.A2, user_schedule.B2, user_schedule.C2, user_schedule.D2, user_schedule.E2]):
+    
+    if not has_set_courses(user_schedule):
         await ctx.respond("You haven't set any courses yet.")
         return
     
-    if tomorrow_schedule == "No school":
-        await ctx.respond("No school tomorrow.")
-        return 
-
-    courses = []
+    # Fetch other necessary data
+    user_courses = get_user_courses(user_schedule)
+    tomorrow_block_times = get_block_times_for_date(tomorrow)
+    alt_rooms = get_alt_rooms_for_date(tomorrow)
+    ap_flex_courses = get_ap_flex_courses_for_date(tomorrow)
     
+    # Generate the schedule
     print(tomorrow_schedule)
+    courses_output = generate_schedule(user_schedule, tomorrow_schedule, tomorrow_block_times, alt_rooms, ap_flex_courses, user_courses)
+    print(courses_output)
     
-    course_for_first_for_loop_slot = ""
-    
-    max_whitespace_after_courses = 0
-    
-    list_of_alt_rooms = get_alt_rooms_for_date(tomorrow)
-    
-    for slot in tomorrow_schedule:
-        print("Slot " + slot)
-        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
-            course_for_first_for_loop_slot = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-
-        elif slot == 'school_event':
-            course_for_first_for_loop_slot = "School Event"
-        else:
-            course_for_first_for_loop_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            
-        max_whitespace_after_courses = max(max_whitespace_after_courses,len(course_for_first_for_loop_slot))
-
-    max_whitespace_after_courses += 3
-        
-    i = 0
-    
-    
-    
-    for slot in tomorrow_schedule:
-        if tomorrow_block_times[i] == "-":
-            courses.append("-" * 20)
-            i += 1
-
-        if slot in ['1C(PA)', '1C(P)', '1C(A)']:
-            course_for_this_slot = getattr(user_schedule, "C1", 'None')
-
-            room = ""
-            
-            if list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
-                room = ROOMS_FOR_COURSES.get("1C", {}).get(course_for_this_slot, 'Unknown Room')
-            else:
-                room = list_of_alt_rooms.get("1C",{}).get(course_for_this_slot,"Unknown Room")
-                
-            advisory_type = "School Event" if slot == '1C(PA)' else "PEAKS" if slot == '1C(P)' else "Academics"
-            courses.append(f"{tomorrow_block_times[i]}  {advisory_type}"
-                           f"{' ' * (max_whitespace_after_courses - len(advisory_type))}{room}")
-            
-        elif slot == 'school_event':
-            courses.append(f"{tomorrow_block_times[i]}  School Event")
-        else:
-            room = ""
-            
-            course_for_this_slot = getattr(user_schedule, slot[1] + slot[0], 'None')
-            
-            if list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room") == "Unknown Room":
-                room = ROOMS_FOR_COURSES.get(slot, {}).get(course_for_this_slot, 'Unknown Room')
-            else:
-                room = list_of_alt_rooms.get(slot,{}).get(course_for_this_slot,"Unknown Room")
-                print(list_of_alt_rooms)
-                print(room)
-        
-            
-            courses.append(f"{tomorrow_block_times[i]}  {course_for_this_slot}"
-                           f"{' ' * (max_whitespace_after_courses - len(course_for_this_slot))}{room}")
-        i += 1
-
-    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses) + "```")
-    return
-
+    await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses_output) + "```")
 
 @getCmds.command(name = "compare_schedules", description = "Compare schedules for two people")
 async def compare_schedules(ctx, person1: discord.Option(discord.Member,description = "Person 1"), person2: discord.Option(discord.Member,description = "Person 2")):
@@ -344,7 +213,31 @@ async def compare_schedules(ctx, person1: discord.Option(discord.Member,descript
     await ctx.respond(f"```\n{output}\n```")
 
 
-
+@bot.slash_command(name="upnxt", description="Quickly get your next course for today.")
+async def up_next(ctx):
+    user_id = str(ctx.author.id)
+    today = "2024-09-16"
+    current_time = datetime.now().time()
+    
+    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
+    
+    # Get today's schedule and block times
+    today_schedule = get_blocks_for_date(today)
+    if not today_schedule:
+        await ctx.respond("No school today.")
+        return
+    
+    if not has_set_courses(user_schedule):
+        await ctx.respond("You haven't set any courses yet.")
+        return
+    
+    user_courses = get_user_courses(user_schedule)
+    today_block_times = get_block_times_for_date(today)
+    alt_rooms = get_alt_rooms_for_date(today)
+    ap_flex_courses = get_ap_flex_courses_for_date(today)
+    
+    await ctx.respond(get_next_course(user_schedule, today_schedule, today_block_times, alt_rooms, ap_flex_courses,user_courses))
+    
 
 @bot.slash_command(name = "ping_class", description = "Pings everyone in this server whose in the class specifed")
 async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1D","1E","2A","2B","2C","2D","2E"]), course_name : discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
@@ -364,7 +257,7 @@ async def ping_class(ctx,block: discord.Option(str, choices = ["1A","1B","1C","1
         except:
             response += f"{theid} (Not in this server) \n"
 
-    await ctx.respond(response)
+    await ctx.respond(response,allowed_mentions=discord.AllowedMentions(users=True))
 
 
 uniform_cmds = bot.create_group("uniform", "Get information about uniform")
@@ -421,8 +314,6 @@ async def get_uniform_for_today(ctx: discord.ApplicationContext):
 
     await ctx.respond(response)
 
-
-
 @uniform_cmds.command(name="tomorrow", description="Get uniform for tomorrow")
 async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
     
@@ -441,7 +332,7 @@ async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
 
     # Check for no school days
     if not tomorrow_block_order_info:
-        response = "No school today."
+        response = "No school tomorrow."
         await ctx.respond(response)
         return
 
@@ -522,6 +413,8 @@ async def say(ctx, message : str):
     else:
         await ctx.respond('This command is for developer only')
 
+
+
 set_cmds = bot.create_group("set", "Set information aobut tables")
 
 @set_cmds.command(name="uniform", description="Set the uniform for a specific day")
@@ -551,7 +444,7 @@ async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(
         await ctx.respond(f"An error occured. ")
       
 @set_cmds.command(name="block_order", description="Set the block order for a specific day")
-async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Option(str, description="YYYY-MM-DD"),block_order_str: discord.Option(str, description= "Block order seperated by commas")):
+async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Option(str, description="YYYY-MM-DD"),block_order_str: discord.Option(str, description= "Block order seperated by commas. E.g. 1A,1B,1C")):
     """
     Set the block order for a given date.
     
@@ -580,7 +473,7 @@ async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Op
         await ctx.respond(f"An error occured. ")
 
 @set_cmds.command(name="block_times", description="Set the uniform for a specific day")
-async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block_times_str: discord.Option(str, description= "Block times seperated by commas. Use default for default block times")):
+async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block_times_str: discord.Option(str, description= "Block times seperated by commas. Use dash for recess and lunch. Use default for default block times.")):
     """
     Set the uniform for a given date.
     
@@ -672,5 +565,5 @@ print("runs?")
 async def on_ready():
     print(f"{bot.user} is ready and online!")
 
-bot.run('MTI3NjAxNDYwNzAyNjIyNTE4Mw.GlNuGp.Z1I4EHYaD3K8D9sJ3qratBCbs3onkzrAQuRPFY') # run the bot with the token
+bot.run(DISCORD_TOKEN) # run the bot with the token
 

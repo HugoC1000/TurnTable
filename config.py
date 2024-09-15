@@ -88,6 +88,111 @@ ROOMS_FOR_COURSES = {
 CUSTOM_DAYS_OFF = [datetime(2024, 9, 2).date()]  # Example: holidays
 DAYS_OFF = {5, 6}  # Saturday and Sunday
 
+AP_FLEX = {
+  "2024-09-16": {
+    "AP Physics": "034E",
+    "AP Human Geo": "Dining Hall",
+    "AP Chem": "208"
+  },
+  "2024-09-24": {
+    "AP Calculus AB": "031E",
+    "AP Calculus BC": "122"
+  },
+  "2024-10-03": {
+    "AP Pysch": "Dining Hall",
+    "AP Environmental Science": "110"
+  },
+  "2024-10-09": {
+    "AP Stats": "204",
+    "AP English Lit": "114",
+    "AP Music Theory": "JS"
+  },
+  "2024-10-18": {
+    "AP English Lan": "216"
+  },
+  "2024-10-24": {
+    "AP Biology": "208",
+    "AP Modern World": "108",
+    "AP Chinese": "023W"
+  },
+  "2024-11-04": {
+    "AP Calculus AB": "031E",
+    "AP Calculus BC": "216"
+  },
+  "2024-11-22": {
+    "AP English Lan": "110"
+  },
+  "2024-11-28": {
+    "AP Physics": "206",
+    "AP Human Geo": "Dining Hall",
+    "AP Chem": "204"
+  },
+  "2024-12-04": {
+    "AP Biology": "210",
+    "AP Modern World": "200",
+    "AP Chinese": "203"
+  },
+  "2024-12-16": {
+    "AP Pysch": "Dining Hall",
+    "AP Environmental Science": "208"
+  },
+  "2024-01-15": {
+    "AP Stats": "031E",
+    "AP English Lit": "021W",
+    "AP Music Theory": "JS"
+  },
+  "2024-01-23": {
+    "AP Calculus AB": "110",
+    "AP Calculus BC": "122"
+  },
+  "2024-01-31": {
+    "AP Physics": "206",
+    "AP Human Geo": "Dining Hall",
+    "AP Chem": "204"
+  },
+  "2024-02-18": {
+    "AP English Lan": "216"
+  },
+  "2024-02-24": {
+    "AP Biology": "208",
+    "AP Modern World": "108",
+    "AP Chinese": "023W"
+  },
+  "2024-02-28": {
+    "AP Stats": "031E",
+    "AP English Lit": "021W",
+    "AP Music Theory": "JS"
+  },
+  "2024-03-06": {
+    "AP Pysch": "Dining Hall",
+    "AP Environmental Science": "110"
+  },
+  "2024-03-31": {
+    "AP Calculus AB": "204",
+    "AP Calculus BC": "216"
+  },
+  "2024-04-04": {
+    "AP Biology": "210",
+    "AP Modern World": "200",
+    "AP Chinese": "203"
+  },
+  "2024-04-14": {
+    "AP Stats": "032E",
+    "AP English Lit": "108",
+    "AP Music Theory": "JS"
+  },
+  "2024-04-22": {
+    "AP Pysch": "Dining Hall",
+    "AP Environmental Science": "215"
+  },
+  "2024-04-28": {
+    "AP Physics": "110",
+    "AP Human Geo": "Dining Hall",
+    "AP Chem": "112"
+  }
+
+}
+
 BLOCK_1A_COURSES = ["AP Chinese", "AP Stats", "AP Modern World", "CLE", "Concert Band 10", "Entrepreneurship 12",  "PC 12", "Socials 10","Theatre Comp. 10", "Web Dev 10"]
 BLOCK_1B_COURSES = ["AP Calculus BC", "CLE", "EFP 10", "French 10 Enr", "French 11", "Lit Studies 11", "Pre-AP Eng. 11", "Science 10", "Socials 10", "Study Block"]
 BLOCK_1C_COURSES = ["Advisory Field", "Advisory Harms", "Advisory McGee", "Advisory O'Donnell", "Advisory Sjerven" ]
