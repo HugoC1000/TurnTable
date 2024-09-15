@@ -21,7 +21,7 @@ load_dotenv()
 intents = discord.Intents.all()
 bot = discord.Bot(intents = intents)
 
-DISCORD_TOKEN = os.getenv("TOKEN")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 async def get_courses_from_block(ctx: discord.AutocompleteContext):
     selectedBlock = ctx.options['block']
