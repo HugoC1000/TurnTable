@@ -535,7 +535,7 @@ async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Opt
             block_times_list = TIME_SLOTS
         else:
             block_order_list = [block.strip() for block in block_order.split(',')]
-            block_times_list = [time.strip() for time in block_times.split(',')]
+        block_times_list = [time.strip() for time in block_times.split(',')]
     except Exception as e:
         await ctx.respond(f"Error parsing block order or block times: {e}")
         return
