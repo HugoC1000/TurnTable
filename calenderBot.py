@@ -526,12 +526,17 @@ async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Opt
         await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
         return
     # Parse block order and block times
-    try:
-        block_order_list = [block.strip() for block in block_order.split(',')]
-        block_times_list = [time.strip() for time in block_times.split(',')]
-    except Exception as e:
-        await ctx.respond(f"Error parsing block order or block times: {e}")
-        return
+    
+    block_times_list = []
+    if block_times.strip().lower() == "default":
+        block_times_list = TIME_SLOTS
+    else:
+        try: 
+            block_order_list = [block.strip() for block in block_order.split(',')]
+            block_times_list = [time.strip() for time in block_times.split(',')]
+        except Exception as e:
+            await ctx.respond(f"Error parsing block order or block times: {e}")
+            return
     
     status = modify_or_create_new_date(date_obj, uniform, is_school, block_order_list, block_times_list)
     
