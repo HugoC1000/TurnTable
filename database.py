@@ -469,7 +469,7 @@ def get_school_events_for_date(date_str):
         list: A list of dictionaries where each dictionary represents an event.
     """
     
-    date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    date_obj = date_str
     
     try:
         # Query the database for events on the target_date
