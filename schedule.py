@@ -187,12 +187,11 @@ def is_advisory(slot):
     """Check if the slot is an advisory block."""
     return slot in ['1C(PA)', '1C(P)', '1C(A)']
 
-def get_next_course(user_schedule, schedule, block_times, alt_rooms, ap_flex_courses, user_courses):
+def get_next_course(user_schedule, schedule, block_times, alt_rooms, ap_flex_courses, user_courses, user_grade, school_events):
     """Generate the final schedule output for the day."""
     current_time = datetime.now().time()
     courses = []
 
-    max_whitespace = get_max_whitespace(schedule, user_courses, ap_flex_courses)
     i=0
     
     for slot in schedule:
@@ -217,6 +216,13 @@ def get_next_course(user_schedule, schedule, block_times, alt_rooms, ap_flex_cou
                     room = get_room_for_slot('1C', next_course, alt_rooms)
                 else:
                     room = get_room_for_slot(slot, next_course, alt_rooms)
+                    
+                for event in school_events:
+                    if slot in event['block'] and user_grade in event['grades']:
+                        course_info = (event['name'],event['location'])
+                        if event['start_time'] and event['end_time']:
+                            block_times[i] = f"{event['start_time']}-{event['end_time']}"
+                        return f"**Next:** {block_times[i]} - {event['name']} in {event['location']}."
                 return f"**Next:** {block_time_str} - {next_course} in {room}."
         i += 1
 

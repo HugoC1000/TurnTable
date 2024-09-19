@@ -223,7 +223,7 @@ async def up_next(ctx):
     current_time = datetime.now().time()
     
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
-    
+    user_grade = user_schedule.grade
     # Get today's schedule and block times
     today_schedule = get_blocks_for_date(today)
     if not today_schedule:
@@ -238,8 +238,8 @@ async def up_next(ctx):
     today_block_times = get_block_times_for_date(today)
     alt_rooms = get_alt_rooms_for_date(today)
     ap_flex_courses = get_ap_flex_courses_for_date(today)
-    
-    await ctx.respond(get_next_course(user_schedule, today_schedule, today_block_times, alt_rooms, ap_flex_courses,user_courses))
+    school_events_for_today = get_school_events_for_date(today)
+    await ctx.respond(get_next_course(user_schedule, today_schedule, today_block_times, alt_rooms, ap_flex_courses,user_courses, user_grade, school_events_for_today))
     
 
 @bot.slash_command(name = "ping_class", description = "Pings everyone in this server whose in the class specifed")
