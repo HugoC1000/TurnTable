@@ -106,7 +106,7 @@ def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_c
     return courses
 
 
-def get_max_whitespace(schedule, user_courses, ap_flex_courses):
+def get_max_whitespace(schedule, user_courses, ap_flex_courses, user_grade, school_events):
     """Calculate the max whitespace for alignment."""
     max_length = 0
     for slot in schedule:
