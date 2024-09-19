@@ -3,7 +3,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
-from models import UserSchedule, SchoolSchedule  # Import models
+from models import UserSchedule, SchoolSchedule, SchoolEvent  # Import models
 from datetime import datetime 
 import os
 from dotenv import load_dotenv
@@ -319,5 +319,129 @@ def add_or_update_alternate_room(date_obj, block, course_name, alternate_room):
         print(f"An error occurred while updating alternate room: {e}")
         return 0
 
+def create_new_school_event(event_name, date_str, block_order_override, grades, location, start_time_str, end_time_str):
+    """
+    Create a new entry in the school_event table.
+    
+    Args:
+        event_name (str): Name of the event
+        date_str (str): Date in "YYYY-MM-DD" format.
+        block_order_override (list): Blocks the event is taking place in. 
+        grades (list(int)): The grades attending the event
+        location (str): Location of the event. 
+        start_time_str (str): Start time of the event. In "HH:mm" format
+        end_time_str (str): End time of the event. In "HH:mm" format. 
+        
+    """
+    
+    try: 
+        # Convert string date to a datetime object
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+        
+        # Convert start_time and end_time to time objects
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+        end_time = datetime.strptime(end_time_str, "%H:%M").time()
+    except:
+        return "Error: date or times can not be converted into datetime object."
+        
+    
+    try:
+        # Check if the date already exists
+        existing_date = session.query(SchoolEvent).filter_by(event_date=date_obj).first()
+        if existing_date:
+            print(f"Date {date_str} already exists in the database.")
+            return None
 
-create_new_date("2024-09-13",True,{"2B": {"PE 10 Brenko" : "Lawn Bowling Place"}},["2A","2B","2C","2D","school_event"],["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"],"PE Uniform allowed all day")
+        # Create a new SchoolEvent entry
+        new_event = SchoolEvent(
+            event_date=date_obj,
+            event_name=event_name,
+            block_order_override=block_order_override,
+            grades=grades,
+            location=location,  # corrected field name
+            start_time=start_time,
+            end_time=end_time
+        )
+        
+        # Add the new entry to the session and commit it to the database
+        session.add(new_event)
+        session.commit()
+        
+        print(f"New event '{event_name}' added successfully.")
+        return new_event
+
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred: {e}")
+        return None
+
+def edit_school_event(old_event_name, new_event_name=None, new_date_str=None, new_block_order_override=None, 
+                      new_grades=None, new_location=None, new_start_time_str=None, new_end_time_str=None):
+    """
+    Edit an existing school event entry in the school_event table.
+    
+    Args:
+        old_event_name (str): Current name of the event to be edited.
+        new_event_name (str, optional): New name of the event. Defaults to None.
+        new_date_str (str, optional): New date in "YYYY-MM-DD" format. Defaults to None.
+        new_block_order_override (list, optional): New blocks the event is taking place in. Defaults to None.
+        new_grades (list(int), optional): New list of grades attending the event. Defaults to None.
+        new_location (str, optional): New location of the event. Defaults to None.
+        new_start_time_str (str, optional): New start time of the event in "HH:mm" format. Defaults to None.
+        new_end_time_str (str, optional): New end time of the event in "HH:mm" format. Defaults to None.
+    
+    Returns:
+        The updated event or None if an error occurred.
+    """
+    try:
+        # Retrieve the existing event by the old event name
+        event = session.query(SchoolEvent).filter_by(event_name=old_event_name).first()
+        
+        if not event:
+            print(f"No event found with name '{old_event_name}'")
+            return None
+        
+        # Update the event name if provided
+        if new_event_name:
+            event.event_name = new_event_name
+        
+        # Update other fields if new values are provided
+        if new_date_str:
+            event.event_date = datetime.strptime(new_date_str, "%Y-%m-%d").date()
+        if new_block_order_override:
+            event.block_order_override = new_block_order_override
+        if new_grades:
+            event.grades = new_grades
+        if new_location:
+            event.location = new_location
+        if new_start_time_str:
+            event.start_time = datetime.strptime(new_start_time_str, "%H:%M").time()
+        if new_end_time_str:
+            event.end_time = datetime.strptime(new_end_time_str, "%H:%M").time()
+        
+        # Commit the changes to the database
+        session.commit()
+        print(f"Event '{old_event_name}' updated successfully.")
+        return event
+
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred: {e}")
+        return None
+
+
+
+event_name = "University Fair"
+date_str = "2024-09-19"  # Assuming tomorrow is 2024-09-13
+block_order_override = ["2B"]
+grades = [10]
+location = "Saint Georges"
+start_time_str = "09:35"
+end_time_str = "11:15"
+
+create_new_school_event(event_name, date_str, block_order_override, grades, location, start_time_str, end_time_str)
+old_event_name = "CUE Fair"
+new_event_name = "CUE Fair"
+new_location = "SGS(Head to 2B class first)"
+
+edit_school_event(old_event_name, new_location=new_location)
