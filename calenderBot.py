@@ -12,7 +12,8 @@ import numpy as np
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date
+from database import modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event, get_school_events_for_date
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
 
 # Load environment variables from .env file
@@ -138,7 +139,7 @@ async def get_today_schedule(ctx):
     
     # Fetch the user schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
-    
+    user_grade = user_schedule.grade
     # Get today's schedule and block times
     today_schedule = get_blocks_for_date(today)
     if not today_schedule:
@@ -154,10 +155,11 @@ async def get_today_schedule(ctx):
     today_block_times = get_block_times_for_date(today)
     alt_rooms = get_alt_rooms_for_date(today)
     ap_flex_courses = get_ap_flex_courses_for_date(today)
+    school_events_for_today = get_school_events_for_date(today)
     
     # Generate the schedule
     print(today_schedule)
-    courses_output = generate_schedule(user_schedule, today_schedule, today_block_times, alt_rooms, ap_flex_courses, user_courses)
+    courses_output = generate_schedule(user_schedule, today_schedule, today_block_times, alt_rooms, ap_flex_courses, user_courses, user_grade, school_events_for_today)
     
     await ctx.respond(f"**## Today's schedule for {ctx.author.name}:**```\n" + "\n".join(courses_output) + "```")
 
@@ -171,7 +173,7 @@ async def get_tomorrow_schedule(ctx):
     
     # Fetch the user schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
-    
+    user_grade = user_schedule.grade
     # Get today's schedule and block times
     tomorrow_schedule = get_blocks_for_date(tomorrow)
     if not tomorrow_schedule:
@@ -187,10 +189,11 @@ async def get_tomorrow_schedule(ctx):
     tomorrow_block_times = get_block_times_for_date(tomorrow)
     alt_rooms = get_alt_rooms_for_date(tomorrow)
     ap_flex_courses = get_ap_flex_courses_for_date(tomorrow)
+    school_events_for_today = get_school_events_for_date(tomorrow)
     
     # Generate the schedule
     print(tomorrow_schedule)
-    courses_output = generate_schedule(user_schedule, tomorrow_schedule, tomorrow_block_times, alt_rooms, ap_flex_courses, user_courses)
+    courses_output = generate_schedule(user_schedule, tomorrow_schedule, tomorrow_block_times, alt_rooms, ap_flex_courses, user_courses, user_grade, school_events_for_today)
     print(courses_output)
     
     await ctx.respond(f"**## Tomorrow's schedule for {ctx.author.name}:**```\n" + "\n".join(courses_output) + "```")
@@ -418,7 +421,7 @@ async def say(ctx, message : str):
 set_cmds = bot.create_group("set", "Set information aobut tables")
 
 @set_cmds.command(name="uniform", description="Set the uniform for a specific day")
-async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), new_uniform: str):
+async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), new_uniform: discord.Option(str, description = "Uniform for the day. Use 'Ceremonial' for ceremonial")):
     """
     Set the uniform for a given date.
     
@@ -571,7 +574,7 @@ async def new_school_event(ctx: discord.ApplicationContext,
                            event_name: discord.Option(str, description="Name of the event"),
                            date_str: discord.Option(str, description="YYYY-MM-DD"), 
                            blocks_overrides: discord.Option(str, description="Blocks it takes place in, separated by commas"), 
-                           grades: discord.Option(str, description="The grades involved, separated by commas"), 
+                           grades: discord.Option(str, description="The grades involved, separated by commas. Use -1 for all"), 
                            location: discord.Option(str, description="Location of event. Keep this short."), 
                            start_time_str: discord.Option(str, description="Start time in HH:MM"), 
                            end_time_str: discord.Option(str, description="End time in HH:MM")):

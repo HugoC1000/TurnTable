@@ -429,19 +429,79 @@ def edit_school_event(old_event_name, new_event_name=None, new_date_str=None, ne
         print(f"An error occurred: {e}")
         return None
 
+def delete_school_event(event_name):
+    """
+    Delete a school event entry from the school_event table.
+    
+    Args:
+        event_name (str): Name of the event to be deleted.
+    
+    Returns:
+        bool: True if the deletion was successful, False otherwise.
+    """
+    try:
+        # Retrieve the event by the event name
+        event = session.query(SchoolEvent).filter_by(event_name=event_name).first()
+        
+        if not event:
+            print(f"No event found with name '{event_name}'")
+            return False
+        
+        # Delete the event
+        session.delete(event)
+        session.commit()
+        print(f"Event '{event_name}' deleted successfully.")
+        return True
 
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred: {e}")
+        return False
 
-event_name = "University Fair"
-date_str = "2024-09-19"  # Assuming tomorrow is 2024-09-13
-block_order_override = ["2B"]
-grades = [10]
-location = "Saint Georges"
-start_time_str = "09:35"
-end_time_str = "11:15"
+def get_school_events_for_date(date_str):
+    """
+    Retrieve school events scheduled for a specific date.
 
-create_new_school_event(event_name, date_str, block_order_override, grades, location, start_time_str, end_time_str)
-old_event_name = "CUE Fair"
-new_event_name = "CUE Fair"
-new_location = "SGS(Head to 2B class first)"
+    Args:
+        target_date (date): The date for which to retrieve school events.
 
-edit_school_event(old_event_name, new_location=new_location)
+    Returns:
+        list: A list of dictionaries where each dictionary represents an event.
+    """
+    
+    date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    
+    try:
+        # Query the database for events on the target_date
+        events = session.query(SchoolEvent).filter_by(event_date=date_obj).all()
+
+        # Format the results into a list of dictionaries
+        event_list = [{
+            'name': event.event_name,
+            'block': event.block_order_override,  # List of blocks the event affects
+            'start_time': event.start_time.strftime("%H:%M") if event.start_time else None,
+            'end_time': event.end_time.strftime("%H:%M") if event.end_time else None,
+            'location': event.location,
+            'grades': event.grades  # List of grades or -1 if applies to all grades
+        } for event in events]
+
+        return event_list
+
+    except Exception as e:
+        print(f"An error occurred while retrieving events: {e}")
+        return []
+    
+# event_name = "University Fair"
+# date_str = "2024-09-19"  # Assuming tomorrow is 2024-09-13
+# block_order_override = ["2B"]
+# grades = [10]
+# location = "Saint Georges"
+# start_time_str = "09:35"
+# end_time_str = "11:15"
+
+# create_new_school_event(event_name, date_str, block_order_override, grades, location, start_time_str, end_time_str)
+# old_event_name = "CUE Fair"
+# new_event_name = "CUE Fair"
+# new_location = "SGS(Head to 2B class first)"
+
+# edit_school_event(old_event_name, new_location=new_location)

@@ -24,6 +24,7 @@ class UserSchedule(Base):
     C2 = Column(String)
     D2 = Column(String)
     E2 = Column(String)
+    grade = Column(Integer)
     
 class SchoolSchedule(Base):
     __tablename__ = 'school_schedules'

@@ -74,10 +74,10 @@ def get_user_courses(user_schedule):
     }
 
 
-def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_courses, user_courses):
+def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_courses, user_courses, user_grade, school_events):
     """Generate the final schedule output for the day."""
     courses = []
-    max_whitespace = get_max_whitespace(schedule, user_courses, ap_flex_courses)
+    max_whitespace = get_max_whitespace(schedule, user_courses, ap_flex_courses, user_grade, school_events)
     print("Whitespace: ")
     print(max_whitespace)
     i=0
@@ -91,9 +91,17 @@ def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_c
             course_info = handle_advisory(slot, user_courses.get(slot), ap_flex_courses, user_courses, alt_rooms)
         else:
             course_info = handle_regular_block(slot, user_schedule, user_courses, alt_rooms)
+        
+        for event in school_events:
+            if slot in event['block'] and user_grade in event['grades']:
+                course_info = (event['name'],event['location'])
+                if event['start_time'] and event['end_time']:
+                    block_times[i] = f"{event['start_time']-event['end_time']}"
 
         courses.append(format_schedule_entry(block_times[i], course_info, max_whitespace))
         i += 1
+        
+        
 
     return courses
 
@@ -109,10 +117,14 @@ def get_max_whitespace(schedule, user_courses, ap_flex_courses):
     return max_length + 3
 
 
-def determine_course_name_for_slot(slot, user_courses, ap_flex_courses):
+def determine_course_name_for_slot(slot, user_courses, ap_flex_courses,user_grade, school_events):
     #print("Slot")
     #print(slot) 
-    """Determine the course for the current slot, including AP Flex logic."""
+    """Determine the course for the current slot"""
+    for event in school_events:
+        if slot in event['block'] and user_grade in event['grades']:
+            return event['name']
+    
     if is_advisory(slot) and ap_flex_courses:
         matching_courses = [course for course in user_courses.values() if course in ap_flex_courses]
         if len(matching_courses) == 1:
