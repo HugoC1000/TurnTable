@@ -96,7 +96,7 @@ def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_c
             if slot in event['block'] and user_grade in event['grades']:
                 course_info = (event['name'],event['location'])
                 if event['start_time'] and event['end_time']:
-                    block_times[i] = f"{event['start_time']-event['end_time']}"
+                    block_times[i] = f"{event['start_time']}-{event['end_time']}"
 
         courses.append(format_schedule_entry(block_times[i], course_info, max_whitespace))
         i += 1
@@ -110,7 +110,7 @@ def get_max_whitespace(schedule, user_courses, ap_flex_courses, user_grade, scho
     """Calculate the max whitespace for alignment."""
     max_length = 0
     for slot in schedule:
-        course = determine_course_name_for_slot(slot, user_courses, ap_flex_courses)
+        course = determine_course_name_for_slot(slot, user_courses, ap_flex_courses, user_grade, school_events)
         #print("Course: " + course)
         max_length = max(max_length, len(course))
         #print(f"Max length: {max_length}")
