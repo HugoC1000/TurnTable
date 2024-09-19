@@ -347,9 +347,9 @@ def create_new_school_event(event_name, date_str, block_order_override, grades, 
     
     try:
         # Check if the date already exists
-        existing_date = session.query(SchoolEvent).filter_by(event_date=date_obj).first()
-        if existing_date:
-            print(f"Date {date_str} already exists in the database.")
+        existing_event = session.query(SchoolEvent).filter_by(event_name=event_name).first()
+        if existing_event:
+            print(f"Event {event_name} already exists in the database.")
             return None
 
         # Create a new SchoolEvent entry
