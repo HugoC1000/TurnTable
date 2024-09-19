@@ -12,7 +12,7 @@ import numpy as np
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
 
 # Load environment variables from .env file
@@ -565,7 +565,70 @@ async def add_alt_room(ctx:discord.ApplicationContext, date_str: discord.Option(
     else:
         await ctx.respond("An error occured")
         return
+
+@set_cmds.command(name="new_school_event", description="Add a grade level school event")
+async def new_school_event(ctx: discord.ApplicationContext, 
+                           event_name: discord.Option(str, description="Name of the event"),
+                           date_str: discord.Option(str, description="YYYY-MM-DD"), 
+                           blocks_overrides: discord.Option(str, description="Blocks it takes place in, separated by commas"), 
+                           grades: discord.Option(str, description="The grades involved, separated by commas"), 
+                           location: discord.Option(str, description="Location of event. Keep this short."), 
+                           start_time_str: discord.Option(str, description="Start time in HH:MM"), 
+                           end_time_str: discord.Option(str, description="End time in HH:MM")):
+    """
+    Create a new school event for specific grades, overriding block orders.
+    """
+    try:
+        # Split and parse the block overrides and grades
+        block_order_override = blocks_overrides.split(",")  # e.g., "1A,1B" -> ['1A', '1B']
+        grade_list = [int(g) for g in grades.split(",")]   # e.g., "9,10" -> [9, 10]
+        
+        # Create the school event using the provided function
+        result = create_new_school_event(event_name, date_str, block_order_override, grade_list,location, start_time_str, end_time_str)
+        if result == "Error: date or times can not be converted into datetime object.":
+            await ctx.respond(f"Please ensure days are in YYYY-MM-DD and times are in HH:MM")
+        elif result:
+            await ctx.respond(f"Successfully added the event '{event_name}' on {date_str} for grades {grades}.")
+        else:
+            await ctx.respond(f"Failed to add the event '{event_name}'. Please check the inputs and try again.")
     
+    except ValueError as e:
+        await ctx.respond(f"Error in input: {e}")
+    except Exception as e:
+        await ctx.respond(f"An unexpected error occurred: {e}")
+        
+@set_cmds.command(name="edit_school_event", description="Edit a grade level school event")
+async def edit_school_event_command(ctx: discord.ApplicationContext, 
+                                     current_event_name: discord.Option(str, description="Current name of the event", required=True),
+                                     new_event_name: discord.Option(str, description="Name to change to", required=False),
+                                     date_str: discord.Option(str, description="YYYY-MM-DD", required=False), 
+                                     blocks_overrides: discord.Option(str, description="Blocks it takes place in, separated by commas", required=False), 
+                                     grades: discord.Option(str, description="The grades involved, separated by commas", required=False), 
+                                     location: discord.Option(str, description="Location of event. Keep this short.", required=False), 
+                                     start_time_str: discord.Option(str, description="Start time in HH:MM", required=False), 
+                                     end_time_str: discord.Option(str, description="End time in HH:MM", required=False)):
+
+    # Convert input options to appropriate formats
+    blocks_overrides_list = blocks_overrides.split(',') if blocks_overrides else None
+    grades_list = list(map(int, grades.split(','))) if grades else None
+
+    # Call the function to edit the school event
+    updated_event = edit_school_event(
+        old_event_name=current_event_name,
+        new_event_name=new_event_name,
+        new_date_str=date_str,
+        new_block_order_override=blocks_overrides_list,
+        new_grades=grades_list,
+        new_location=location,
+        new_start_time_str=start_time_str,
+        new_end_time_str=end_time_str
+    )
+    
+    # Send a response to the user
+    if updated_event:
+        await ctx.send(f"Event '{current_event_name}' has been updated successfully.")
+    else:
+        await ctx.send(f"Failed to update event '{current_event_name}'.")
 
 print("runs?")
 
