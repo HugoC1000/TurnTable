@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, Time
 from sqlalchemy import Date, Text, Boolean, JSON, ARRAY
 from sqlalchemy.orm import declarative_base
 
@@ -36,7 +36,19 @@ class SchoolSchedule(Base):
     block_order = Column(ARRAY(Text), nullable=True)  # New column for block order (list of blocks, e.g., ['1A', '1B', '1C'])
     block_times = Column(ARRAY(Text), nullable=True)
     ap_flexes = Column(JSON, nullable=True)
-    
+
+class SchoolEvent(Base):
+    __tablename__ = 'school_events'
+
+    id = Column(Integer, primary_key=True)
+    event_name = Column(String, nullable=False)          # Name of the event
+    event_date = Column(Date, nullable=False)            # Date of the event
+    block_order_override = Column(ARRAY(String), nullable=False)  # Blocks that the event overrides
+    grades = Column(ARRAY(Integer), nullable=True)       # List of grades the event applies to; NULL for all grades
+    location = Column(String, nullable=False)            # Location of the event
+    start_time = Column(Time, nullable=False)            # Start time of the event
+    end_time = Column(Time, nullable=False)              # End time of the event
+
 
 # Connect to the Heroku PostgreSQL database
 #DATABASE_URL = os.environ['postgresql://u5hsl3t8vpl42s:pe6a13af81a75d26bf7ec16ed5614d296602e45c12f84e7dc965e840334951295@cd1goc44htrmfn.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d66o2tq3s18vlt']
