@@ -372,6 +372,31 @@ async def get_uniform_for_tomorrow(ctx: discord.ApplicationContext):
     await ctx.respond(response)
 
 
+@uniform_cmds.command(name="set", description="Set the uniform for a specific day")
+async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), new_uniform: discord.Option(str, description = "Uniform for the day. Use 'Ceremonial' for ceremonial")):
+    """
+    Set the uniform for a given date.
+    
+    Args:
+        ctx (discord.ApplicationContext): The context of the command call.
+        date_str (str): The date in "YYYY-MM-DD" format for which to set the uniform.
+        new_uniform (str): The new uniform value to set.
+    """
+    # Convert the string date to a datetime object
+    try:
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    
+    status = edit_uniform_for_date(date_obj, new_uniform)
+    
+    if status == 1:
+        await ctx.respond("No school on that day")
+    elif status == 2:
+        await ctx.respond(f"Uniform for {date_str} has been updated to {new_uniform}.")
+    elif status == None:
+        await ctx.respond(f"An error occured. ")
 
 
 @bot.slash_command(name="help", description="List all available commands.")
@@ -420,31 +445,6 @@ async def say(ctx, message : str):
 
 set_cmds = bot.create_group("set", "Set information aobut tables")
 
-@set_cmds.command(name="uniform", description="Set the uniform for a specific day")
-async def set_uniform(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), new_uniform: discord.Option(str, description = "Uniform for the day. Use 'Ceremonial' for ceremonial")):
-    """
-    Set the uniform for a given date.
-    
-    Args:
-        ctx (discord.ApplicationContext): The context of the command call.
-        date_str (str): The date in "YYYY-MM-DD" format for which to set the uniform.
-        new_uniform (str): The new uniform value to set.
-    """
-    # Convert the string date to a datetime object
-    try:
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        await ctx.respond("Invalid date format. Please use YYYY-MM-DD.")
-        return
-    
-    status = edit_uniform_for_date(date_obj, new_uniform)
-    
-    if status == 1:
-        await ctx.respond("No school on that day")
-    elif status == 2:
-        await ctx.respond(f"Uniform for {date_str} has been updated to {new_uniform}.")
-    elif status == None:
-        await ctx.respond(f"An error occured. ")
       
 @set_cmds.command(name="block_order", description="Set the block order for a specific day")
 async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Option(str, description="YYYY-MM-DD"),block_order_str: discord.Option(str, description= "Block order seperated by commas. E.g. 1A,1B,1C")):
@@ -569,7 +569,8 @@ async def add_alt_room(ctx:discord.ApplicationContext, date_str: discord.Option(
         await ctx.respond("An error occured")
         return
 
-@set_cmds.command(name="new_school_event", description="Add a grade level school event")
+school_event_cmds = bot.create_group("set", "Set information aobut school events")
+@school_event_cmds.command(name="new", description="Add a grade level school event")
 async def new_school_event(ctx: discord.ApplicationContext, 
                            event_name: discord.Option(str, description="Name of the event"),
                            date_str: discord.Option(str, description="YYYY-MM-DD"), 
@@ -600,7 +601,7 @@ async def new_school_event(ctx: discord.ApplicationContext,
     except Exception as e:
         await ctx.respond(f"An unexpected error occurred: {e}")
         
-@set_cmds.command(name="edit_school_event", description="Edit a grade level school event")
+@school_event_cmds.command(name="edit", description="Edit a grade level school event")
 async def edit_school_event_command(ctx: discord.ApplicationContext, 
                                      current_event_name: discord.Option(str, description="Current name of the event", required=True),
                                      new_event_name: discord.Option(str, description="Name to change to", required=False),
