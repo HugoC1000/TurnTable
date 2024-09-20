@@ -569,7 +569,8 @@ async def add_alt_room(ctx:discord.ApplicationContext, date_str: discord.Option(
         await ctx.respond("An error occured")
         return
 
-school_event_cmds = bot.create_group("set", "Set information aobut school events")
+school_event_cmds = bot.create_group("school_event", "Set information aobut school events")
+
 @school_event_cmds.command(name="new", description="Add a grade level school event")
 async def new_school_event(ctx: discord.ApplicationContext, 
                            event_name: discord.Option(str, description="Name of the event"),
