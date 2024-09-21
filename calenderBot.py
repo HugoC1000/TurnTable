@@ -3,19 +3,17 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from discord.ext import commands
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-from models import UserSchedule, Base 
 from table2ascii import table2ascii as t2a, PresetStyle
-import psycopg2
 import numpy as np
+import random
+import asyncio
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
 from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date
 from database import modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event, get_school_events_for_date
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
-
+from games import RPSGame, BlackjackGame
 # Load environment variables from .env file
 load_dotenv()
 
@@ -637,6 +635,50 @@ async def edit_school_event_command(ctx: discord.ApplicationContext,
 
 print("runs?")
 
+
+
+game_cmds = bot.create_group("games", "Commands for games")
+
+@game_cmds.command(name='slot')
+async def slot_machine(ctx):
+    symbols = ['🍒', '🍋', '🍊', '🍉', '⭐', '7️⃣']
+    grid = [[random.choice(symbols) for _ in range(3)] for _ in range(3)]
+
+    # Create an embedded message to display the slot result
+    embed = discord.Embed(title="🎰 Slot Machine 🎰", color=discord.Color.gold())
+    #await ctx.respond("Hi")
+    # Format the 3x3 grid of symbols
+    result_str = ""
+    for i, row in enumerate(grid):
+        #await asyncio.sleep(1)
+        if i == 1:
+            # Add the arrow to the middle row
+            result_str += f" {' | '.join(row)} ⬅︎ \n"
+        else:
+            result_str += f"   {' | '.join(row)}\n"
+    
+    # Display the formatted grid in the embed
+    embed.add_field(name="Result", value=result_str)
+    
+    # Check if the user has won (e.g., all symbols in the middle row match)
+    if grid[1][0] == grid[1][1] == grid[1][2]:
+        embed.add_field(name="Outcome", value="**Jackpot!** You won! 🎉",inline = False)
+    else:
+        embed.add_field(name="Outcome", value="You lost! Try again.", inline = False)
+    
+    # Send the embed
+    await ctx.respond(embed=embed)
+
+
+@game_cmds.command(name="rps")
+async def rps(ctx):
+    view = RPSGame(ctx)
+    await view.send_initial_embed()
+
+@game_cmds.command(name="blackjack")
+async def blackjack(ctx):
+    view = BlackjackGame(ctx)
+    await view.update_embed()
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
