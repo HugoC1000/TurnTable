@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Time
+from sqlalchemy import create_engine, Column, Integer, String, Time, ForeignKey
 from sqlalchemy import Date, Text, Boolean, JSON, ARRAY
 from sqlalchemy.orm import declarative_base
 
@@ -57,11 +57,18 @@ class Reminder(Base):
     text = Column(String, nullable=False)
     due_date = Column(Date, nullable=False)
     tag = Column(String)  # e.g., "Assignment", "Exam", "Project"
-    notify_dm = Column(Boolean, default=False)
-    notify_channel = Column(Boolean, default=False)
     
     class_block = Column(String)
     class_name = Column(String)
+
+    
+class UserPreferences(Base):
+    __tablename__ = 'user_preferences'
+    
+    id = Column(Integer, primary_key=True)
+    user_schedule_id = Column(Integer, ForeignKey('user_schedules.id'), nullable=False)
+    notification_method = Column(String, nullable=False)  # 'None', 'DM', 'Channel'
+    notification_time = Column(Time, nullable=False)  # Time of day when the user wants to be notified
     
 DB_URL = os.getenv("CORRECT_DATABASE_URL")
 engine = create_engine(DB_URL)

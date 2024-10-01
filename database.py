@@ -21,7 +21,7 @@ Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 session = Session()
 
 
-
+# User Schedule Related Commands
 def get_or_create_user_schedule(discord_id, username=None):
     user_schedule = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
     if not user_schedule:
@@ -129,6 +129,8 @@ def compare_schedule(discord_id1, discord_id2):
     # Return the schedules in a tuple
     return schedule1, schedule2
 
+
+# School Info
 def create_new_date(date_str, is_school_open, courses, block_order, block_times,uniform):
     """
     Create a new entry in the school_schedule table.
@@ -319,6 +321,8 @@ def add_or_update_alternate_room(date_obj, block, course_name, alternate_room):
         print(f"An error occurred while updating alternate room: {e}")
         return 0
 
+
+# School Events
 def create_new_school_event(event_name, date_str, block_order_override, grades, location, start_time_str, end_time_str):
     """
     Create a new entry in the school_event table.
