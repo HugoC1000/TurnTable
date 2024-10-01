@@ -74,7 +74,7 @@ async def change(ctx: discord.ApplicationContext, block: discord.Option(str, cho
         await ctx.respond("An error occured")
 
 @schedule_input_cmds.command(name = "setup", description = "Set up your schedule here!")
-async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Option(str, choices = BLOCK_1A_COURSES), block1b : discord.Option(str, choices = BLOCK_1B_COURSES), block1c :  discord.Option(str, choices = BLOCK_1C_COURSES), block1d :  discord.Option(str, choices = BLOCK_1D_COURSES), block1e :  discord.Option(str, choices = BLOCK_1E_COURSES), 
+async def setup_schedule(ctx: discord.ApplicationContext, grade : str, block1a : discord.Option(str, choices = BLOCK_1A_COURSES), block1b : discord.Option(str, choices = BLOCK_1B_COURSES), block1c :  discord.Option(str, choices = BLOCK_1C_COURSES), block1d :  discord.Option(str, choices = BLOCK_1D_COURSES), block1e :  discord.Option(str, choices = BLOCK_1E_COURSES), 
                          block2a : discord.Option(str, choices = BLOCK_2A_COURSES), block2b : discord.Option(str, choices = BLOCK_2B_COURSES), block2c : discord.Option(str, choices = BLOCK_2C_COURSES), block2d : discord.Option(str, choices = BLOCK_2D_COURSES), block2e : discord.Option(str, choices = BLOCK_2E_COURSES)):
    
     user_id = str(ctx.author.id)
@@ -82,6 +82,7 @@ async def setup_schedule(ctx: discord.ApplicationContext, block1a : discord.Opti
 
     schedule_data = {
         'Username' : username,
+        'Grade' : grade,
         'A1': block1a,
         'B1': block1b,
         'C1': block1c,

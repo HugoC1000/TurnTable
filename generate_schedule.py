@@ -7,7 +7,7 @@ from config import SCHEDULE_PATTERN
 def get_block_order_for_date(date_obj):
     # Define your schedule pattern, example provided    
     # Assuming the start date is September 4, 2024 (adjust as needed)
-    start_date = datetime(2024, 9, 4).date()
+    start_date = datetime(2024, 10, 1).date()
     delta_week_days = np.busday_count(start_date, date_obj)
     day_index = delta_week_days % len(SCHEDULE_PATTERN)
     
@@ -41,8 +41,8 @@ def create_schedules_for_dates(start_date, end_date):
         current_date += timedelta(days=1)
 
 # Define the start and end dates
-start_date = datetime(2024, 9, 23).date()
-end_date = datetime(2024, 9, 27).date()
+start_date = datetime(2024, 10, 1).date()
+end_date = datetime(2024, 10, 4).date()
 
 # Call the function to create schedules for the defined date range
 create_schedules_for_dates(start_date, end_date)
