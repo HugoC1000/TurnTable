@@ -3,7 +3,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
-from models import UserSchedule, SchoolSchedule, SchoolEvent  # Import models
+from models import UserSchedule, SchoolSchedule, SchoolEvent, Reminder  # Import models
 from datetime import datetime 
 import os
 from dotenv import load_dotenv
@@ -509,3 +509,131 @@ def get_school_events_for_date(date_str):
 # new_location = "SGS(Head to 2B class first)"
 
 # edit_school_event(old_event_name, new_location=new_location)
+
+
+def create_new_reminder_db(reminder_title, description, due_date_str, tag, class_block, class_name):
+    """
+    Create a new entry in the school_event table.
+    
+    Args:
+        reminder_title (str): Name of the reminder
+        description (str): Description of the reminder
+        due_date_str (str): Date in "YYYY-MM-DD" format.
+        tag (str): Either "Assignment", "Exam", "Project", or 'Uniform'
+        class_block (str): The block. i.e. 1A,1B,1C,1D,1E,2A...
+        class_name (str): Name of the course. 
+    """
+    
+    try: 
+        # Convert string date to a datetime object
+        date_obj = datetime.strptime(due_date_str, "%Y-%m-%d").date()
+    
+    except:
+        return "Error: date or times can not be converted into datetime object."
+        
+    try:
+        # Check if the date already exists
+        existing_reminder = session.query(Reminder).filter_by(reminder_title=reminder_title).first()
+        if existing_reminder:
+            print(f"Reminder {reminder_title} already exists in the database.")
+            return None
+
+        # Create a new Reminder entry
+        new_reminder = Reminder(
+            reminder_title = reminder_title,
+            text = description.strip(),
+            due_date =  date_obj,
+            tag = tag,
+            
+            class_block = class_block,
+            class_name = class_name
+        )
+        
+        # Add the new entry to the session and commit it to the database
+        session.add(new_reminder)
+        session.commit()
+        
+        print(f"New reminder '{reminder_title}' added successfully.")
+        return new_reminder
+
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred: {e}")
+        return None
+    
+def edit_reminder_db(reminder_id, user_changed, new_reminder_title =None, new_description =None, new_due_date_str =None, 
+                      new_tag =None, new_block=None, new_course_name=None):
+    """
+    Edit an existing school event entry in the school_event table.
+    
+    Args:
+        reminder_id (int): Reminder id of the reminder to be edited. 
+        reminder_title (str, optional): New name of the reminder. Defaults to None.
+        description (str, optional): New description. Defaults to None.
+        due_date_str (str, optional): Date in "YYYY-MM-DD" format. Defaults to None.
+        tag (str): New tag of the reminder. Must be Assignment, Exam, Project, Uniform, Other. Defaults to None.
+        block (str): New block of the class the reminder is related to. E.g. 1A,1B,1C etc. Defaults to None. 
+        course_name (str): New course name of the class the reminder is related to. Defaults to None. 
+        User changed(str): Username of the person who executed the command. 
+    
+    Returns:
+        The updated event or None if an error occurred.
+    """
+    try:
+        # Retrieve the existing event by the old event name
+        reminder = session.query(Reminder).filter_by(id=reminder_id).first()
+        
+        if not reminder:
+            print(f"No event found with id '{reminder_id}'")
+            return None
+        
+        # Update the reminder title if provided
+        if  new_reminder_title:
+            reminder.reminder_title = new_reminder_title
+        if new_description:
+            reminder.text = new_description
+        if new_due_date_str:
+            reminder.due_date = datetime.strptime(new_due_date_str, "%Y-%m-%d").date()
+        if new_tag:
+            reminder.tag = new_tag
+        if new_block:
+            reminder.class_block = new_block
+        if new_course_name:
+            reminder.class_name = new_course_name
+        
+        reminder.last_user_modified = user_changed
+        
+        # Commit the changes to the database
+        session.commit()
+        print(f"Reminder '{reminder.reminder_title}' updated successfully.")
+        return reminder
+
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred: {e}")
+        return None
+    
+def delete_reminder_db(reminder_id):
+    
+    """
+    Edit an existing school event entry in the school_event table.
+    
+    Args:
+        reminder_id (int): Reminder id of the reminder to be edited. 
+    Returns:
+        The updated event or None if an error occurred.
+    """
+    
+    
+    reminder = session.query(Reminder).filter_by(id=reminder_id).first()
+
+    # If no reminder is found, send an error message
+    if reminder is None:
+        return None
+
+    # Delete the reminder from the database
+    session.delete(reminder)
+    session.commit()
+
+    # Send a confirmation message
+    return reminder

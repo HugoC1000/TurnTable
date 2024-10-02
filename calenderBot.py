@@ -9,8 +9,8 @@ import random
 import asyncio
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
-from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date
+from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES, STAFF_DISCORD_IDS
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, create_new_reminder_db, edit_reminder_db, delete_reminder_db
 from database import modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event, get_school_events_for_date
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
 from games import RPSGame, BlackjackGame
@@ -630,9 +630,9 @@ async def edit_school_event_command(ctx: discord.ApplicationContext,
     
     # Send a response to the user
     if updated_event:
-        await ctx.send(f"Event '{current_event_name}' has been updated successfully.")
+        await ctx.respond(f"Event '{current_event_name}' has been updated successfully.")
     else:
-        await ctx.send(f"Failed to update event '{current_event_name}'.")
+        await ctx.respond(f"Failed to update event '{current_event_name}'.")
 
 print("runs?")
 
@@ -680,9 +680,86 @@ async def rps(ctx):
 async def blackjack(ctx):
     view = BlackjackGame(ctx)
     await view.update_embed()
+    
+reminder_cmds = bot.create_group("reminders", "Commands for reminders")
+@reminder_cmds.command(name="new", description="Add a grade level school event")
+async def new_reminder(ctx: discord.ApplicationContext, 
+                            reminder_title: discord.Option(str, description="Name of the reminder"),
+                            description: discord.Option(str, description="Describe the event. Be specific. You can also copy and paste from Wolfnet"), 
+                            due_date_str: discord.Option(str, description="Due date. YYYY-MM-DD"), 
+                            tag: discord.Option(str, choices = ['Assignment', 'Exam', 'Project', 'Uniform', 'Other']), 
+                            block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"]), 
+                            course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
+
+    
+    try:
+    
+        # Create the school event using the provided function
+        result = create_new_reminder_db(reminder_title, description, due_date_str, tag, block,course_name)
+        if result == "Error: date or times can not be converted into datetime object.":
+            await ctx.respond(f"Please ensure days are in YYYY-MM-DD and times are in HH:MM")
+        elif result:
+            await ctx.respond(f"Successfully added the event '{reminder_title}' due on {due_date_str} for {block} {course_name}.")
+        else:
+            await ctx.respond(f"Failed to add the event '{reminder_title}'. Please check the inputs and try again.")
+    
+    except ValueError as e:
+        await ctx.respond(f"Error in input: {e}")
+    except Exception as e:
+        await ctx.respond(f"An unexpected error occurred: {e}")
+        
+@reminder_cmds.command(name="edit", description="Edit attributes about a reminder given the reminder id")
+async def edit_reminder(ctx: discord.ApplicationContext, 
+                            reminder_id : discord.Option(int, description = "id of the reminder. Use /display reminders to see the id", required = True),
+                            reminder_title: discord.Option(str, description="Name of the reminder", required = False),
+                            description: discord.Option(str, description="Describe the event. Be specific. You can also copy and paste from Wolfnet", required = False), 
+                            due_date_str: discord.Option(str, description="Due date. YYYY-MM-DD", required = False), 
+                            tag: discord.Option(str, choices = ['Assignment', 'Exam', 'Project', 'Uniform', 'Other'], required = False), 
+                            block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"], description = "If changing this, make sure to change the course name option.", required = False), 
+                            course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block), description = "Use this with the course_name option", required = False)):
+
+    author_name = ctx.author.name
+    # Call the function to edit the school event
+    updated_reminder = edit_reminder_db(
+        reminder_id=reminder_id,
+        new_reminder_title = reminder_title, 
+        new_description = description, 
+        new_due_date_str = due_date_str,
+        new_tag = tag,
+        new_block = block,
+        new_course_name = course_name,
+        user_changed=author_name
+    )
+    
+    # Send a response to the user
+    if updated_reminder:
+        await ctx.respond(f"Reminder '{reminder_id}' has been updated successfully.")
+    else:
+        await ctx.respond(f"Failed to update reminder '{reminder_id}'.")
+        
+@reminder_cmds.command(name = "delete", description = "Delete a reminder. Can only be done by a staff")
+async def delete_reminder(ctx: discord.ApplicationContext, reminder_id : discord.Option(int, description = "Reminder id of the reminder to delete")):
+    
+    if(ctx.author.id not in STAFF_DISCORD_IDS):
+        await ctx.respond("Only doable by a staff member")
+        return
+    
+    reminder = delete_reminder_db(reminder_id)
+    
+    if reminder:
+        await ctx.respond(f"Reminder {reminder_id} succesfully deleted")
+    else:
+        await ctx.respond(f"An error occured. Reminder not found.") 
+
+
+    
+
+    
 @bot.event
 async def on_ready():
     print(f"{bot.user} is ready and online!")
+    
+    
 
 bot.run(DISCORD_TOKEN) # run the bot with the token
 

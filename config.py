@@ -203,3 +203,5 @@ BLOCK_2B_COURSES = ["AP Economics", "AP French", "AP Music Theory", "Chem 12", "
 BLOCK_2C_COURSES = ["AP Human Geo","AP Stats",  "Film/TV 11",  "French 10 Enr", "French 11 Enr", "French 12",  "Jazz Perf. 11", "Math 10",  "Mandarin 10", "Mandarin 11 Accel", "Physics 11", "Pre-AP Eng. 10", "Science 10H", "Socials 10", "Study Block"]
 BLOCK_2D_COURSES = ["Art Studio 10", "CLE", "Film/TV 11", "Life Science 11", "Pre-AP Eng. 10", "PC 12", "Study Block", "Web Dev 10"]
 BLOCK_2E_COURSES = ["20 Cent. History", "BC FP 12",  "Chem 11", "French 10", "Math 10", "Physics 11", "Physics 12", "PC 11", "Study Block", "Woodwork 10"]
+
+STAFF_DISCORD_IDS = [826334880455589918]
