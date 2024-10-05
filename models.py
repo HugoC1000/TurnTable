@@ -54,14 +54,19 @@ class SchoolEvent(Base):
 class Reminder(Base):
     __tablename__ = 'reminders'
     id = Column(Integer, primary_key=True)
-    reminder_title = Column(String, nullable = False)
+    reminder_title = Column(String, nullable=False)
     text = Column(String, nullable=False)
     due_date = Column(Date, nullable=False)
     tag = Column(String)  # e.g., "Assignment", "Exam", "Project", 'Uniform'
     last_user_modified = Column(String)
     
+    display_for = Column(String)  # "All", "Grade-Wide", "Specific Class"
+    
     class_block = Column(String)
     class_name = Column(String)
+    
+
+    grade = Column(Integer)
 
     
 class UserPreferences(Base):

@@ -511,84 +511,106 @@ def get_school_events_for_date(date_str):
 # edit_school_event(old_event_name, new_location=new_location)
 
 
-def create_new_reminder_db(reminder_title, description, due_date_str, tag, class_block, class_name):
+def create_new_reminder_db(reminder_title, description, due_date_str, tag, reminder_for, user_created, grade=None, class_block=None, class_name=None):
     """
-    Create a new entry in the school_event table.
+    Create a new entry in the reminders table.
     
     Args:
-        reminder_title (str): Name of the reminder
-        description (str): Description of the reminder
-        due_date_str (str): Date in "YYYY-MM-DD" format.
-        tag (str): Either "Assignment", "Exam", "Project", or 'Uniform'
-        class_block (str): The block. i.e. 1A,1B,1C,1D,1E,2A...
-        class_name (str): Name of the course. 
+        reminder_title (str): Title of the reminder.
+        description (str): Description of the reminder.
+        due_date_str (str): Due date in "YYYY-MM-DD" format.
+        tag (str): Either "Assignment", "Exam", "Project", or "Uniform".
+        display_for (str): Either "All", "Grade-Wide", "Specific Class".
+        user_created (str): Username of the person creating the reminder.
+        grade (int, optional): Grade level reminder (required if display_for is "Grade-Wide").
+        class_block (str, optional): The class block (required if display_for is "Specific Class").
+        class_name (str, optional): The course name (required if display_for is "Specific Class").
+    
+    Returns:
+        The newly created reminder or None if an error occurred.
     """
     
-    try: 
-        # Convert string date to a datetime object
-        date_obj = datetime.strptime(due_date_str, "%Y-%m-%d").date()
-    
-    except:
-        return "Error: date or times can not be converted into datetime object."
-        
     try:
-        # Check if the date already exists
+        # Convert the string date to a datetime object
+        due_date = datetime.strptime(due_date_str, "%Y-%m-%d").date()
+    except Exception as e:
+        print(f"Error: Could not convert due date '{due_date_str}' to a date object. Error: {e}")
+        return None
+    
+    try:
+        # Check if a reminder with the same title already exists
         existing_reminder = session.query(Reminder).filter_by(reminder_title=reminder_title).first()
         if existing_reminder:
-            print(f"Reminder {reminder_title} already exists in the database.")
+            print(f"Reminder '{reminder_title}' already exists in the database.")
             return None
-
-        # Create a new Reminder entry
+        
+        # Handle display_for logic
+        if reminder_for == "Grade-Wide" and grade is None:
+            raise ValueError("Grade must be specified when 'Grade-Wide' is selected.")
+        elif reminder_for == "Specific Class" and (class_block is None or class_name is None):
+            raise ValueError("Both class_block and class_name must be provided when 'Specific Class' is selected.")
+        elif reminder_for not in ["All", "Grade-Wide", "Specific Class"]:
+            raise ValueError(f"Invalid display_for value: '{reminder_for}'. Must be 'All', 'Grade-Wide', or 'Specific Class'.")
+        
+        # Create a new Reminder object
         new_reminder = Reminder(
-            reminder_title = reminder_title,
-            text = description.strip(),
-            due_date =  date_obj,
-            tag = tag,
-            
-            class_block = class_block,
-            class_name = class_name
+            reminder_title=reminder_title,
+            text=description.strip(),
+            due_date=due_date,
+            tag=tag,
+            display_for=reminder_for,
+            grade=grade if reminder_for == "Grade-Wide" else None,
+            class_block=class_block if reminder_for == "Specific Class" else None,
+            class_name=class_name if reminder_for == "Specific Class" else None,
+            last_user_modified=user_created  # Track who created the reminder
         )
         
-        # Add the new entry to the session and commit it to the database
+        # Add the new reminder to the session and commit to the database
         session.add(new_reminder)
         session.commit()
         
         print(f"New reminder '{reminder_title}' added successfully.")
         return new_reminder
 
+    except ValueError as ve:
+        print(f"Validation error: {ve}")
+        return None
     except Exception as e:
         session.rollback()  # Rollback in case of error
         print(f"An error occurred: {e}")
         return None
+
     
-def edit_reminder_db(reminder_id, user_changed, new_reminder_title =None, new_description =None, new_due_date_str =None, 
-                      new_tag =None, new_block=None, new_course_name=None):
+def edit_reminder_db(reminder_id, user_changed, new_reminder_title=None, new_description=None, new_due_date_str=None, 
+                      new_tag=None, new_reminder_for=None, new_grade=None, new_block=None, new_course_name=None):
     """
-    Edit an existing school event entry in the school_event table.
+    Edit an existing reminder entry in the reminders table.
     
     Args:
-        reminder_id (int): Reminder id of the reminder to be edited. 
-        reminder_title (str, optional): New name of the reminder. Defaults to None.
-        description (str, optional): New description. Defaults to None.
-        due_date_str (str, optional): Date in "YYYY-MM-DD" format. Defaults to None.
-        tag (str): New tag of the reminder. Must be Assignment, Exam, Project, Uniform, Other. Defaults to None.
-        block (str): New block of the class the reminder is related to. E.g. 1A,1B,1C etc. Defaults to None. 
-        course_name (str): New course name of the class the reminder is related to. Defaults to None. 
-        User changed(str): Username of the person who executed the command. 
+        reminder_id (int): ID of the reminder to be edited.
+        user_changed (str): Username of the person who executed the command.
+        new_reminder_title (str, optional): New title of the reminder. Defaults to None.
+        new_description (str, optional): New description of the reminder. Defaults to None.
+        new_due_date_str (str, optional): New due date in "YYYY-MM-DD" format. Defaults to None.
+        new_tag (str, optional): New tag of the reminder. Must be one of ["Assignment", "Exam", "Project", "Uniform", "Other"]. Defaults to None.
+        new_reminder_for (str, optional): Either "All", "Grade-Wide", or "Specific Class". Defaults to None.
+        new_grade (int, optional): Grade level reminder (required if display_for is "Grade-Wide"). Defaults to None.
+        new_block (str, optional): New class block, e.g., "1A", "2B", etc. (required if display_for is "Specific Class"). Defaults to None.
+        new_course_name (str, optional): New course name (required if display_for is "Specific Class"). Defaults to None.
     
     Returns:
-        The updated event or None if an error occurred.
+        The updated reminder or None if an error occurred.
     """
     try:
-        # Retrieve the existing event by the old event name
+        # Retrieve the existing reminder by ID
         reminder = session.query(Reminder).filter_by(id=reminder_id).first()
         
         if not reminder:
-            print(f"No event found with id '{reminder_id}'")
+            print(f"No reminder found with ID '{reminder_id}'")
             return None
         
-        # Update the reminder title if provided
-        if  new_reminder_title:
+        # Update the reminder fields if new values are provided
+        if new_reminder_title:
             reminder.reminder_title = new_reminder_title
         if new_description:
             reminder.text = new_description
@@ -596,11 +618,26 @@ def edit_reminder_db(reminder_id, user_changed, new_reminder_title =None, new_de
             reminder.due_date = datetime.strptime(new_due_date_str, "%Y-%m-%d").date()
         if new_tag:
             reminder.tag = new_tag
-        if new_block:
-            reminder.class_block = new_block
-        if new_course_name:
-            reminder.class_name = new_course_name
+        if new_reminder_for:
+            reminder.display_for = new_reminder_for
+            
+            # Handle changes based on display_for
+            if new_reminder_for == "Grade-Wide" and new_grade is not None:
+                reminder.grade = new_grade
+                reminder.class_block = None
+                reminder.class_name = None
+            elif new_reminder_for == "Specific Class" and new_block and new_course_name:
+                reminder.class_block = new_block
+                reminder.class_name = new_course_name
+                reminder.grade = None
+            elif new_reminder_for == "All":
+                reminder.grade = None
+                reminder.class_block = None
+                reminder.class_name = None
+            else:
+                raise ValueError("Invalid or incomplete information provided for 'display_for'.")
         
+        # Update the last user who modified the reminder
         reminder.last_user_modified = user_changed
         
         # Commit the changes to the database
@@ -612,6 +649,7 @@ def edit_reminder_db(reminder_id, user_changed, new_reminder_title =None, new_de
         session.rollback()  # Rollback in case of error
         print(f"An error occurred: {e}")
         return None
+
     
 def delete_reminder_db(reminder_id):
     

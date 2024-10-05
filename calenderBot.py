@@ -688,14 +688,34 @@ async def new_reminder(ctx: discord.ApplicationContext,
                             description: discord.Option(str, description="Describe the event. Be specific. You can also copy and paste from Wolfnet"), 
                             due_date_str: discord.Option(str, description="Due date. YYYY-MM-DD"), 
                             tag: discord.Option(str, choices = ['Assignment', 'Exam', 'Project', 'Uniform', 'Other']), 
-                            block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"]), 
-                            course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block))):
-
-    
+                            reminder_for : discord.Option(str, choices = ["All", "Grade-Wide", "Specific Class"], description= "If choosing a class, be sure to select the block and course_name option. "),
+                            grade: discord.Option(int, description= "Only select this if you selected a grade for the reminder_for option", required = False),
+                            block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"], description= "Only select this if you selected a class for the reminder_for option", required = False), 
+                            course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block), description= "Only select this if you selected a grade for the reminder_for option", required = False)):
+    author_name = ctx.author.name
+    if (course_name is not None or block is not None or grade is not None) and reminder_for == "All":
+        await ctx.respond(f"Your 'reminder_for' value is 'All'. Please do not fill any of the fields for grade, course_name, or block.")
+        return
+    elif grade is not None and reminder_for != "Grade-Wide":
+        await ctx.respond(f"You selected the grade. Please change the 'reminder_for' value to 'Grade-Wide")
+        return
+    elif (course_name is not None or block is not None) and reminder_for != "Specific Class":
+        await ctx.respond(f"You filled in course_name or block. If this what you intend to do, Please change the 'reminder_for' value to 'Specific Class'.")
+        return
+    elif reminder_for == "Grade-Wide" and grade is None:
+        await ctx.respond("Grade must be specified when 'Grade-Wide' is selected.")
+        return
+    elif reminder_for == "Specific Class" and (block is None or course_name is None):
+        await ctx.respond("Both class_block and class_name must be provided when 'Specific Class' is selected.")
+        return
+    elif reminder_for not in ["All", "Grade-Wide", "Specific Class"]:
+        await ctx.respond(f"Invalid display_for value: '{reminder_for}'. Must be 'All', 'Grade-Wide', or 'Specific Class'.")
+        return
+        
     try:
     
         # Create the school event using the provided function
-        result = create_new_reminder_db(reminder_title, description, due_date_str, tag, block,course_name)
+        result = create_new_reminder_db(reminder_title, description, due_date_str, tag, reminder_for, author_name, grade, block,course_name)
         if result == "Error: date or times can not be converted into datetime object.":
             await ctx.respond(f"Please ensure days are in YYYY-MM-DD and times are in HH:MM")
         elif result:
@@ -715,9 +735,27 @@ async def edit_reminder(ctx: discord.ApplicationContext,
                             description: discord.Option(str, description="Describe the event. Be specific. You can also copy and paste from Wolfnet", required = False), 
                             due_date_str: discord.Option(str, description="Due date. YYYY-MM-DD", required = False), 
                             tag: discord.Option(str, choices = ['Assignment', 'Exam', 'Project', 'Uniform', 'Other'], required = False), 
-                            block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"], description = "If changing this, make sure to change the course name option.", required = False), 
-                            course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block), description = "Use this with the course_name option", required = False)):
+                            reminder_for : discord.Option(str, choices = ["All", "Grade-Wide", "Specific Class"], description= "If choosing a class, be sure to select the block and course_name option. ", required = False),
+                            grade: discord.Option(int, description= "Only select this if you selected a grade for the reminder_for option", required = False),
+                            block: discord.Option(str, choices=["1A", "1B", "1C", "1D", "1E", "2A", "2B", "2C", "2D", "2E"], description= "Only select this if you selected a class for the reminder_for option", required = False), 
+                            course_name: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(get_courses_from_block), description= "Only select this if you selected a grade for the reminder_for option", required = False)):
 
+    if (course_name is not None or block is not None or grade is not None) and reminder_for == "All":
+        await ctx.respond(f"Your 'reminder_for' value is 'All'. Please do not fill any of the fields for grade, course_name, or block.")
+        return
+    elif grade is not None and reminder_for != "Grade-Wide":
+        await ctx.respond(f"You selected the grade. Please change the 'reminder_for' value to 'Grade-Wide")
+        return
+    elif (course_name is not None or block is not None) and reminder_for != "Specific Class":
+        await ctx.respond(f"You filled in course_name or block. If this what you intend to do, please change the 'reminder_for' value to 'Specific Class'.")
+        return
+    elif reminder_for == "Grade-Wide" and grade is None:
+        await ctx.respond("Grade must be specified when 'Grade-Wide' is selected.")
+        return
+    elif reminder_for == "Specific Class" and (block is None or course_name is None):
+        await ctx.respond("Both class_block and class_name must be provided when 'Specific Class' is selected.")
+        return
+        
     author_name = ctx.author.name
     # Call the function to edit the school event
     updated_reminder = edit_reminder_db(
@@ -726,6 +764,8 @@ async def edit_reminder(ctx: discord.ApplicationContext,
         new_description = description, 
         new_due_date_str = due_date_str,
         new_tag = tag,
+        new_reminder_for=reminder_for,
+        new_grade = grade,
         new_block = block,
         new_course_name = course_name,
         user_changed=author_name
@@ -741,7 +781,7 @@ async def edit_reminder(ctx: discord.ApplicationContext,
 async def delete_reminder(ctx: discord.ApplicationContext, reminder_id : discord.Option(int, description = "Reminder id of the reminder to delete")):
     
     if(ctx.author.id not in STAFF_DISCORD_IDS):
-        await ctx.respond("Only doable by a staff member")
+        await ctx.respond("Only deletable by a staff member")
         return
     
     reminder = delete_reminder_db(reminder_id)
