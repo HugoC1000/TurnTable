@@ -675,3 +675,39 @@ def delete_reminder_db(reminder_id):
 
     # Send a confirmation message
     return reminder
+
+def get_relevant_reminders(user_id, user_courses, user_grade):
+    """
+    Retrieve reminders that are relevant to a user based on their grade and enrolled courses.
+
+    Args:
+        user_id (int): The ID of the user whose reminders need to be fetched.
+        user_courses()
+        user_grade
+    
+    Returns:
+        List[Reminder]: A list of reminders relevant to the user.
+    """
+
+    try:
+        # Retrieve reminders visible to all users
+        all_reminders = session.query(Reminder).filter_by(display_for="All").all()
+
+        # Retrieve reminders for the user's grade
+        grade_wide_reminders = session.query(Reminder).filter_by(display_for="Grade-Wide", grade=user_grade).all()
+
+        # Retrieve class-specific reminders based on the user's enrolled courses
+        class_specific_reminders = []
+        for course in user_courses:
+            block = course['class_block']
+            name = course['class_name']
+            course_reminders = session.query(Reminder).filter_by(display_for="Specific Class", class_block=block, class_name=name).all()
+            class_specific_reminders.extend(course_reminders)
+
+        # Combine all the relevant reminders into a single list
+        relevant_reminders = all_reminders + grade_wide_reminders + class_specific_reminders
+        return relevant_reminders
+
+    except Exception as e:
+        print(f"An error occurred while retrieving reminders: {e}")
+        return []

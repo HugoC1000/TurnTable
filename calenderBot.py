@@ -10,7 +10,7 @@ import asyncio
 
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES, STAFF_DISCORD_IDS
-from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, create_new_reminder_db, edit_reminder_db, delete_reminder_db
+from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, create_new_reminder_db, edit_reminder_db, delete_reminder_db, get_relevant_reminders
 from database import modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event, get_school_events_for_date
 from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
 from games import RPSGame, BlackjackGame
@@ -792,8 +792,18 @@ async def delete_reminder(ctx: discord.ApplicationContext, reminder_id : discord
         await ctx.respond(f"An error occured. Reminder not found.") 
 
 
+@reminder_cmds.command(name = "display all", description = "Display all reminders")
+async def display_all(ctx: discord.ApplicationContext):
+    user_id = str(ctx.author.id)
+    today = datetime.now().date()
     
-
+    # Fetch the user schedule
+    user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
+    user_courses = get_user_courses(user_schedule)
+    user_grade = user_schedule.grade
+    
+    users_reminders = get_relevant_reminders(user_id, user_courses, user_grade)
+    
     
 @bot.event
 async def on_ready():
