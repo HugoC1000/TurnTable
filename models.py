@@ -73,9 +73,9 @@ class UserPreferences(Base):
     __tablename__ = 'user_preferences'
     
     id = Column(Integer, primary_key=True)
-    user_schedule_id = Column(Integer, ForeignKey('user_schedules.id'), nullable=False)
-    notification_method = Column(String, nullable=False)  # 'None', 'DM', 'Channel'
-    notification_time = Column(Time, nullable=False)  # Time of day when the user wants to be notified
+    discord_id = Column(String, unique=True, nullable=False)
+    notification_method = Column(String, nullable=True)  # 'None', 'DM'
+    notification_time = Column(Time, nullable=True)  # Time of day when the user wants to be notified
     
 DB_URL = os.getenv("CORRECT_DATABASE_URL")
 engine = create_engine(DB_URL)

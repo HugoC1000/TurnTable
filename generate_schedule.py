@@ -41,8 +41,8 @@ def create_schedules_for_dates(start_date, end_date):
         current_date += timedelta(days=1)
 
 # Define the start and end dates
-start_date = datetime(2024, 10, 1).date()
-end_date = datetime(2024, 10, 4).date()
+start_date = datetime(2024, 10, 7).date()
+end_date = datetime(2024, 10, 11).date()
 
 # Call the function to create schedules for the defined date range
 create_schedules_for_dates(start_date, end_date)

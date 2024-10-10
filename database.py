@@ -3,7 +3,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
-from models import UserSchedule, SchoolSchedule, SchoolEvent, Reminder  # Import models
+from models import UserSchedule, SchoolSchedule, SchoolEvent, Reminder, UserPreferences  # Import models
 from datetime import datetime 
 import os
 from dotenv import load_dotenv
@@ -28,6 +28,7 @@ def get_or_create_user_schedule(discord_id, username=None):
         user_schedule = UserSchedule(discord_id=discord_id, username=username or "Placeholder")
         session.add(user_schedule)
         session.commit()
+    # print("Entered this succesfully")
     return user_schedule
 
 def change_one_block(user_id,username,block,course_name):  
@@ -433,7 +434,7 @@ def edit_school_event(old_event_name, new_event_name=None, new_date_str=None, ne
         print(f"An error occurred: {e}")
         return None
 
-def delete_school_event(event_name):
+def delete_school_event_db(event_name):
     """
     Delete a school event entry from the school_event table.
     
@@ -494,7 +495,7 @@ def get_school_events_for_date(date_str):
     except Exception as e:
         print(f"An error occurred while retrieving events: {e}")
         return []
-    
+
 # event_name = "University Fair"
 # date_str = "2024-09-19"  # Assuming tomorrow is 2024-09-13
 # block_order_override = ["2B"]
@@ -651,7 +652,7 @@ def edit_reminder_db(reminder_id, user_changed, new_reminder_title=None, new_des
         return None
 
     
-def delete_reminder_db(reminder_id):
+def delete_reminder_db(school_event_name):
     
     """
     Edit an existing school event entry in the school_event table.
@@ -663,20 +664,20 @@ def delete_reminder_db(reminder_id):
     """
     
     
-    reminder = session.query(Reminder).filter_by(id=reminder_id).first()
+    event = session.query(Reminder).filter_by(Event_name =school_event_name).first()
 
     # If no reminder is found, send an error message
-    if reminder is None:
+    if event is None:
         return None
 
     # Delete the reminder from the database
-    session.delete(reminder)
+    session.delete(event)
     session.commit()
 
     # Send a confirmation message
-    return reminder
+    return event
 
-def get_relevant_reminders(user_id, user_courses, user_grade):
+def get_reminders_for_user(user_id, user_courses, user_grade):
     """
     Retrieve reminders that are relevant to a user based on their grade and enrolled courses.
 
@@ -698,10 +699,9 @@ def get_relevant_reminders(user_id, user_courses, user_grade):
 
         # Retrieve class-specific reminders based on the user's enrolled courses
         class_specific_reminders = []
-        for course in user_courses:
-            block = course['class_block']
-            name = course['class_name']
-            course_reminders = session.query(Reminder).filter_by(display_for="Specific Class", class_block=block, class_name=name).all()
+        for block, course in user_courses.items():
+            print(block, course)
+            course_reminders = session.query(Reminder).filter_by(display_for="Specific Class", class_block=block, class_name=course).all()
             class_specific_reminders.extend(course_reminders)
 
         # Combine all the relevant reminders into a single list
@@ -709,5 +709,108 @@ def get_relevant_reminders(user_id, user_courses, user_grade):
         return relevant_reminders
 
     except Exception as e:
+        session.rollback() 
         print(f"An error occurred while retrieving reminders: {e}")
         return []
+    
+
+def get_reminders_for_user_on_date(user_id, date, user_courses, user_grade):
+    """
+    Retrieve reminders relevant to a user for tomorrow's date, based on their grade and enrolled courses.
+
+    Args:
+        user_id (int): The ID of the user whose reminders need to be fetched.
+        user_courses (dict): A dictionary of the user's enrolled courses.
+        user_grade (int): The user's grade level.
+
+    Returns:
+        List[Reminder]: A list of reminders relevant to the user for tomorrow.
+    """
+    try:
+
+        # Retrieve reminders visible to all users and due tomorrow
+        all_reminders = session.query(Reminder).filter_by(display_for="All", due_date=date).all()
+
+        # Retrieve reminders for the user's grade and due tomorrow
+        grade_wide_reminders = session.query(Reminder).filter_by(display_for="Grade-Wide", grade=user_grade, due_date=date).all()
+
+        # Retrieve class-specific reminders based on the user's enrolled courses and due tomorrow
+        class_specific_reminders = []
+        for block, course in user_courses.items():
+            # print(block, course)
+            course_reminders = session.query(Reminder).filter_by(display_for="Specific Class", class_block=block, class_name=course, due_date=date).all()
+            # print(date)
+            class_specific_reminders.extend(course_reminders)
+
+        # Combine all the relevant reminders into a single list
+        relevant_reminders = all_reminders + grade_wide_reminders + class_specific_reminders
+        # print(relevant_reminders)
+        return relevant_reminders
+
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred while retrieving the reminders for {date}: {e}")
+        return []
+
+def delete_uniform_reminder(date_obj):
+    """
+    Deletes the uniform reminder for a given date if it exists.
+
+    Args:
+        date_obj (datetime.date): The date of the reminder to be deleted.
+
+    Returns:
+        bool: True if a reminder was deleted, False otherwise.
+    """
+    try:
+        # Query the reminder by date, tag, and display_for
+        reminder = session.query(Reminder).filter_by(due_date=date_obj, tag="Uniform", display_for="All").first()
+        
+        if reminder:
+            # Delete the reminder if found
+            session.delete(reminder)
+            session.commit()
+            return True
+        return False  # No reminder found for the given date
+    
+    except Exception as e:
+        session.rollback()  # Rollback in case of error
+        print(f"An error occurred while deleting the uniform reminder: {e}")
+        return False
+
+
+def get_user_pref():
+    try:
+        user_preferences = session.query(UserPreferences).all()
+        return user_preferences
+
+    except Exception as e:
+        print(f"An error occurred while retrieving reminders: {e}")
+        return []
+    
+def set_user_pref(discord_id, notification_time = None, notification_method = None):
+    try: 
+        user_preferences = session.query(UserPreferences).filter_by(discord_id=discord_id).first()
+
+        if not user_preferences:
+            new_setting = UserPreferences(
+                notification_method = notification_method,
+                notification_time = notification_time,
+                discord_id = discord_id,
+            )
+            
+            session.add(new_setting)        
+        else:
+            if notification_time:
+                user_preferences.notification_time = notification_time
+            if notification_method:
+                user_preferences.notification_method = notification_method
+   
+        session.commit()
+        print(f"Setting  updated successfully.")
+        return 1
+        
+    except Exception as e:
+        print(f"An error occurred while setting user preferences: {e}")
+        return []
+        
