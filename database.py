@@ -664,7 +664,7 @@ def delete_reminder_db(reminder_id):
     """
     
     
-    event = session.query(Reminder).filter_by(reminder_id =reminder_id).first()
+    event = session.query(Reminder).filter_by(id =reminder_id).first()
 
     # If no reminder is found, send an error message
     if event is None:
