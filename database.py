@@ -652,7 +652,7 @@ def edit_reminder_db(reminder_id, user_changed, new_reminder_title=None, new_des
         return None
 
     
-def delete_reminder_db(school_event_name):
+def delete_reminder_db(reminder_id):
     
     """
     Edit an existing school event entry in the school_event table.
@@ -664,7 +664,7 @@ def delete_reminder_db(school_event_name):
     """
     
     
-    event = session.query(Reminder).filter_by(Event_name =school_event_name).first()
+    event = session.query(Reminder).filter_by(reminder_id =reminder_id).first()
 
     # If no reminder is found, send an error message
     if event is None:
