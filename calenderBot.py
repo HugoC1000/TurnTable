@@ -824,7 +824,7 @@ async def display_all(ctx: discord.ApplicationContext):
     user_id = str(ctx.author.id)
     today = datetime.date(datetime.now())
     tomorrow = today + timedelta(days=1)
-    
+
     # Fetch the user schedule
     user_schedule = get_or_create_user_schedule(user_id, username=str(ctx.author))
     user_courses = get_user_courses(user_schedule)
@@ -855,6 +855,9 @@ async def display_all(ctx: discord.ApplicationContext):
         start_index = page * reminders_per_page
         end_index = start_index + reminders_per_page
         for reminder in users_reminders[start_index:end_index]:
+            if reminder.due_date < today:
+                delete_reminder_db(reminder.id)
+                continue
             if reminder.due_date == today:
                 due_date_display = "Due: **TODAY**"
             elif reminder.due_date == tomorrow:
@@ -915,6 +918,9 @@ async def get_tomorrow_reminders(ctx: discord.ApplicationContext):
         start_index = page * reminders_per_page
         end_index = start_index + reminders_per_page
         for reminder in users_reminders[start_index:end_index]:
+            if reminder.due_date < today:
+                delete_reminder_db(reminder.id)
+                continue
             embed.add_field(
                 name=f"# __{reminder.reminder_title}__ (Due: TOMORROW)",
                 value=(
@@ -968,6 +974,9 @@ async def get_today_reminders(ctx: discord.ApplicationContext):
         start_index = page * reminders_per_page
         end_index = start_index + reminders_per_page
         for reminder in users_reminders[start_index:end_index]:
+            if reminder.due_date < today:
+                delete_reminder_db(reminder.id)
+                continue
             embed.add_field(
                 name=f"# __{reminder.reminder_title}__ (Due: TODAY)",
                 value=(
