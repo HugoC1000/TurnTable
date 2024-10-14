@@ -496,21 +496,6 @@ def get_school_events_for_date(date_str):
         print(f"An error occurred while retrieving events: {e}")
         return []
 
-# event_name = "University Fair"
-# date_str = "2024-09-19"  # Assuming tomorrow is 2024-09-13
-# block_order_override = ["2B"]
-# grades = [10]
-# location = "Saint Georges"
-# start_time_str = "09:35"
-# end_time_str = "11:15"
-
-# create_new_school_event(event_name, date_str, block_order_override, grades, location, start_time_str, end_time_str)
-# old_event_name = "CUE Fair"
-# new_event_name = "CUE Fair"
-# new_location = "SGS(Head to 2B class first)"
-
-# edit_school_event(old_event_name, new_location=new_location)
-
 
 def create_new_reminder_db(reminder_title, description, due_date_str, tag, reminder_for, user_created, grade=None, class_block=None, class_name=None):
     """
@@ -813,4 +798,5 @@ def set_user_pref(discord_id, notification_time = None, notification_method = No
     except Exception as e:
         print(f"An error occurred while setting user preferences: {e}")
         return []
-        
+
+set_user_pref("826334880455589918", notification_time="19:09")

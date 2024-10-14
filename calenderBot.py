@@ -1050,10 +1050,10 @@ async def send_notification_dm(discord_id, reminders):
 
 @tasks.loop(seconds = 60) # repeat after every 10 seconds
 async def send_reminders():
-    # print("Enteres 1")
+    print("Enteres 1")
     # Fetch all reminders that are due today
     while not bot.is_closed():
-        # print("Enters 2")
+        print("Enters 2")
         # print("hi")
         now = datetime.now()
         current_time = now.strftime("%H:%M")  # Format current time as 'HH:MM'
@@ -1073,7 +1073,7 @@ async def send_reminders():
                 continue
             
             if user_pref.notification_method == 'DM':
-                # print("Enters 3")
+                print("Enters 3")
                 # print(current_time)
                 user_schedule = get_or_create_user_schedule(user_pref.discord_id)
                 user_courses = get_user_courses(user_schedule)
@@ -1084,6 +1084,20 @@ async def send_reminders():
                     if user_reminders:
                         # print("Enters 5")
                         await send_notification_dm(user_pref.discord_id, user_reminders)
+                    else:
+                        embed = discord.Embed(
+                            title="Reminder Notification",
+                            description="Here are your reminders for tomorrow:",
+                            color=discord.Colour.blue(),
+                        )
+                        embed.add_field(
+                            name="You don't have any reminders for tomomrrow! To see other future reminders, use /reminder display",
+                            inline=False
+                        )
+                        discord_user = await bot.fetch_user(int(user_pref.discord_id))
+                        channel = await discord_user.create_dm()
+                        await channel.send(embed=embed)
+        
 
         await asyncio.sleep(60)  # Check every minute
 
