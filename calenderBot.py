@@ -1067,7 +1067,7 @@ async def send_reminders():
         # await channel.send("Hi")
         
 
-
+        
         for user_pref in user_preferences:
             if user_pref.notification_method == None or user_pref.notification_time == None:
                 continue
@@ -1075,31 +1075,33 @@ async def send_reminders():
             if user_pref.notification_method == 'DM':
                 print("Enters 3")
                 # print(current_time)
-                user_schedule = get_or_create_user_schedule(user_pref.discord_id)
-                user_courses = get_user_courses(user_schedule)
-                user_grade = int(user_schedule.grade)
-                if user_pref.notification_time.strftime("%H:%M") == current_time:
-                    # print("Enters 4")
-                    user_reminders = get_reminders_for_user_on_date(user_pref.discord_id,tomorrow, user_courses, user_grade)
-                    if user_reminders:
-                        # print("Enters 5")
-                        await send_notification_dm(user_pref.discord_id, user_reminders)
-                    else:
-                        embed = discord.Embed(
-                            title="Reminder Notification",
-                            description="Here are your reminders for tomorrow:",
-                            color=discord.Colour.blue(),
-                        )
-                        embed.add_field(
-                            name="You don't have any reminders for tomomrrow! To see other future reminders, use /reminder display",
-                            inline=False
-                        )
-                        discord_user = await bot.fetch_user(int(user_pref.discord_id))
-                        channel = await discord_user.create_dm()
-                        await channel.send(embed=embed)
-        
-
-        await asyncio.sleep(60)  # Check every minute
+                try: 
+                    user_schedule = get_or_create_user_schedule(user_pref.discord_id)
+                    user_courses = get_user_courses(user_schedule)
+                    user_grade = int(user_schedule.grade)
+                    if user_pref.notification_time.strftime("%H:%M") == current_time:
+                        print("Enters 4")
+                        user_reminders = get_reminders_for_user_on_date(user_pref.discord_id,tomorrow, user_courses, user_grade)
+                        if user_reminders:
+                            print("Enters 5")
+                            await send_notification_dm(user_pref.discord_id, user_reminders)
+                        else:
+                            embed = discord.Embed(
+                                title="Reminder Notification",
+                                description="Here are your reminders for tomorrow:",
+                                color=discord.Colour.blue(),
+                            )
+                            embed.add_field(
+                                name="You don't have any reminders for tomomrrow! To see other future reminders, use /reminder display",
+                                inline=False
+                            )
+                            discord_user = await bot.fetch_user(int(user_pref.discord_id))
+                            channel = await discord_user.create_dm()
+                            await channel.send(embed=embed)
+                except:
+                    print(f"An error occured for {user_pref.discord_id}")
+                    
+        await asyncio.sleep(60)
 
 
 
