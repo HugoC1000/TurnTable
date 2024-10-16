@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
 from models import UserSchedule, SchoolSchedule, SchoolEvent, Reminder, UserPreferences  # Import models
-from datetime import datetime 
+from datetime import datetime, time
 import os
 from dotenv import load_dotenv
 
@@ -799,4 +799,3 @@ def set_user_pref(discord_id, notification_time = None, notification_method = No
         print(f"An error occurred while setting user preferences: {e}")
         return []
 
-set_user_pref("826334880455589918", notification_time="19:09")
