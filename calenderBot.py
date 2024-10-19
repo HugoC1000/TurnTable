@@ -1098,8 +1098,8 @@ async def send_reminders():
                             discord_user = await bot.fetch_user(int(user_pref.discord_id))
                             channel = await discord_user.create_dm()
                             await channel.send(embed=embed)
-                except:
-                    print(f"An error occured for {user_pref.discord_id}")
+                except Exception as e:
+                    print(f"An error occured for {user_pref.discord_id}: {e}")
                     
         await asyncio.sleep(60)
 
