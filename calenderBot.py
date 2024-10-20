@@ -1092,7 +1092,8 @@ async def send_reminders():
                                 color=discord.Colour.blue(),
                             )
                             embed.add_field(
-                                name="You don't have any reminders for tomomrrow! To see other future reminders, use /reminder display",
+                                name="You don't have any reminders for tomomrrow!",
+                                value = "To see other future reminders, use /reminder display",
                                 inline=False
                             )
                             discord_user = await bot.fetch_user(int(user_pref.discord_id))
