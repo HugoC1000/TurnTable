@@ -799,4 +799,4 @@ def set_user_pref(discord_id, notification_time = None, notification_method = No
         print(f"An error occurred while setting user preferences: {e}")
         return []
 
-set_user_pref("826334880455589918", notification_time="23:09")
+set_user_pref("826334880455589918", notification_time="17:09")

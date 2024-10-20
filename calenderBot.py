@@ -1073,8 +1073,8 @@ async def send_reminders():
                 continue
             
             if user_pref.notification_method == 'DM':
-                # print("Enters 3")
-                # print(current_time)
+                print("Enters 3")
+                print(current_time)
                 try: 
                     user_schedule = get_or_create_user_schedule(user_pref.discord_id)
                     user_courses = get_user_courses(user_schedule)
