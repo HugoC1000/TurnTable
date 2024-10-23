@@ -73,16 +73,26 @@ async def change(ctx: discord.ApplicationContext, block: discord.Option(str, cho
     else:
         await ctx.respond("An error occured")
 
-@schedule_cmds.command(name = "setup", description = "Set up your schedule here!")
-async def setup_schedule(ctx: discord.ApplicationContext, grade : str, block1a : discord.Option(str, choices = BLOCK_1A_COURSES), block1b : discord.Option(str, choices = BLOCK_1B_COURSES), block1c :  discord.Option(str, choices = BLOCK_1C_COURSES), block1d :  discord.Option(str, choices = BLOCK_1D_COURSES), block1e :  discord.Option(str, choices = BLOCK_1E_COURSES), 
-                         block2a : discord.Option(str, choices = BLOCK_2A_COURSES), block2b : discord.Option(str, choices = BLOCK_2B_COURSES), block2c : discord.Option(str, choices = BLOCK_2C_COURSES), block2d : discord.Option(str, choices = BLOCK_2D_COURSES), block2e : discord.Option(str, choices = BLOCK_2E_COURSES)):
-   
-    user_id = str(ctx.author.id)
-    username = ctx.author.name
-
+async def setup_schedule(ctx: discord.ApplicationContext, 
+                         grade : str, 
+                         block1a : discord.Option(str, choices = BLOCK_1A_COURSES), 
+                         block1b : discord.Option(str, choices = BLOCK_1B_COURSES), 
+                         block1c : discord.Option(str, choices = BLOCK_1C_COURSES), 
+                         block1d : discord.Option(str, choices = BLOCK_1D_COURSES), 
+                         block1e : discord.Option(str, choices = BLOCK_1E_COURSES), 
+                         block2a : discord.Option(str, choices = BLOCK_2A_COURSES), 
+                         block2b : discord.Option(str, choices = BLOCK_2B_COURSES), 
+                         block2c : discord.Option(str, choices = BLOCK_2C_COURSES), 
+                         block2d : discord.Option(str, choices = BLOCK_2D_COURSES), 
+                         block2e : discord.Option(str, choices = BLOCK_2E_COURSES)):
+    
+    user_id = str(ctx.author.id)  # Discord ID of the user
+    username = ctx.author.name    # Username of the user
+    
+    # Create a dictionary to store the schedule data
     schedule_data = {
-        'Username' : username,
-        'Grade' : grade,
+        'Username': username,
+        'Grade': grade,
         'A1': block1a,
         'B1': block1b,
         'C1': block1c,
@@ -94,10 +104,17 @@ async def setup_schedule(ctx: discord.ApplicationContext, grade : str, block1a :
         'D2': block2d,
         'E2': block2e
     }
+    
     print("About to print schedule data")
     print(schedule_data)
-    save_user_schedule(user_id, schedule_data)
-    await ctx.respond("Schedule saved!")
+    
+    # Call save_user_schedule with the user ID, username, grade, and schedule data
+    try: 
+        save_user_schedule(user_id, username, grade, schedule_data)
+        await ctx.respond("Schedule saved!")
+    except:
+        await ctx.respond("Something went wrong. ")
+
 
 
 @bot.slash_command(name = "people_in_class", description = "Gives a list of people who are in the class specified")
@@ -1065,8 +1082,7 @@ async def send_reminders():
         # channel = await discord_user.create_dm()
         # print(channel)
         # await channel.send("Hi")
-        
-
+    
         
         for user_pref in user_preferences:
             if user_pref.notification_method == None or user_pref.notification_time == None:
@@ -1097,6 +1113,7 @@ async def send_reminders():
                                 value = "To see other future reminders, use /reminder display",
                                 inline=False
                             )
+                            print(user_pref.discord_id)
                             discord_user = await bot.fetch_user(int(user_pref.discord_id))
                             channel = await discord_user.create_dm()
                             await channel.send(embed=embed)

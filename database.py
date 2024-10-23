@@ -47,16 +47,61 @@ def change_one_block(user_id,username,block,course_name):
     except:
         return 0
 
-def save_user_schedule(discord_id, schedule_data):
-    user = session.query(UserSchedule).filter_by(discord_id=discord_id).first()
-    if not user:
-        user = UserSchedule(discord_id=discord_id, username="Placeholder")
-        session.add(user)
+def save_user_schedule(user_id, username, grade, schedule_data):
+    """
+    Saves or updates a user's schedule in the database.
+
+    Parameters:
+    - user_id (str): The Discord ID of the user, used to uniquely identify the schedule.
+    - username (str): The Discord username of the user.
+    - grade (str): The user's grade level (e.g., 'g10' for Grade 10).
+    - schedule_data (dict): A dictionary containing the user's schedule for different blocks. 
+      Expected keys are 'A1', 'B1', 'C1', 'D1', 'E1', 'A2', 'B2', 'C2', 'D2', 'E2'.
+
+    Behavior:
+    - If a schedule already exists for the given user, it updates the existing schedule with the new data.
+    - If no schedule exists, a new entry is created and saved in the database.
+    - This function commits the changes to the database after the operation.
+    """
+    # Check if the user already has a schedule saved
+    existing_schedule = session.query(UserSchedule).filter_by(discord_id=user_id).first()
     
-    for block, course in schedule_data.items():
-        setattr(user, block, course)
-    
+    if existing_schedule:
+        # Update the existing schedule
+        existing_schedule.username = username
+        existing_schedule.grade = grade
+        existing_schedule.A1 = schedule_data['A1']
+        existing_schedule.B1 = schedule_data['B1']
+        existing_schedule.C1 = schedule_data['C1']
+        existing_schedule.D1 = schedule_data['D1']
+        existing_schedule.E1 = schedule_data['E1']
+        existing_schedule.A2 = schedule_data['A2']
+        existing_schedule.B2 = schedule_data['B2']
+        existing_schedule.C2 = schedule_data['C2']
+        existing_schedule.D2 = schedule_data['D2']
+        existing_schedule.E2 = schedule_data['E2']
+    else:
+        # Create a new user schedule
+        new_schedule = UserSchedule(
+            discord_id=user_id,
+            username=username,
+            grade=grade,
+            A1=schedule_data['A1'],
+            B1=schedule_data['B1'],
+            C1=schedule_data['C1'],
+            D1=schedule_data['D1'],
+            E1=schedule_data['E1'],
+            A2=schedule_data['A2'],
+            B2=schedule_data['B2'],
+            C2=schedule_data['C2'],
+            D2=schedule_data['D2'],
+            E2=schedule_data['E2']
+        )
+        session.add(new_schedule)
+
+    # Commit the changes to the database
     session.commit()
+
 
 def get_same_class(block, course_name):
     # Convert the block format (e.g., '1A' to 'A1') Colums in database are in A1,B1,C1, etc
@@ -798,5 +843,3 @@ def set_user_pref(discord_id, notification_time = None, notification_method = No
     except Exception as e:
         print(f"An error occurred while setting user preferences: {e}")
         return []
-
-set_user_pref("826334880455589918", notification_time="17:30")
