@@ -52,6 +52,7 @@ def get_block_times_for_date(date):
     return school_info.block_times
 
 def get_ap_flex_courses_for_date(date):
+    date = date.strftime("%Y-%m-%d")
     
     # Check if the date exists in the AP Flex schedule
     if date in AP_FLEX:
@@ -78,8 +79,8 @@ def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_c
     """Generate the final schedule output for the day."""
     courses = []
     max_whitespace = get_max_whitespace(schedule, user_courses, ap_flex_courses, user_grade, school_events)
-    print("Whitespace: ")
-    print(max_whitespace)
+    # print("Whitespace: ")
+    # print(max_whitespace)
     i=0
     
     for slot in schedule:
@@ -137,10 +138,16 @@ def determine_course_name_for_slot(slot, user_courses, ap_flex_courses,user_grad
 
 
 def handle_advisory(slot, user_advisory, ap_flex_courses, user_courses, alt_rooms):
+    # print("Entered 1A")
     """Handle the advisory block, including AP Flex check."""
     if ap_flex_courses:
+        # print("Entered 1B")
         matching_courses = [course for course in user_courses.values() if course in ap_flex_courses]
+        # print("Matching courses: ")
+        # print(matching_courses)
+        
         if len(matching_courses) == 1:
+            # print("F: " + matching_courses[0], ap_flex_courses[matching_courses[0]])
             return ("F: " + matching_courses[0], ap_flex_courses[matching_courses[0]])
         elif len(matching_courses) > 1:
             return ("AP Flex conflict", "")
@@ -176,16 +183,16 @@ def get_room_for_slot(slot, course, alt_rooms):
 def format_schedule_entry(time, course_info, max_whitespace):
     """Format a schedule entry with aligned whitespace."""
     course, room = course_info
-    print("Format schedule entry")
-    print(course)
-    print(room)
-    print(max_whitespace)
+    # print("Format schedule entry")
+    # print(course)
+    # print(room)
+    # print(max_whitespace)
     return f"{time}  {course}{' ' * (max_whitespace - len(course))}{room}"
 
 
 def is_advisory(slot):
     """Check if the slot is an advisory block."""
-    return slot in ['1C(PA)', '1C(P)', '1C(A)']
+    return slot in ['1C(PA)', '1C(P)', '1C(A)','1C']
 
 def get_next_course(user_schedule, schedule, block_times, alt_rooms, ap_flex_courses, user_courses, user_grade, school_events):
     """Generate the final schedule output for the day."""
