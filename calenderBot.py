@@ -73,6 +73,7 @@ async def change(ctx: discord.ApplicationContext, block: discord.Option(str, cho
     else:
         await ctx.respond("An error occured")
 
+@schedule_cmds.command(name="setup", description="Setup to use TurnTables")
 async def setup_schedule(ctx: discord.ApplicationContext, 
                          grade : str, 
                          block1a : discord.Option(str, choices = BLOCK_1A_COURSES), 
