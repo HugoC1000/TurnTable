@@ -1104,20 +1104,21 @@ async def send_reminders():
                             # print("Enters 5")
                             await send_notification_dm(user_pref.discord_id, user_reminders)
                         else:
-                            embed = discord.Embed(
-                                title="Reminder Notification",
-                                description="Here are your reminders for tomorrow:",
-                                color=discord.Colour.blue(),
-                            )
-                            embed.add_field(
-                                name="You don't have any reminders for tomomrrow!",
-                                value = "To see other future reminders, use /reminder display",
-                                inline=False
-                            )
-                            print(user_pref.discord_id)
-                            discord_user = await bot.fetch_user(int(user_pref.discord_id))
-                            channel = await discord_user.create_dm()
-                            await channel.send(embed=embed)
+                            # embed = discord.Embed(
+                            #     title="Reminder Notification",
+                            #     description="Here are your reminders for tomorrow:",
+                            #     color=discord.Colour.blue(),
+                            # )
+                            # embed.add_field(
+                            #     name="You don't have any reminders for tomomrrow!",
+                            #     value = "To see other future reminders, use /reminder display",
+                            #     inline=False
+                            # )
+                            # print(user_pref.discord_id)
+                            # discord_user = await bot.fetch_user(int(user_pref.discord_id))
+                            # channel = await discord_user.create_dm()
+                            # await channel.send(embed=embed)
+                            pass
                 except Exception as e:
                     print(f"An error occured for {user_pref.discord_id}: {e}")
                     
