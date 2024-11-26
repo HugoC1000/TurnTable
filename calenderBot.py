@@ -11,8 +11,8 @@ import asyncio
 from config import CUSTOM_BLOCK_TIMES, CUSTOM_BLOCK_ORDERS, SPECIAL_UNIFORM_DATES, SCHEDULE_PATTERN, DAYS_OFF, CUSTOM_DAYS_OFF, TIME_SLOTS, SCHEDULE_START, ROOMS_FOR_COURSES
 from config import BLOCK_1A_COURSES,BLOCK_1B_COURSES,BLOCK_1C_COURSES,BLOCK_1D_COURSES, BLOCK_1E_COURSES, BLOCK_2A_COURSES, BLOCK_2B_COURSES, BLOCK_2C_COURSES, BLOCK_2D_COURSES, BLOCK_2E_COURSES, STAFF_DISCORD_IDS
 from database import get_or_create_user_schedule, save_user_schedule, get_same_class, compare_schedule, get_school_info_from_date, create_new_reminder_db, edit_reminder_db, delete_reminder_db, get_reminders_for_user, get_user_pref, set_user_pref, delete_uniform_reminder, delete_school_event_db, get_reminders_for_user_on_date
-from database import modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event, get_school_events_for_date
-from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course
+from database import modify_or_create_new_date, edit_uniform_for_date,edit_block_order_for_date, edit_block_times_for_date, add_or_update_alternate_room, change_one_block, create_new_school_event, edit_school_event, get_school_events_for_date, get_server_pref, set_server_pref
+from schedule import is_day_off, get_blocks_for_date, get_block_times_for_date, get_uniform_for_date, get_alt_rooms_for_date,get_ap_flex_courses_for_date, generate_schedule, get_user_courses, has_set_courses, get_next_course    
 from games import RPSGame, BlackjackGame
 # Load environment variables from .env file
 load_dotenv()
@@ -1150,6 +1150,15 @@ async def set_notification_time(ctx: discord.ApplicationContext, notification_ti
     if result:
         await ctx.respond(f"**Notification time set to {notification_time}.** If you are setting notifications for the first time, make sure to edit notification_method as well. ")
     
+@preferences_cmds.command(name="set_downtime", description="Set downtime")
+async def set_downtime(ctx: discord.ApplicationContext, downtime_activated: discord.Option(bool), downtime_start_time: discord.Option(int), downtime_end_time: discord.Option(int)):
+    server_id = ctx.guild.id
+    result = set_server_pref(server_id, downtime_activated, downtime_start_time, downtime_end_time)
+    
+    if result:
+        await ctx.respond(f"**Downtime set to {downtime_activated} from {downtime_start_time} to {downtime_end_time}.**")
+    else:
+        await ctx.respond("**Failed to set downtime.**")
 
 
 @bot.event
@@ -1158,7 +1167,28 @@ async def on_ready():
     
     bot.loop.create_task(send_reminders())
     
+
+@bot.event
+async def on_message(message):
+    # Ignore messages sent by the bot itself
+    if message.author == bot.user:
+        return
+    server_id = message.guild.id
+    # Get the current time
+    now = datetime.now()
+    current_hour = now.hour
     
+    server_pref = get_server_pref(server_id)        
+    if server_pref and server_pref.downtime_activated:
+        # Extract just the hour from the time objects for comparison
+        start_hour = server_pref.downtime_start_time.hour if server_pref.downtime_start_time else None
+        end_hour = server_pref.downtime_end_time.hour if server_pref.downtime_end_time else None
+        
+        if start_hour is not None and end_hour is not None:
+            if current_hour >= start_hour and current_hour < end_hour:
+                await message.channel.send("Go to sleep!")
+
+
 
 bot.run(DISCORD_TOKEN) # run the bot with the token
 

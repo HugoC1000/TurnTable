@@ -5,6 +5,7 @@ from config import SCHEDULE_PATTERN
 
 
 def get_block_order_for_date(date_obj):
+
     # Define your schedule pattern, example provided    
     # Assuming the start date is September 4, 2024 (adjust as needed)
     start_date = datetime(2024, 10, 19).date()

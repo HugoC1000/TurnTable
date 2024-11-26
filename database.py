@@ -3,7 +3,7 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import psycopg2
-from models import UserSchedule, SchoolSchedule, SchoolEvent, Reminder, UserPreferences  # Import models
+from models import UserSchedule, SchoolSchedule, SchoolEvent, Reminder, UserPreferences,ServerPreferences  # Import models
 from datetime import datetime, time
 import os
 from dotenv import load_dotenv
@@ -843,3 +843,51 @@ def set_user_pref(discord_id, notification_time = None, notification_method = No
     except Exception as e:
         print(f"An error occurred while setting user preferences: {e}")
         return []
+
+def get_server_pref(server_id):
+    # Convert server_id to string
+    server_id = str(server_id)
+    try:
+        server_preferences = session.query(ServerPreferences).filter_by(server_id=server_id).first()
+        return server_preferences
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred while getting server preferences: {e}")
+        return None
+
+def set_server_pref(server_id, downtime_activated, downtime_start_time, downtime_end_time):
+    try:
+        # Convert server_id to string
+        server_id = str(server_id)
+        
+        # Convert integer hours to time objects
+        start_time = time(hour=downtime_start_time, minute=0) if downtime_start_time is not None else None
+        end_time = time(hour=downtime_end_time, minute=0) if downtime_end_time is not None else None
+
+        server_preferences = session.query(ServerPreferences).filter_by(server_id=server_id).first()
+        if not server_preferences:
+            new_setting = ServerPreferences(
+                downtime_activated=downtime_activated,
+                downtime_start_time=start_time,
+                downtime_end_time=end_time,
+                server_id=server_id,
+            )
+            
+            session.add(new_setting)        
+        else:
+            if downtime_activated is not None:
+                server_preferences.downtime_activated = downtime_activated
+            if start_time is not None:
+                server_preferences.downtime_start_time = start_time
+            if end_time is not None:
+                server_preferences.downtime_end_time = end_time
+   
+        session.commit()
+        print(f"Setting updated successfully.")
+        return 1
+        
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred while setting server preferences: {e}")
+        return 0
+    

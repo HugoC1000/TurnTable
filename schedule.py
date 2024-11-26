@@ -82,6 +82,8 @@ def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_c
     # print("Whitespace: ")
     # print(max_whitespace)
     i=0
+    print(block_times)
+    print(schedule)
     
     for slot in schedule:
         if block_times[i] == "-":
@@ -101,7 +103,7 @@ def generate_schedule(user_schedule, schedule, block_times, alt_rooms, ap_flex_c
 
         courses.append(format_schedule_entry(block_times[i], course_info, max_whitespace))
         i += 1
-        
+    print(courses)        
         
 
     return courses

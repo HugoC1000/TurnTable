@@ -77,6 +77,17 @@ class UserPreferences(Base):
     notification_method = Column(String, nullable=True)  # 'None', 'DM'
     notification_time = Column(Time, nullable=True)  # Time of day when the user wants to be notified
     
+class ServerPreferences(Base):
+    __tablename__ = 'server_preferences'
+    
+    id = Column(Integer, primary_key=True)
+    server_id = Column(String, unique=True, nullable=False)
+    admin_role_id = Column(String, nullable=True)  # ID of the admin role for the server
+    downtime_activated = Column(Boolean, nullable=False)
+    downtime_start_time = Column(Time, nullable=False)
+    downtime_end_time = Column(Time, nullable=False)
+
+    
 DB_URL = os.getenv("CORRECT_DATABASE_URL")
 engine = create_engine(DB_URL)
 # Create the tables in the database
