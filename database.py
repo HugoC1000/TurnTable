@@ -860,9 +860,9 @@ def set_server_pref(server_id, downtime_activated, downtime_start_time, downtime
         # Convert server_id to string
         server_id = str(server_id)
         
-        # Convert integer hours to time objects
-        start_time = time(hour=downtime_start_time, minute=0) if downtime_start_time is not None else None
-        end_time = time(hour=downtime_end_time, minute=0) if downtime_end_time is not None else None
+        # Convert HH:MM strings to time objects
+        start_time = datetime.strptime(downtime_start_time, "%H:%M").time() if downtime_start_time is not None else None
+        end_time = datetime.strptime(downtime_end_time, "%H:%M").time() if downtime_end_time is not None else None
 
         server_preferences = session.query(ServerPreferences).filter_by(server_id=server_id).first()
         if not server_preferences:

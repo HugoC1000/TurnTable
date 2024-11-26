@@ -1150,15 +1150,25 @@ async def set_notification_time(ctx: discord.ApplicationContext, notification_ti
     if result:
         await ctx.respond(f"**Notification time set to {notification_time}.** If you are setting notifications for the first time, make sure to edit notification_method as well. ")
     
-@preferences_cmds.command(name="set_downtime", description="Set downtime")
-async def set_downtime(ctx: discord.ApplicationContext, downtime_activated: discord.Option(bool), downtime_start_time: discord.Option(int), downtime_end_time: discord.Option(int)):
-    server_id = ctx.guild.id
-    result = set_server_pref(server_id, downtime_activated, downtime_start_time, downtime_end_time)
-    
-    if result:
-        await ctx.respond(f"**Downtime set to {downtime_activated} from {downtime_start_time} to {downtime_end_time}.**")
-    else:
-        await ctx.respond("**Failed to set downtime.**")
+@preferences_cmds.command(name="set_downtime", description="Set server downtime")
+async def set_downtime(
+    ctx: discord.ApplicationContext,
+    activated: discord.Option(bool, description="Enable/disable downtime"),
+    start_time: discord.Option(str, description="Start time (HH:MM)"),
+    end_time: discord.Option(str, description="End time (HH:MM)")
+):
+    try:
+        # Validate time format
+        datetime.strptime(start_time, "%H:%M")
+        datetime.strptime(end_time, "%H:%M")
+        
+        status = set_server_pref(ctx.guild.id, activated, start_time, end_time)
+        if status == 1:
+            await ctx.respond("Downtime settings updated successfully!")
+        else:
+            await ctx.respond("Failed to update downtime settings.")
+    except ValueError:
+        await ctx.respond("Invalid time format. Please use HH:MM (e.g., 23:00)")
 
 
 @bot.event
@@ -1176,17 +1186,23 @@ async def on_message(message):
     server_id = message.guild.id
     # Get the current time
     now = datetime.now()
-    current_hour = now.hour
+    current_time = now.time()  # Get full time object instead of just hour
     
     server_pref = get_server_pref(server_id)        
     if server_pref and server_pref.downtime_activated:
-        # Extract just the hour from the time objects for comparison
-        start_hour = server_pref.downtime_start_time.hour if server_pref.downtime_start_time else None
-        end_hour = server_pref.downtime_end_time.hour if server_pref.downtime_end_time else None
+        start_time = server_pref.downtime_start_time
+        end_time = server_pref.downtime_end_time
         
-        if start_hour is not None and end_hour is not None:
-            if current_hour >= start_hour and current_hour < end_hour:
-                await message.channel.send("Go to sleep!")
+        if start_time is not None and end_time is not None:
+            # Handle case where downtime spans across midnight
+            if start_time > end_time:
+                # If current time is after start OR before end, it's downtime
+                if current_time >= start_time or current_time < end_time:
+                    await message.channel.send("Go to sleep!")
+            else:
+                # Normal case: if current time is between start and end
+                if current_time >= start_time and current_time < end_time:
+                    await message.channel.send("Go to sleep!")
 
 
 
