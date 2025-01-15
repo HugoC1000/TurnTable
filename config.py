@@ -1,6 +1,6 @@
 from datetime import datetime
 
-SCHEDULE_START = datetime(2024, 9, 4).date()
+SCHEDULE_START = datetime(2025, 1, 13).date()
 # Time slots
 TIME_SLOTS = ["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"]
 
@@ -136,56 +136,56 @@ AP_FLEX = {
     "AP Pysch": "Dining Hall",
     "AP Environmental Science": "208"
   },
-  "2024-01-15": {
+  "2025-01-15": {
     "AP Stats": "031E",
     "AP English Lit": "021W",
     "AP Music Theory": "JS"
   },
-  "2024-01-23": {
+  "2025-01-23": {
     "AP Calculus AB": "110",
     "AP Calculus BC": "122"
   },
-  "2024-01-31": {
+  "2025-01-31": {
     "AP Physics": "206",
     "AP Human Geo": "Dining Hall",
     "AP Chem": "204"
   },
-  "2024-02-18": {
+  "2025-02-18": {
     "AP English Lan": "216"
   },
-  "2024-02-24": {
+  "2025-02-24": {
     "AP Biology": "208",
     "AP Modern World": "108",
     "AP Chinese": "023W"
   },
-  "2024-02-28": {
+  "2025-02-28": {
     "AP Stats": "031E",
     "AP English Lit": "021W",
     "AP Music Theory": "JS"
   },
-  "2024-03-06": {
+  "2025-03-06": {
     "AP Pysch": "Dining Hall",
     "AP Environmental Science": "110"
   },
-  "2024-03-31": {
+  "2025-03-31": {
     "AP Calculus AB": "204",
     "AP Calculus BC": "216"
   },
-  "2024-04-04": {
+  "2025-04-04": {
     "AP Biology": "210",
     "AP Modern World": "200",
     "AP Chinese": "203"
   },
-  "2024-04-14": {
+  "2025-04-14": {
     "AP Stats": "032E",
     "AP English Lit": "108",
     "AP Music Theory": "JS"
   },
-  "2024-04-22": {
+  "2025-04-22": {
     "AP Pysch": "Dining Hall",
     "AP Environmental Science": "215"
   },
-  "2024-04-28": {
+  "2025-04-28": {
     "AP Physics": "110",
     "AP Human Geo": "Dining Hall",
     "AP Chem": "112"

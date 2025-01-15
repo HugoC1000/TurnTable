@@ -1,87 +1,10 @@
 import re
 from datetime import datetime
 from database import modify_or_create_new_date
+import json
 
 # Original schedule data
 schedule_data = """
-Tue, Sep 3	G8 Assm	SS Assm	Day 2 shortened classes		
-Wed, Sep 4	1A	1B	1Cap	1D	1E
-Thu, Sep 5	2A	2B	2C	2D	2E
-Fri, Sep 6	1A	1B	1Cap	1D	1E
-Mon, Sep 9	2A	2B	2D	2E	2C
-Tue, Sep 10	1A	1B	1E	2E	1D
-Wed, Sep 11	2A	2B	2E	2C	2D
-Thu, Sep 12	1A	1B	1Ca	1D	1E
-Fri, Sep 13	2A	2B	2C	2D	TFR
-Mon, Sep 16	1A	1B	1D	1E	1Cp
-Tue, Sep 17	2A	2B	2D	2E	2C
-Wed, Sep 18	1A	1B	1E	2D	1D
-Thu, Sep 19	2A	2B	2E	2C	
-Fri, Sep 20	1A	1B	1Ca	1D	1E
-Mon, Sep 23	2A	2B	2C	2D	2E
-Tue, Sep 24	1A	1B	1D	1E	1Cp
-Wed, Sep 25	2A	2B	2D	2E	2C
-Thu, Sep 26	1A	1B	1E	2E	1D
-Fri, Sep 27	2A	2B	ASSM	2C	2D
-Mon, Sep 30					
-Tue, Oct 1	1A	1B	1Ca	1D	1E
-Wed, Oct 2	2A	2B	2C	2D	2E
-Thu, Oct 3	1A	1B	1D	1E	1Cp
-Fri, Oct 4	2A	2B	2D	2E	2C
-Mon, Oct 7	1A	1B	1E	1Ca	1D
-Tue, Oct 8	2A	2B	2E	2C	2D
-Wed, Oct 9	1A	1B	1Cp	1D	1E
-Thu, Oct 10	2A	2B	2C	2D	2E
-Fri, Oct 11	1A	1B	1D	1E	
-Mon, Oct 14					
-Tue, Oct 15	2A	2B	2D	2E	2C
-Wed, Oct 16	1A	1B	1E	1Ca	1D
-Thu, Oct 17	2A	2B	2E	2C	2D
-Fri, Oct 18	1A	1B	1Cp	1D	1E
-Mon, Oct 21	2A	2B	2C	2D	2E
-Tue, Oct 22	1A	1B	1D	1E	1Ca
-Wed, Oct 23	2A	2B	2D	2E	2C
-Thu, Oct 24	1A	1B	1E	1Cp	1D
-Fri, Oct 25					
-Mon, Oct 28	2A	2B	2E	2C	2D
-Tue, Oct 29	1A	1B	1Ca	1D	1E
-Wed, Oct 30	2A	2B	2C	2D	2E
-Thu, Oct 31	1A	1B	1D	1E	2C
-Fri, Nov 1		2A	2B	2D	2E
-Mon, Nov 4	1A	1B	1E	1Cp	1D
-Tue, Nov 5	2A	2B	2E	2C	2D
-Wed, Nov 6	1A	1B	1Ca	1D	1E
-Thu, Nov 7	2A	2B	2C	2D	2E
-Fri, Nov 8	1A	1B	1D	ASSM	1E
-Mon, Nov 11					
-Tue, Nov 12					
-Wed, Nov 13					
-Thu, Nov 14					
-Fri, Nov 15					
-Mon, Nov 18	2A	2B	2D	2E	2C
-Tue, Nov 19	1A	1B	1E	2D	1D
-Wed, Nov 20	2A	2B	2E	2C	
-Thu, Nov 21					
-Fri, Nov 22	1A	1B	1Cp	1D	1E
-Mon, Nov 25	2A	2B	2C	2D	2E
-Tue, Nov 26	1A	1B	1D	1E	1Ca
-Wed, Nov 27	2A	2B	2D	2E	2C
-Thu, Nov 28	1A	1B	1E	1Cp	1D
-Fri, Nov 29	2A	2B	2E	2C	2D
-Mon, Dec 2	1A	1B	1Ca	1D	1E
-Tue, Dec 3	2A	2B	2C	2D	2E
-Wed, Dec 4	1A	1B	1D	1E	1Cp
-Thu, Dec 5	2A	2B	2D	2E	2C
-Fri, Dec 6	1A	1B	1E	1D	
-Mon, Dec 9	2A	2B	2E	2C	2D
-Tue, Dec 10	1A	1B	1Ca	1D	1E
-Wed, Dec 11	2A	2B	2C	2D	2E
-Thu, Dec 12	1A	1B	1D	1E	
-Fri, Dec 13	2A	2B	2D	2E	2C
-Mon, Dec 16	1A	1B	1E	1Cp	1D
-Tue, Dec 17	2A	2B	2E	2C	2D
-Wed, Dec 18	1A	1B	2E	1D	1E
-Thu, Dec 19	2A	2B	2C	2D	ASSEMBLY
 Mon, Jan 13	1A	1B	1D	1E	1Ca
 Tue, Jan 14	2A	2B	2D	2E	2C
 Wed, Jan 15	1A	1B	1E	1Cp	1D
@@ -105,9 +28,7 @@ Fri, Feb 7	2A	2B	2D	2E	2C
 Mon, Feb 10	1A	1B	1E	1Ca	1D
 Tue, Feb 11	2A	2B	2E	2C	2D
 Wed, Feb 12	1A	1B	2E	1D	1E
-Thu, Feb 13	2A	2B	2C	2D	
-Fri, Feb 14					
-Mon, Feb 17					
+Thu, Feb 13	2A	2B	2C	2D				
 Tue, Feb 18	1A	1B	1D	1E	1Cp
 Wed, Feb 19	2A	2B	2D	2E	2C
 Thu, Feb 20	1A	1B	1E	1Ca	1D
@@ -124,19 +45,11 @@ Thu, Mar 6	1A	1B	1D	1E	1Cp
 Fri, Mar 7	2A	2B	2D	2E	2C
 Mon, Mar 10	1A	1B	1E	1Ca	1D
 Tue, Mar 11	2A	2B	2E	2C	2D
-Wed, Mar 12	1A	1B	 	1D	1E
-Thu, Mar 13	2A	2B	2C	2D	Assm
-Fri, Mar 14	ProD Half Day				
-Mon, Mar 17	Spring Break				
-Tue, Mar 18	Spring Break				
-Wed, Mar 19	Spring Break				
-Thu, Mar 20	Spring Break				
-Fri, Mar 21	Spring Break				
-Mon, Mar 24	Spring Break				
-Tue, Mar 25	Spring Break				
-Wed, Mar 26	Spring Break				
-Thu, Mar 27	Spring Break				
-Fri, Mar 28	Spring Break				
+Wed, Mar 12	1A	1B	2E	1D	1E
+Thu, Mar 13	2A	2B	2C	2D	Assm							
+"""
+
+term3 = """
 Mon, Mar 31	1A	1B	1D	1E	1Cp
 Tue, Apr 1	2A	2B	2D	2E	2C
 Wed, Apr 2	1A	1B	1E	1Ca	1D
@@ -151,8 +64,6 @@ Mon, Apr 14	1A	1B	1Cp	1D	1E
 Tue, Apr 15	2A	2B	2C	2D	2E
 Wed, Apr 16	1A	1B	1D	1E	1Ca
 Thu, Apr 17	2A	2B	2D	2E	2C
-Fri, Apr 18					
-Mon, Apr 21					
 Tue, Apr 22	1A	1B	1E	1Cp	1D
 Wed, Apr 23	2A	2B	2E	2C	2D
 Thu, Apr 24	1A	1B	1Ca	1D	1E
@@ -172,7 +83,6 @@ Tue, May 13	2A	2B	2C	2D	2E
 Wed, May 14	1A	1B	1D	1E	1Ca
 Thu, May 15	2A	2B	2D	2E	2C
 Fri, May 16	1A	1B	1E	1D	
-Mon, May 19					
 Tue, May 20	2A	2B	2E	2C	2D
 Wed, May 21	1A	1B	1D	1E	Assm
 Thu, May 22	2A	2B	2C	2D	2E
@@ -191,8 +101,7 @@ Mon, Jun 9	Math Exams and Make-up day
 Tue, Jun 10	2A	2B	2C	2D	2E
 Wed, Jun 11	1A	1B	1D	1E	Final Assembly
 Thu, Jun 12	SS Sports Day				
-Fri, Jun 13	Half Day for faculty (report cards due)						
-...
+Fri, Jun 13	Half Day for faculty (report cards due)	
 """
 
 data = [
@@ -276,22 +185,74 @@ data = [
     {"date": "19-12-2024", "block1": "2A", "block2": "2B", "block3": "2C", "block4": "2D", "block5": "school_event"}
 ]
 
+def format_date(date_str):
+    import datetime
+    date_obj = datetime.datetime.strptime(date_str, "%b %d %Y")
+    return date_obj.strftime("%m-%d-%Y")
+
+def parse_schedule_to_json(raw_data):
+    result = []
+    for line in raw_data.strip().split("\n"):
+        # Split by whitespace and tabs, then remove empty entries
+        parts = [part.strip() for part in line.split() if part.strip()]
+        if not parts:
+            continue
+
+        # Parse date and blocks
+        print(parts[1], parts[2])
+        date_str = parts[1] + " " + parts[2] + " 2025"
+        blocks = parts[3:]
+
+        entry = {"date": format_date(date_str)}
+        for i, block in enumerate(blocks):
+            if block.strip():
+                if block == "Assm":
+                    entry[f"block{i + 1}"] = "1C(PA)"
+                elif block == "1Cp":
+                    entry[f"block{i + 1}"] = "1C(P)"
+                elif block == "1Ca":
+                    entry[f"block{i + 1}"] = "1C(A)"
+                else:
+                    entry[f"block{i + 1}"] = block.strip()
+
+        result.append(entry)
+
+    return result
+
+term2data = parse_schedule_to_json(schedule_data)
+# print(term2data)
 
 def upload_schedule_to_db(schedule_data):
     for entry in schedule_data:
+        print(entry)
         date_str = entry['date']
-        blocks = [entry['block1'], entry['block2'], entry['block3'], entry['block4'], entry['block5']]
+        try:
+            blocks = [entry['block1'], entry['block2'], entry['block3'], entry['block4'], entry['block5']]
+        except:
+            blocks = [entry['block1'], entry['block2'], entry['block3'], entry['block4']]
         
         # Convert date to a datetime object
-        date_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
+        date_obj = datetime.strptime(date_str, "%m-%d-%Y").date()
         
         # Define block times for this day
-        block_times_list = ["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"]
+        if(len(blocks) == 4):
+            if(date_str == "04-30-2025" or date_str == "05-27-2025"):
+                block_times_list = ["09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"]
+            else:
+                block_times_list = ["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15"]
+        else:
+            block_times_list = ["08:20-09:30", "09:35-10:45", "-", "11:05-12:15", "-", "13:05-14:15", "14:20-15:30"]
+
+        ceremonialDates = ["01-13-2025", "01-27-2025", "02-04-2025", "02-05-2025", "02-06-2025", "02-18-2025", "03-13-2025"]
+        if(date_str in ceremonialDates):
+            uniform = "Ceremonial"
+        else:
+            uniform = "Regular uniform"
         
         # Modify or create new date entry in the database
         result = modify_or_create_new_date(
             date_obj, 
-            "Regular uniform",  # Assume uniform is "Regular uniform" for now
+            uniform,
             True,  # Assuming it's a school day
             blocks,  # The list of blocks for the day
             block_times_list  # The block times for the day
@@ -303,4 +264,5 @@ def upload_schedule_to_db(schedule_data):
             print(f"Failed to process schedule for {date_obj}.")
 
 # Call the function to upload the schedule
-upload_schedule_to_db(data)
+upload_schedule_to_db(term2data)
+

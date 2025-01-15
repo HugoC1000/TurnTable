@@ -149,7 +149,7 @@ def handle_advisory(slot, user_advisory, ap_flex_courses, user_courses, alt_room
         # print(matching_courses)
         
         if len(matching_courses) == 1:
-            # print("F: " + matching_courses[0], ap_flex_courses[matching_courses[0]])
+            print("F: " + matching_courses[0], ap_flex_courses[matching_courses[0]])
             return ("F: " + matching_courses[0], ap_flex_courses[matching_courses[0]])
         elif len(matching_courses) > 1:
             return ("AP Flex conflict", "")

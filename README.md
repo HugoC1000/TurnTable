@@ -3,6 +3,13 @@
 
 A Discord bot that helps students and staff manage their school schedules, reminders, and notifications.
 
+## Strings
+
+Uniform: 
+Ceremonial = "Ceremonial"
+Regular uniform = "Regular uniform"
+
+
 ## Features
 
 ### Schedule Management
