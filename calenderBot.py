@@ -499,7 +499,7 @@ async def set_block_order(ctx: discord.ApplicationContext, date_str : discord.Op
     elif status == None:
         await ctx.respond(f"An error occured. ")
 
-@date_cmds.command(name="block_times", description="Set the uniform for a specific day")
+@date_cmds.command(name="block_times", description="Set the block times for a specific day")
 async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), block_times_str: discord.Option(str, description= "Block times seperated by commas. Use dash for recess and lunch. Use default for default block times.")):
     """
     Set the uniform for a given date.
@@ -534,7 +534,7 @@ async def set_block_times(ctx: discord.ApplicationContext, date_str: discord.Opt
         await ctx.respond(f"An error occured. ")    
         
 @date_cmds.command(name="general", description="Set the all the info for a specific day")
-async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), uniform: str, is_school: bool, block_order: discord.Option(str, description= "Block order seperated by commas"), block_times: discord.Option(str, description= "Block times seperated by comma. Type default for 'default' times")):
+async def update_schedule(ctx: discord.ApplicationContext, date_str: discord.Option(str, description= "YYYY-MM-DD"), uniform: str, is_school: bool, block_order: discord.Option(str, description= "Block order seperated by commas"), block_times: discord.Option(str, description= "Block times seperated by comma.E.g 08:20-09:30,-,09:45-10:45.Type 'default' for usual times")):
     """
     Update or create a schedule entry for a given date.
     
