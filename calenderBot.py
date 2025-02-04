@@ -661,15 +661,15 @@ async def edit_school_event_command(ctx: discord.ApplicationContext,
 
 
 @school_event_cmds.command(name = "delete", description = "Delete a school event. Can only be done by a staff")
-async def delete_school_event(ctx: discord.ApplicationContext, school_event_name : discord.Option(int, description = "Exact id of the school event to delete(case sensitive)")):
+async def delete_school_event(ctx: discord.ApplicationContext, school_event_name : discord.Option(str, description = "Exact id of the school event to delete(case sensitive)")):
 
     if(ctx.author.id not in STAFF_DISCORD_IDS):
         await ctx.respond("Only deletable by a staff member")
         return
     
-    reminder = delete_reminder_db(school_event_name)
+    school_event = delete_school_event_db(school_event_name)
     
-    if reminder:
+    if school_event :
         await ctx.respond(f"School event {school_event_name} succesfully deleted")
     else:
         await ctx.respond(f"An error occured. Reminder not found.") 
