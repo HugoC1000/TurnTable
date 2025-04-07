@@ -9,6 +9,8 @@ Uniform:
 Ceremonial = "Ceremonial"
 Regular uniform = "Regular uniform"
 
+Date strings inputted into discord: 08:20-09:30,09:35-10:45,-,11:05-12:15,-,13:05-14:15,14:20-15:30
+
 
 ## Features
 
